@@ -1,0 +1,12 @@
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\bin\Debug\net7.0\StudentManagementAPI.DataContext.deps.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\bin\Debug\net7.0\StudentManagementAPI.DataContext.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\bin\Debug\net7.0\StudentManagementAPI.DataContext.pdb
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.csproj.AssemblyReference.cache
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.GeneratedMSBuildEditorConfig.editorconfig
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.AssemblyInfoInputs.cache
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.AssemblyInfo.cs
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.csproj.CoreCompileInputs.cache
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\refint\StudentManagementAPI.DataContext.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.pdb
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\ref\StudentManagementAPI.DataContext.dll
