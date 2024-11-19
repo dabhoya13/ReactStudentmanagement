@@ -154,14 +154,14 @@ namespace StudentManagementAPI.Controllers
                             var result = methodInfo.Invoke(controller, new object[] { value });
                             var actionResult = (ActionResult<APIResponse>)result;
                             _response = actionResult.Value;
-                            return _response;
+                            return Ok(_response);
                         }
                         else
                         {
                             var result = methodInfo.Invoke(controller, null);
                             var actionResult = (ActionResult<APIResponse>)result;
                             _response = actionResult.Value;
-                            return _response;
+                            return Ok(_response);
                         }
 
                     }
@@ -170,7 +170,8 @@ namespace StudentManagementAPI.Controllers
                         _response.ErroMessages = new List<string> { "Method Or Controller Invalid" };
                         _response.IsSuccess = false;
                         _response.StatusCode = HttpStatusCode.NotFound;
-                        return _response;
+                        return StatusCode(StatusCodes.Status400BadRequest,_response);
+
                     }
                 }
                 else
@@ -178,7 +179,7 @@ namespace StudentManagementAPI.Controllers
                     _response.ErroMessages = new List<string> { "Controller Invalid" };
                     _response.IsSuccess = false;
                     _response.StatusCode = HttpStatusCode.BadRequest;
-                    return _response;
+                    return StatusCode(StatusCodes.Status400BadRequest, _response);
                 }
 
             }
@@ -187,7 +188,8 @@ namespace StudentManagementAPI.Controllers
                 _response.ErroMessages = new List<string> { ex.Message };
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
-                return _response;
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
+
             }
         }
 

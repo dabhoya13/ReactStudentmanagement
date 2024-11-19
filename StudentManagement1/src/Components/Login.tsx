@@ -53,7 +53,8 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
       };
 
       var response = await CallLoginAPI(formData);
-      if (response.result.data.jwtToken != null) {
+      console.log(response);
+      if (response.result != null && response.result.data.jwtToken != null) {
         var token = response.result.data.jwtToken;
         sessionStorage.setItem("token", token);
         setAuthenticated(true);
@@ -115,19 +116,19 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
           },
           boxShadow: "0 0 11px rgba(33,33,33,.2)",
           borderRadius: 3,
-          width: { sm: "80%", xs: "80%", md: "70%", lg: "50%", xl: "40%" },
+          width: { sm: "80%", xs: "80%", md: "80%", lg: "60%", xl: "40%" },
           gap: 10,
           alignItems: "center",
           justifyContent: "center",
           padding: 5,
         }}
       >
-        <Typography sx={{color:"red"}}>{invalidUsernamePassword}</Typography>
         <Box
           sx={{
             display: { sx: "none", xs: "none", md: "block", xl: "block" },
           }}
         >
+          
           <img src={SignInImage} alt="signin-img" />
         </Box>
         <Box
@@ -145,6 +146,7 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
             your Account
           </Box>
           <form className="login-form" onSubmit={formik.handleSubmit}>
+          <Typography sx={{color:"red",marginTop:2}}>{invalidUsernamePassword}</Typography>
             <Box
               sx={{ marginTop: 3, display: "flex", flexDirection: "column" }}
             >

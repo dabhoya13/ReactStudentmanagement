@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { CheckAuthenticated } from "./Utils/Auth/Auth";
 import AdminDashboard from "./Components/Hod/AdminDashboard";
 import Dashboard from "./Components/Students/Dashboard";
+import Header from "./Components/Header";
+import Sidebar from "./Components/Sidebar";
+import Layout from "./Components/Layout";
+import AllStudents from "./Components/Hod/AllStudents";
+import AllProfessors from "./Components/Hod/AllProfessors";
 const App: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(
     CheckAuthenticated()
@@ -20,21 +25,21 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Routes>
         <Route
-          path="/login"
+          path="/"
           element={<Login setAuthenticated={setAuthenticated} />}
         />
         <Route
-          path="/student/dashboard"
-          element={authenticated ? <Dashboard /> : <Navigate to="/login" />}
+          path="/login"
+          element={<Login setAuthenticated={setAuthenticated} />}
         />
 
-        {/* Admin Dashboard route */}
-        <Route
-          path="/admin/adminDashboard"
-          element={
-            authenticated ? <AdminDashboard /> : <Navigate to="/login" />
-          }
-        />
+        <Route element={<Layout />}>
+          <Route path="/student/dashboard" element={authenticated ? <Dashboard /> : <Navigate to="/login" />} />
+          <Route path="/admin/adminDashboard" element={authenticated ? <AdminDashboard /> : <Navigate to="/login" />} />
+          <Route path="/admin/allstudents" element={<AllStudents />}/>
+          <Route path="/admin/allProfessors" element={<AllProfessors />}/>
+        </Route>
+
       </Routes>
     </BrowserRouter>
   );

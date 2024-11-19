@@ -21,6 +21,7 @@ export const CallLoginAPI = async (formData: FormDataProps): Promise<any> => {
       body: JSON.stringify(formData),
     });
     var data = await response.json();
+    console.log(data);
     return data;
   } catch (error) {
     throw new Error();
