@@ -28,11 +28,11 @@ namespace StudentManagementAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("CheckLoginDetails", Name = "CheckLoginDetails")]
-        public ActionResult<APIResponse> CheckLoginDetails([FromQuery] StudentLoginDto studentLoginDto)
+        public async Task<ActionResult<APIResponse>> CheckLoginDetails([FromQuery] StudentLoginDto studentLoginDto)
         {
             try
             {
-                LoginInformationDto loginInformationDto = _studentServices.GetLoginStudentDetails(studentLoginDto);
+                LoginInformationDto loginInformationDto = await _studentServices.GetLoginStudentDetails(studentLoginDto);
                 if (loginInformationDto != null && loginInformationDto.StudentId != 0)
                 {
                     RoleBaseResponse<LoginInformationDto> roleBaseResponse = new()
@@ -49,7 +49,7 @@ namespace StudentManagementAPI.Controllers
                 }
                 else
                 {
-                    LoginInformationDto loginInformationDto1 = _studentServices.CheckUserNamePassword(studentLoginDto);
+                    LoginInformationDto loginInformationDto1 = await _studentServices.CheckUserNamePassword(studentLoginDto);
                     if (loginInformationDto1.UserName == null)
                     {
                         _response.ErroMessages = new List<string> { "User not Found" };

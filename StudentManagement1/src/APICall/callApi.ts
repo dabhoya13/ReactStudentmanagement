@@ -4,6 +4,13 @@ interface FormDataProps {
   DataObject: any;
 }
 
+interface MainFormDataProps {
+  ControllerName: string;
+  MethodName: string;
+  DataObject: any;
+  RoleIds: string[];
+}
+
 export const CallLoginAPI = async (formData: FormDataProps): Promise<any> => {
   const _baseAddress = "https://localhost:7199/MasterAPI/";
   try {
@@ -23,6 +30,35 @@ export const CallLoginAPI = async (formData: FormDataProps): Promise<any> => {
     var data = await response.json();
     console.log(data);
     return data;
+  } catch (error) {
+    throw new Error();
+  }
+};
+
+export const CallAPI = async (formData: MainFormDataProps): Promise<any> => {
+  const _baseAddress = "https://localhost:7199/MasterAPI/";
+  try {
+    var token = sessionStorage.getItem("token");
+    if (token != null) {
+      var url =
+        _baseAddress +
+        formData.ControllerName +
+        "/" +
+        formData.MethodName +
+        "/";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          token: `${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      var data = await response.json();
+      return data;
+    }else{
+      return null;
+    }
   } catch (error) {
     throw new Error();
   }

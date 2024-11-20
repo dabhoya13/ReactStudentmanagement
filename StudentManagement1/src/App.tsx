@@ -2,13 +2,14 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./Components/Login";
 import { useEffect, useState } from "react";
 import { CheckAuthenticated } from "./Utils/Auth/Auth";
-import AdminDashboard from "./Components/Hod/AdminDashboard";
 import Dashboard from "./Components/Students/Dashboard";
-import Header from "./Components/Header";
-import Sidebar from "./Components/Sidebar";
-import Layout from "./Components/Layout";
+import Header from "./Components/Layouts/HodLayouts/Header";
+import Sidebar from "./Components/Layouts/HodLayouts/Sidebar";
+import Layout from "./Components/Layouts/HodLayouts/Layout";
 import AllStudents from "./Components/Hod/AllStudents";
 import AllProfessors from "./Components/Hod/AllProfessors";
+import StudentLayout from "./Components/Layouts/StudentLayout/StudentLayout";
+import AdminDashboard from "./Components/Hod/AdminDashboard";
 const App: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(
     CheckAuthenticated()
@@ -34,12 +35,22 @@ const App: React.FC = () => {
         />
 
         <Route element={<Layout />}>
-          <Route path="/student/dashboard" element={authenticated ? <Dashboard /> : <Navigate to="/login" />} />
-          <Route path="/admin/adminDashboard" element={authenticated ? <AdminDashboard /> : <Navigate to="/login" />} />
-          <Route path="/admin/allstudents" element={<AllStudents />}/>
-          <Route path="/admin/allProfessors" element={<AllProfessors />}/>
+          <Route
+            path="/admin/adminDashboard"
+            element={
+              authenticated ? <AdminDashboard /> : <Navigate to="/login" />
+            }
+          />
+          <Route path="/admin/allstudents" element={<AllStudents />} />
+          <Route path="/admin/allProfessors" element={<AllProfessors />} />
         </Route>
 
+        <Route element={<StudentLayout />}>
+          <Route
+            path="/student/dashboard"
+            element={authenticated ? <Dashboard /> : <Navigate to="/login" />}
+          />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

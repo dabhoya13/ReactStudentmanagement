@@ -1,15 +1,15 @@
 import { Box } from "@mui/material";
-import Sidebar from "./Sidebar";
-import Header from "./Header";
+import Sidebar from "./StudentSidebar";
+import Header from "./StudentHeader";
 import { Outlet } from "react-router-dom";
 
-const Layout:React.FC = () => {
+const StudentLayout:React.FC = () => {
     return(
         <div style={{display:"block"}}>
             <Sidebar />
             <Box sx={{flex:1}}>
                 <Header />
-                <Box sx={{marginTop:"64px", marginLeft:{sm:2, xs:2,md:"264px" , lg:"264px"}, marginRight:2}}>
+                <Box sx={{marginTop:"64px",marginBottom:3, marginLeft:{sm:2, xs:2,md:"264px" , lg:"264px"}, marginRight:2}}>
                     <Outlet />
                 </Box>
             </Box>
@@ -17,4 +17,4 @@ const Layout:React.FC = () => {
     );
 }
 
-export default Layout;
+export default StudentLayout;

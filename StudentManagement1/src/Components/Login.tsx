@@ -53,7 +53,6 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
       };
 
       var response = await CallLoginAPI(formData);
-      console.log(response);
       if (response.result != null && response.result.data.jwtToken != null) {
         var token = response.result.data.jwtToken;
         sessionStorage.setItem("token", token);

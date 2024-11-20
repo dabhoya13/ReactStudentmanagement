@@ -11,7 +11,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import logoImage from "../assets/Images/logo2.svg";
+import logoImage from "../../../assets/Images/logo2.svg";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SchoolIcon from "@mui/icons-material/School";
 import Diversity3Icon from "@mui/icons-material/Diversity3";

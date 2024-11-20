@@ -15,6 +15,8 @@
     "@mui/icons-material": "^6.1.7",
     "@mui/material": "^6.1.7",
     "@mui/x-charts": "^7.22.2",
+    "@mui/x-date-pickers": "^7.22.2",
+    "dayjs": "^1.11.13",
     "formik": "^2.4.6",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",

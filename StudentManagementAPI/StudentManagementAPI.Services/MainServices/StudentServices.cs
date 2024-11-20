@@ -24,25 +24,25 @@ namespace StudentManagementAPI.Services.MainServices
             _jwtServices = jwtServices;
         }
 
-        public T GetStudent<T>(string Procedure, int Id)
+        public async Task<T> GetStudent<T>(string Procedure, int Id)
         {
             Collection<DbParameters> parameters = new()
             {
                 new DbParameters { Name = "@StudentId", Value = Id, DBType = DbType.Int64 }
             };
-            T newobj = DbClient.ExecuteOneRecordProcedure<T>(Procedure, parameters);
+            T newobj = await DbClient.ExecuteOneRecordProcedure<T>(Procedure, parameters);
             return newobj;
 
         }
 
-        public LoginInformationDto GetLoginStudentDetails(StudentLoginDto studentLoginDto)
+        public async Task<LoginInformationDto> GetLoginStudentDetails(StudentLoginDto studentLoginDto)
         {
             try
             {
                 Collection<DbParameters> parameters = new Collection<DbParameters>();
                 parameters.Add(new DbParameters() { Name = "@UserName", Value = studentLoginDto.UserName, DBType = DbType.String });
                 parameters.Add(new DbParameters() { Name = "@PassWord", Value = studentLoginDto.Password, DBType = DbType.String });
-                LoginInformationDto loginInformationDto = DbClient.ExecuteOneRecordProcedure<LoginInformationDto>("[dbo].[Get_UserName_Password]", parameters);
+                LoginInformationDto loginInformationDto =await DbClient.ExecuteOneRecordProcedure<LoginInformationDto>("[dbo].[Get_UserName_Password]", parameters);
                 if (loginInformationDto != null && loginInformationDto.StudentId > 0)
                 {
                     LoginInformationDto jwtClaimsDto = new()
@@ -64,14 +64,14 @@ namespace StudentManagementAPI.Services.MainServices
             }
         }
 
-        public LoginInformationDto CheckUserNamePassword(StudentLoginDto studentLoginDto)
+        public async Task<LoginInformationDto> CheckUserNamePassword(StudentLoginDto studentLoginDto)
         {
             try
             {
                 Collection<DbParameters> parameters = new Collection<DbParameters>();
                 parameters.Add(new DbParameters() { Name = "@UserName", Value = studentLoginDto.UserName, DBType = DbType.String });
                 parameters.Add(new DbParameters() { Name = "@PassWord", Value = studentLoginDto.Password, DBType = DbType.String });
-                LoginInformationDto loginInformationDto = DbClient.ExecuteOneRecordProcedure<LoginInformationDto>("[dbo].[Get_ProfessorHod_UserName_Password]", parameters);
+                LoginInformationDto loginInformationDto = await DbClient.ExecuteOneRecordProcedure<LoginInformationDto>("[dbo].[Get_ProfessorHod_UserName_Password]", parameters);
                 if (loginInformationDto.Id != 0)
                 {
 
@@ -86,12 +86,12 @@ namespace StudentManagementAPI.Services.MainServices
             }
         }
 
-        public void AddVerificationRecord(LoginInformationDto loginInformationDto)
+        public async Task AddVerificationRecord(LoginInformationDto loginInformationDto)
         {
             Collection<DbParameters> parameters = new Collection<DbParameters>();
             parameters.Add(new DbParameters() { Name = "@UserId", Value = loginInformationDto.StudentId, DBType = DbType.String });
             parameters.Add(new DbParameters() { Name = "@Token", Value = loginInformationDto.token, DBType = DbType.String });
-            DbClient.ExecuteProcedure("[dbo].[Add_CheckStatus_Details]", parameters, ExecuteType.ExecuteNonQuery);
+            await DbClient.ExecuteProcedure("[dbo].[Add_CheckStatus_Details]", parameters, ExecuteType.ExecuteNonQuery);
         }
 
         public static T GetDataModel<T>(object dataObj)
@@ -111,12 +111,12 @@ namespace StudentManagementAPI.Services.MainServices
             }
         }
 
-        public bool UpdateVerificationRecord(string token, int UserId)
+        public async Task<bool> UpdateVerificationRecord(string token, int UserId)
         {
             Collection<DbParameters> parameters = new Collection<DbParameters>();
             parameters.Add(new DbParameters() { Name = "@UserId", Value = UserId, DBType = DbType.String });
             parameters.Add(new DbParameters() { Name = "@Token", Value = token, DBType = DbType.String });
-            int row = (int)DbClient.ExecuteProcedure("[dbo].[Update_CheckStatus_Details]", parameters, ExecuteType.ExecuteNonQuery);
+            int row = (int)await DbClient.ExecuteProcedure("[dbo].[Update_CheckStatus_Details]", parameters, ExecuteType.ExecuteNonQuery);
             if (row == 0)
             {
                 return false;
@@ -153,5 +153,17 @@ namespace StudentManagementAPI.Services.MainServices
         //    }
         //}
 
+
+        public async Task<IList<GenderWiseCountDto>> GetStudentCountByGender()
+        {
+            try
+            {
+                IList<GenderWiseCountDto> genderWiseCount =await DbClient.ExecuteProcedure<GenderWiseCountDto>("[dbo].[Get_StudentCount_ByGender]", null);
+                return genderWiseCount;
+            }catch(Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

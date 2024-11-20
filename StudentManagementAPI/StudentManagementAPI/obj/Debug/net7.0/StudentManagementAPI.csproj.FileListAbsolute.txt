@@ -83,3 +83,4 @@ D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\De
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.pdb
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.genruntimeconfig.cache
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\ref\StudentManagementAPI.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.MvcApplicationPartsAssemblyInfo.cs

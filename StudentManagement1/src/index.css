@@ -1,7 +1,11 @@
-
-:root{
+:root {
   --main-color: #4c8cf8;
   --secondary-color: #1fe5d1;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0; /* If you want to hide both scrollbars */
 }
 
 /* ----------------------------------------------------------------------------
@@ -9,25 +13,22 @@
 LOGIN SCREEN CSSS
 
 ----------------------------------------------------------------------------- */
-body{
+body {
   background-color: #f1f0ff;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
 }
 
-.welcome-h3{
-  margin: 0 ;
+.welcome-h3 {
+  margin: 0;
 }
 
-.login-textfield{
-  width: 100%!important;
+.login-textfield {
+  width: 100% !important;
 }
 
-.login-form{
+.login-form {
   width: 100%;
 }
-
-
 
 /* ----------------------------------------------------------------------------
 
@@ -35,64 +36,64 @@ Header Sidebar CSS
 
 ----------------------------------------------------------------------------- */
 
-
-.sidebar-main-div{
+.sidebar-main-div {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.logo-div{
+.logo-div {
   padding: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.list-items-btn{
+.list-items-btn {
   gap: 10px;
 }
 
-.list-items{
+.list-items {
   padding-left: 25px;
 }
 
-.list-items.selected{
+.list-items.selected {
   background-color: var(--main-color);
   color: white;
 }
 
 .selected {
-  background-color: #1976d2; 
+  background-color: #1976d2;
 
   color: white;
 }
 
-.menu-icon{
+.menu-icon {
   position: absolute !important;
   padding-left: 25px !important;
   padding-top: 15px !important;
 }
 
-.bg-dark{
+.bg-dark {
   background-color: darkblue;
 }
 
-.header-box{
+.header-box {
   box-shadow: none !important;
   background-color: white !important;
   color: black !important;
   gap: 15px;
 }
 
-.header-toolbar ,.header-icon-box{
+.header-toolbar,
+.header-icon-box {
   gap: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.icon-div{
+.icon-div {
   height: 40px;
   width: 40px;
   display: flex;
@@ -102,19 +103,104 @@ Header Sidebar CSS
   background-color: rgb(209, 209, 209);
 }
 
-.profile-icon-div-btn{
+.profile-icon-div-btn {
   width: 100% !important;
   height: 100% !important;
 }
-.profile-icon-div{
+.profile-icon-div {
   height: 50px;
   width: 50px;
   border-radius: 50%;
-
 }
 
-.profile-picture{
+.profile-picture {
   width: 50px !important;
   height: 50px !important;
 }
 
+/* ----------------------------------------------------------------------------
+
+ADMIN DASHBOARD CSS START
+
+----------------------------------------------------------------------------- */
+
+.adminDashboard-cards {
+  background-color: #eff6fe !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.adminDashboard-cards:hover {
+  background-color: var(--main-color) !important;
+  transform: translateY(-10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.notice-board-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  background-color: var(--main-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 30px;
+  font-size: 25px;
+  height: 30px;
+}
+
+.notice-board-imgs {
+  width: 50px;
+  height: 50px;
+}
+
+.notice-board-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  background-color: var(--main-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  font-size: 15px;
+  height: 30px;
+}
+
+.event-calender-div {
+  width: 25%;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(33, 33, 33, 0.2);
+}
+
+@media (max-width: 1581px) {
+  .event-calender-div {
+    width: 30% !important;
+  }
+}
+
+@media (max-width: 1389px) {
+  .event-calender-div {
+    width: 35% !important;
+  }
+}
+
+@media (max-width: 1199px) {
+  .event-calender-div {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 1005px) {
+  .event-calender-div {
+    width: 55% !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .event-calender-div {
+    width: 100% !important;
+  }
+}

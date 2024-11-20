@@ -44,5 +44,14 @@ namespace StudentManagementAPI.Models
         public string Email { get; set; }
 
         public bool IsBlocked { get; set; }
+
+        public int Gender { get; set; }
+    }
+
+    public class GenderWiseCountDto
+    {
+        public int Gender { get; set; }
+
+        public int GenderCount { get; set; }
     }
 }

@@ -9,16 +9,13 @@ namespace StudentManagementAPI.Services.MainServices
 {
     public interface IStudentServices
     {
-        T GetStudent<T>(string Procedure, int Id);
+        Task<T> GetStudent<T>(string Procedure, int Id);
 
-        LoginInformationDto GetLoginStudentDetails(StudentLoginDto studentLoginDto);
-
-        LoginInformationDto CheckUserNamePassword(StudentLoginDto studentLoginDto);
-
+        Task<LoginInformationDto> GetLoginStudentDetails(StudentLoginDto studentLoginDto);
+        Task<LoginInformationDto> CheckUserNamePassword(StudentLoginDto studentLoginDto);
         dynamic GetDynamicData(string controllerName, string methodName, object dataObj);
-
-        void AddVerificationRecord(LoginInformationDto loginInformationDto);
-
-        bool UpdateVerificationRecord(string token, int UserId);
+        Task AddVerificationRecord(LoginInformationDto loginInformationDto);
+        Task<bool> UpdateVerificationRecord(string token, int UserId);
+        Task<IList<GenderWiseCountDto>> GetStudentCountByGender();
     }
 }

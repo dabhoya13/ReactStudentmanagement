@@ -14,7 +14,7 @@ namespace StudentManagementAPI.DataContext
 {
     public class DbClient
     {
-        public static object ExecuteProcedureWithQuery(string query, Collection<DbParameters> parameters, ExecuteType executeType)
+        public static async Task<object> ExecuteProcedureWithQuery(string query, Collection<DbParameters> parameters, ExecuteType executeType)
         {
             string connectionString = AppSettings.GetConnectionString();
             object returnValue;
@@ -25,22 +25,21 @@ namespace StudentManagementAPI.DataContext
 
                 SqlCommand sqlCommand = new SqlCommand(query, sqlConnection);
                 sqlCommand.CommandType = System.Data.CommandType.Text;
-
                 if (parameters != null)
                 {
                     AddParameters(ref sqlCommand, parameters);
                 }
                 if (executeType == ExecuteType.ExecuteNonQuery)
                 {
-                    returnValue = sqlCommand.ExecuteNonQuery();
+                    returnValue = await sqlCommand.ExecuteNonQueryAsync();
                 }
                 else if (executeType == ExecuteType.ExecuteScalar)
                 {
-                    returnValue = sqlCommand.ExecuteScalar();
+                    returnValue = await sqlCommand.ExecuteScalarAsync();
                 }
                 else if (executeType == ExecuteType.ExecuteReader)
                 {
-                    returnValue = sqlCommand.ExecuteReader();
+                    returnValue = await sqlCommand.ExecuteReaderAsync();
                 }
                 else
                 {
@@ -51,7 +50,7 @@ namespace StudentManagementAPI.DataContext
             return returnValue;
         }
 
-        public static object ExecuteProcedure(string ProcedureName, Collection<DbParameters> parameters, ExecuteType executeType)
+        public static async Task<object> ExecuteProcedure(string ProcedureName, Collection<DbParameters> parameters, ExecuteType executeType)
         {
             string connectionString = AppSettings.GetConnectionString();
             object returnValue;
@@ -69,15 +68,15 @@ namespace StudentManagementAPI.DataContext
                 }
                 if (executeType == ExecuteType.ExecuteNonQuery)
                 {
-                    returnValue = sqlCommand.ExecuteNonQuery();
+                    returnValue = await sqlCommand.ExecuteReaderAsync();
                 }
                 else if (executeType == ExecuteType.ExecuteScalar)
                 {
-                    returnValue = sqlCommand.ExecuteScalar();
+                    returnValue = await sqlCommand.ExecuteScalarAsync();
                 }
                 else if (executeType == ExecuteType.ExecuteReader)
                 {
-                    returnValue = sqlCommand.ExecuteReader();
+                    returnValue = await sqlCommand.ExecuteReaderAsync();
                 }
                 else
                 {
@@ -88,7 +87,7 @@ namespace StudentManagementAPI.DataContext
             return returnValue;
         }
 
-        public static IList<T> ExecuteProcedure<T>(string ProcedureName, Collection<DbParameters> parameters)
+        public static async Task<IList<T>> ExecuteProcedure<T>(string ProcedureName, Collection<DbParameters> parameters)
         {
             string connectionString = AppSettings.GetConnectionString();
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
@@ -103,11 +102,11 @@ namespace StudentManagementAPI.DataContext
                     AddParameters(ref sqlCommand, parameters);
                 }
                 //var result = ;
-                return DataReaderToList<T>(sqlCommand.ExecuteReader());
+                return await DataReaderToList<T>(sqlCommand.ExecuteReader());
             }
         }
 
-        public static T ExecuteOneRecordProcedure<T>(string ProcedureName, Collection<DbParameters> parameters)
+        public static async Task<T> ExecuteOneRecordProcedure<T>(string ProcedureName, Collection<DbParameters> parameters)
         {
             string connectionString = AppSettings.GetConnectionString();
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
@@ -122,11 +121,11 @@ namespace StudentManagementAPI.DataContext
                     AddParameters(ref sqlCommand, parameters);
                 }
                 //var result = ;
-                return GetValueFromReader<T>(sqlCommand.ExecuteReader());
+                return await GetValueFromReader<T>(sqlCommand.ExecuteReader());
             }
         }
 
-        public static T ExecuteOneRecordProcedureWithQuery<T>(string Query, Collection<DbParameters> parameters)
+        public static async Task<T> ExecuteOneRecordProcedureWithQuery<T>(string Query, Collection<DbParameters> parameters)
         {
             string connectionString = AppSettings.GetConnectionString();
             using (SqlConnection sqlConnection = new SqlConnection(connectionString))
@@ -141,7 +140,7 @@ namespace StudentManagementAPI.DataContext
                     AddParameters(ref sqlCommand, parameters);
                 }
                 //var result = ;
-                return GetValueFromReader<T>(sqlCommand.ExecuteReader());
+                return await GetValueFromReader<T>(sqlCommand.ExecuteReader());
             }
         }
 
@@ -184,7 +183,7 @@ namespace StudentManagementAPI.DataContext
             }
         }
 
-        public static List<T> DataReaderToList<T>(IDataReader dataReader)
+        public static async Task<List<T>> DataReaderToList<T>(IDataReader dataReader)
         {
             List<T> list = new();
 
@@ -195,7 +194,7 @@ namespace StudentManagementAPI.DataContext
                 obj = Activator.CreateInstance<T>();
                 for (int i = 0; i < dataReader.FieldCount; i++)
                 {
-                    PropertyInfo propertyInfo = obj.GetType().GetProperties().FirstOrDefault(o => o.Name.ToLower() == dataReader.GetName(i).ToLower());
+                    PropertyInfo propertyInfo =obj.GetType().GetProperties().FirstOrDefault(o => o.Name.ToLower() == dataReader.GetName(i).ToLower());
                     if (propertyInfo != null)
                     {
                         if (dataReader.GetFieldType(i) == typeof(Int64))
@@ -208,12 +207,12 @@ namespace StudentManagementAPI.DataContext
                         }
                     }
                 }
-                list.Add(obj);
+                 list.Add(obj);
             }
             return list;
         }
 
-        private static T GetValueFromReader<T>(SqlDataReader dataReader)
+        private static async Task<T> GetValueFromReader<T>(SqlDataReader dataReader)
         {
 
             T obj = Activator.CreateInstance<T>();

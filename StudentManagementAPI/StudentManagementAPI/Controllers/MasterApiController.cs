@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StudentManagementAPI.Models;
 using StudentManagementAPI.Services;
 using StudentManagementAPI.Services.MainServices;
@@ -32,6 +33,8 @@ namespace StudentManagementAPI.Controllers
         public Dictionary<string, Type> controllers = new()
         {
             { "Login", typeof(LoginController) },
+            { "Student", typeof(StudentController) },
+
         };
 
 
@@ -41,7 +44,7 @@ namespace StudentManagementAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status203NonAuthoritative)]
         [HttpPost("{controllerName}/{methodName}")]
-        public ActionResult<APIResponse> CallExternalGetMethod(ApiRequest apiRequest)
+        public async Task<ActionResult<APIResponse>> CallExternalGetMethod(ApiRequest apiRequest)
         {
             try
             {
@@ -49,18 +52,20 @@ namespace StudentManagementAPI.Controllers
                 if (!_jwtService.ValidateToken(header["token"], out JwtSecurityToken jwtSecurityToken))
                 {
 
-                    _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID "};
-                    _response.StatusCode = HttpStatusCode.Unauthorized;
+                    _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
+                    _response.StatusCode = HttpStatusCode.BadRequest;
                     _response.IsSuccess = false;
+                    return BadRequest(_response);
                 }
                 else
                 {
                     var userRoles = jwtSecurityToken.Claims?.Where(c => c.Type == ClaimTypes.Role).Select(c => c.Value);
-                    if(userRoles == null || (apiRequest.RoleIds?.Count == 0 ) || !apiRequest.RoleIds.Any(role => userRoles.Contains(role)))
+                    if (userRoles == null || (apiRequest.RoleIds?.Count == 0) || !apiRequest.RoleIds.Any(role => userRoles.Contains(role)))
                     {
                         _response.ErroMessages = new List<string> { "Not Authoried " };
                         _response.IsSuccess = false;
                         _response.StatusCode = HttpStatusCode.Unauthorized;
+                        return Unauthorized(_response);
                     }
                     else
                     {
@@ -71,28 +76,30 @@ namespace StudentManagementAPI.Controllers
                             MethodInfo methodInfo = controller.GetType().GetMethod(apiRequest.MethodName);
                             if (methodInfo != null)
                             {
+                                
                                 if (apiRequest.DataObject != "null")
                                 {
                                     object dtoObject = JsonConvert.DeserializeObject<dynamic>(apiRequest.DataObject);
 
                                     var value = _studentServices.GetDynamicData(apiRequest.ControllerName, apiRequest.MethodName, dtoObject);
-                                    var result = methodInfo.Invoke(controller, new object[] { value });
-                                    var actionResult = (ActionResult<APIResponse>)result;
-                                    _response = actionResult.Value;
+                                    var result = await (Task<ActionResult<APIResponse>>)methodInfo.Invoke(controller, new object[] { value});
+
+                                    //var actionResult = (ActionResult<APIResponse>)result;
+                                    _response = result.Value;
                                 }
                                 else
                                 {
                                     if (apiRequest.MethodName == "GetAllStudents")
                                     {
-                                        var result = methodInfo.Invoke(controller, header["token"]);
-                                        var actionResult = (ActionResult<APIResponse>)result;
-                                        _response = actionResult.Value;
+                                        var result = await (Task<ActionResult<APIResponse>>)methodInfo.Invoke(controller, header["token"]);
+                                        //var actionResult = (ActionResult<APIResponse>)result;
+                                        _response = result.Value;
                                     }
                                     else
                                     {
-                                        var result = methodInfo.Invoke(controller, null);
-                                        var actionResult = (ActionResult<APIResponse>)result;
-                                        _response = actionResult.Value;
+                                        var result = await (Task<ActionResult<APIResponse>>)methodInfo.Invoke(controller, null);
+                                        //var actionResult = (ActionResult<APIResponse>)result;
+                                        _response = result.Value;
                                     }
                                 }
                             }
@@ -101,8 +108,9 @@ namespace StudentManagementAPI.Controllers
                                 _response.ErroMessages = new List<string> { "Method Invalid" };
                                 _response.IsSuccess = false;
                                 _response.StatusCode = HttpStatusCode.NotFound;
+                                return NotFound(_response);
                             }
-                            return _response;
+                            return Ok(_response);
 
                         }
                         else
@@ -110,12 +118,11 @@ namespace StudentManagementAPI.Controllers
                             _response.ErroMessages = new List<string> { "Controller Invalid" };
                             _response.IsSuccess = false;
                             _response.StatusCode = HttpStatusCode.NotFound;
+                            return NotFound(_response);
+
                         }
                     }
-                    
-                   
                 }
-                return _response;
 
             }
             catch (Exception ex)
@@ -123,7 +130,7 @@ namespace StudentManagementAPI.Controllers
                 _response.ErroMessages = new List<string>() { ex.Message.ToString() };
                 _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.IsSuccess = false;
-                return _response;
+                return StatusCode(500, _response);
             }
         }
 
@@ -133,7 +140,7 @@ namespace StudentManagementAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [HttpPost("{controllerName}/{methodName}/Login")]
-        public ActionResult<APIResponse> CallExternamLoginMethod(ApiRequest apiRequest)
+        public async Task<ActionResult<APIResponse>> CallExternamLoginMethod(ApiRequest apiRequest)
         {
             try
             {
@@ -144,16 +151,15 @@ namespace StudentManagementAPI.Controllers
                     MethodInfo methodInfo = controller.GetType().GetMethod(apiRequest.MethodName);
                     if (methodInfo != null)
                     {
-
                         if (apiRequest.DataObject != "null")
                         {
                             object dtoObject = JsonConvert.DeserializeObject<dynamic>(apiRequest.DataObject);
                             //var newobj = ((JObject)dtoObject).ToObject<StudentLoginDto>();
                             var value = _studentServices.GetDynamicData(apiRequest.ControllerName, apiRequest.MethodName, dtoObject);
                             //int intValue = Convert.ToInt32(dtoObject);
-                            var result = methodInfo.Invoke(controller, new object[] { value });
-                            var actionResult = (ActionResult<APIResponse>)result;
-                            _response = actionResult.Value;
+                            var result = await (Task<ActionResult<APIResponse>>)methodInfo.Invoke(controller, new object[] { value });
+
+                            _response = result.Value;
                             return Ok(_response);
                         }
                         else
@@ -170,7 +176,7 @@ namespace StudentManagementAPI.Controllers
                         _response.ErroMessages = new List<string> { "Method Or Controller Invalid" };
                         _response.IsSuccess = false;
                         _response.StatusCode = HttpStatusCode.NotFound;
-                        return StatusCode(StatusCodes.Status400BadRequest,_response);
+                        return StatusCode(StatusCodes.Status400BadRequest, _response);
 
                     }
                 }
