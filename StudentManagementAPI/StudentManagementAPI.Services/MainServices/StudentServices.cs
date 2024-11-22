@@ -165,5 +165,19 @@ namespace StudentManagementAPI.Services.MainServices
                 throw;
             }
         }
+
+
+        public async Task<StudentProfessorCount> GetStudentProfessorCount()
+        {
+            try
+            {
+                StudentProfessorCount studentProfessorCount= await DbClient.ExecuteOneRecordProcedure<StudentProfessorCount>("[dbo].[Get_StudentProfessors_Count]", null);
+                return studentProfessorCount;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
     }
 }

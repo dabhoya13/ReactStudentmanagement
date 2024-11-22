@@ -53,9 +53,9 @@ namespace StudentManagementAPI.Controllers
                 {
 
                     _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
-                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
                     _response.IsSuccess = false;
-                    return BadRequest(_response);
+                    return Unauthorized(_response);
                 }
                 else
                 {

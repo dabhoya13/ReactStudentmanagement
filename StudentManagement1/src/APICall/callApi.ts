@@ -29,6 +29,7 @@ export const CallLoginAPI = async (formData: FormDataProps): Promise<any> => {
     });
     var data = await response.json();
     console.log(data);
+
     return data;
   } catch (error) {
     throw new Error();
@@ -55,8 +56,13 @@ export const CallAPI = async (formData: MainFormDataProps): Promise<any> => {
         body: JSON.stringify(formData),
       });
       var data = await response.json();
+      if (data.statusCode === 401 || data.statusCode === 500 ) {
+        sessionStorage.clear();
+        window.location.href = "/login";
+        return null;
+      }
       return data;
-    }else{
+    } else {
       return null;
     }
   } catch (error) {

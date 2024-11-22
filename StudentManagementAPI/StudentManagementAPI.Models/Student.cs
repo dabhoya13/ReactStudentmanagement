@@ -54,4 +54,11 @@ namespace StudentManagementAPI.Models
 
         public int GenderCount { get; set; }
     }
+
+    public class StudentProfessorCount
+    {
+        public int StudentCount { get; set;}
+
+        public int ProfessorCount { get; set; } 
+    }
 }

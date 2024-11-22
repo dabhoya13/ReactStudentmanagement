@@ -175,6 +175,11 @@ ADMIN DASHBOARD CSS START
   box-shadow: 0 0 5px rgba(33, 33, 33, 0.2);
 }
 
+.pie-chart-count{
+  position: absolute;
+  margin-top: 175px;
+}
+
 @media (max-width: 1581px) {
   .event-calender-div {
     width: 30% !important;
@@ -203,4 +208,45 @@ ADMIN DASHBOARD CSS START
   .event-calender-div {
     width: 100% !important;
   }
+}
+
+
+.Dashboard-fileUpload-box #myinputfile::-webkit-file-upload-button{
+  -webkit-appearance: none;
+  float: right;
+  position: absolute;
+  margin: -10px 0 0 0;
+  right: 3%;
+  padding-top: 12px;
+  border: 1px solid #aaaaaa;
+  border-radius: 4px;
+  opacity: 0;
+  z-index: 9999;
+}
+
+.Dashboard-fileUpload-box input[type="file"] {
+  -webkit-appearance: none;
+  text-align: left;
+  padding-top: 5px;
+  color: gray;
+  width: 100% !important;
+  padding-left: 20px;
+  z-index: 9699;
+}
+
+.upload-btn {
+  border: 1px solid green;
+  color: white;
+  display: flex !important;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  background-color: green;
+  padding: 8px;
+  border-radius: 0 10px 10px 0;
+  font-size: 18px;
+  position: absolute;
+  right: 3%;
+  margin-top: 33px;
+  width: 102px !important;
 }

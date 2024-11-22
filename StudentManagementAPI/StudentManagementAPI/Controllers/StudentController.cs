@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Azure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentManagementAPI.Models;
 using StudentManagementAPI.Services.MainServices;
@@ -66,7 +67,48 @@ namespace StudentManagementAPI.Controllers
             catch (Exception ex)
             {
                 _response.IsSuccess = false;
-                _response.StatusCode = HttpStatusCode.BadRequest;
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.ErroMessages = new List<string> { ex.Message };
+            }
+            return _response;
+        }
+
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("GetStudentProfessorCount")]
+        public async Task<ActionResult<APIResponse>> GetStudentProfessorCount()
+        {
+            try
+            {
+                RoleBaseResponse<StudentProfessorCount> roleBaseResponse = new();
+                StudentProfessorCount studentProfessorCount = await _studentServices.GetStudentProfessorCount();
+
+                if (studentProfessorCount != null)
+                {
+                    roleBaseResponse.data = studentProfessorCount;
+                    _response.result = roleBaseResponse;
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
+                }
+                else
+                {
+                    StudentProfessorCount newStudentProfessorCount = new()
+                    {
+                        ProfessorCount = 0,
+                        StudentCount = 0,
+                    };
+                    roleBaseResponse.data = newStudentProfessorCount;
+                    _response.result = roleBaseResponse;
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
+                }
+            }
+            catch(Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.ErroMessages = new List<string> { ex.Message };
             }
             return _response;

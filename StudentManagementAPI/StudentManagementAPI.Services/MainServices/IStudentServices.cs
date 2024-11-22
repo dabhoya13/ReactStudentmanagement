@@ -17,5 +17,7 @@ namespace StudentManagementAPI.Services.MainServices
         Task AddVerificationRecord(LoginInformationDto loginInformationDto);
         Task<bool> UpdateVerificationRecord(string token, int UserId);
         Task<IList<GenderWiseCountDto>> GetStudentCountByGender();
+
+        Task<StudentProfessorCount> GetStudentProfessorCount();
     }
 }

@@ -1,58 +1,149 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUserFromToken } from "../../Utils/Auth/Auth";
-import Sidebar from "../Layouts/HodLayouts/Sidebar";
-import Header from "../Layouts/HodLayouts/Header";
-import { Box, Card, CardContent, Grid2, Typography } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid2,
+  Menu,
+  MenuItem,
+  Typography,
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
 import SchoolIcon from "@mui/icons-material/School";
 import GroupsIcon from "@mui/icons-material/Groups";
 import GroupIcon from "@mui/icons-material/Group";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { PieChart } from "@mui/x-charts/PieChart";
-
-import { mobileOS, valueFormatter } from "../../Utils/PieCharts";
 import { BarChart } from "@mui/x-charts";
 import demoImage from "../../assets/Images/demo.jpg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
 
-import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
-import { GetGenderWiseCounts } from "./AdminDashboard's";
+import {
+  GetGenderWiseCounts,
+  GetStudentProfessorsCount,
+} from "./AdminDashboard's";
+import { valueFormatter } from "../../Utils/PieCharts";
+import { AddEditNoticeModal, DeleteModal } from "../AllModals/Modals";
 const AdminDashboard: React.FC = () => {
-  const [radius, setRadius] = useState(50);
-  const [itemNb, setItemNb] = useState(2);
-  const [skipAnimation, setSkipAnimation] = useState(false);
-
+  const radius = 50;
+  const [studentCount, setStudentCount] = useState<number>();
+  const [professorCount, setProfessorCount] = useState<number>();
+  const navigate = useNavigate();
   const [value, setValue] = React.useState<Dayjs | null>(dayjs("2024-11-20"));
   const [pieData, setPieData] = useState([
     { label: "Male", value: 10 },
     { label: "Female", value: 30 },
   ]);
+  const [anchorNoticeboard, setAnchorNoticeboard] =
+    useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorNoticeboard);
 
-  const user = getUserFromToken();
-  if (!user || user.Role != "1") {
-    return <Navigate to="/login" />;
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isAddNoticeModalOpen, setIsAddNoticeModalOpen] = useState<boolean>(false);
+
+  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
+  const [noticeEditItemId, setnoticeEditItemId] = useState<number | null>(null);
+
+
+  const handleNoticeboardViewMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorNoticeboard(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorNoticeboard(null);
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setDeleteItemId(id);
+    setIsModalOpen(true);
+    setAnchorNoticeboard(null);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setDeleteItemId(null);
+  };
+
+  const handleDelete = (id: number | null) => {
+    console.log(`Deleting item with ID: ${id}`);
+    setAnchorNoticeboard(null);
+
+    // After deletion, close the modal
+    closeModal();
+  };
+
+  const handleAddEditModelOpen = (id: number | null) => {
+    setnoticeEditItemId(id);
+    setIsAddNoticeModalOpen(true);
   }
 
+  const closeAddEditModal = () => {
+    setIsAddNoticeModalOpen(false);
+    setnoticeEditItemId(null);
+  };
+
+  useEffect(() => {
+    const user = getUserFromToken();
+    if (!user || user.Role != "1") {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     const fetchGenderWiseCounts = async () => {
       const GenderWiseCounts = await GetGenderWiseCounts();
-      console.log("GenderWiseCount", GenderWiseCounts);
       const updatedPieData = GenderWiseCounts.map(
         (item: { Gender: string; GenderCount: number }) => ({
-          label: item.Gender,
+          label: item.Gender + ": " + item.GenderCount,
           value: item.GenderCount,
         })
       );
       setPieData(updatedPieData);
     };
 
+    interface StudentProfessorsCountProps {
+      studentCount: number;
+      professorCount: number;
+    }
+    const fetchStudentProfessorsCount = async () => {
+      const studentProfessorCount: StudentProfessorsCountProps =
+        await GetStudentProfessorsCount();
+      setStudentCount(studentProfessorCount.studentCount);
+      setProfessorCount(studentProfessorCount.professorCount);
+    };
+
     fetchGenderWiseCounts();
+    fetchStudentProfessorsCount();
   }, []);
+
+  const menuId = "primary-search-account-menu";
+  const renderNoticeBoardViewMenu = (
+    <Menu
+      anchorEl={anchorNoticeboard}
+      anchorOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      id={menuId}
+      keepMounted
+      transformOrigin={{
+        vertical: "top",
+        horizontal: "right",
+      }}
+      open={isMenuOpen}
+      onClose={handleMenuClose}
+    >
+      <MenuItem>Edit</MenuItem>
+      <MenuItem>View</MenuItem>
+      <MenuItem onClick={() => handleDeleteClick(1)}>Delete</MenuItem>
+    </Menu>
+  );
 
   const card = (
     <React.Fragment>
@@ -91,7 +182,9 @@ const AdminDashboard: React.FC = () => {
           <Typography sx={{ fontWeight: "600", fontSize: "15px" }}>
             Total Students
           </Typography>
-          <Typography sx={{ color: "grey", fontSize: "15px" }}>2500</Typography>
+          <Typography sx={{ color: "grey", fontSize: "15px" }}>
+            {studentCount}
+          </Typography>
         </Box>
       </CardContent>
     </React.Fragment>
@@ -132,9 +225,11 @@ const AdminDashboard: React.FC = () => {
         </Box>
         <Box>
           <Typography sx={{ fontWeight: "600", fontSize: "15px" }}>
-            Total Students
+            Total Professors
           </Typography>
-          <Typography sx={{ color: "grey", fontSize: "15px" }}>2500</Typography>
+          <Typography sx={{ color: "grey", fontSize: "15px" }}>
+            {professorCount}
+          </Typography>
         </Box>
       </CardContent>
     </React.Fragment>
@@ -328,6 +423,7 @@ const AdminDashboard: React.FC = () => {
           }}
         >
           <h3>Total Students By Gender</h3>
+          <span className="pie-chart-count">{studentCount}</span>
           <PieChart
             colors={["#1fe6d1", "#4b8bf8"]}
             className="pie-chart"
@@ -346,12 +442,12 @@ const AdminDashboard: React.FC = () => {
                 itemMarkHeight: 10,
                 itemMarkWidth: 10,
                 direction: "row",
-                itemGap: 130,
+                itemGap: 100,
                 position: { vertical: "bottom", horizontal: "right" },
-                padding: -100,
+                padding: -80,
               },
             }}
-            skipAnimation={skipAnimation}
+            skipAnimation={false}
           />
         </Box>
         <Box
@@ -433,7 +529,7 @@ const AdminDashboard: React.FC = () => {
             }}
           >
             <h3>Notice Board</h3>
-            <button className="notice-board-add-btn">+</button>
+            <button className="notice-board-add-btn" onClick={() => handleAddEditModelOpen(null)}>+</button>
           </Box>
           <Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -518,6 +614,7 @@ const AdminDashboard: React.FC = () => {
                 }}
               >
                 <button
+                  onClick={handleNoticeboardViewMenu}
                   style={{
                     backgroundColor: "transparent",
                     border: "none",
@@ -617,7 +714,20 @@ const AdminDashboard: React.FC = () => {
             </LocalizationProvider>
           </Box>
         </div>
+        {renderNoticeBoardViewMenu}
       </Box>
+
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onDelete={() => handleDelete(deleteItemId)}
+      />
+
+      <AddEditNoticeModal 
+      isOpen={isAddNoticeModalOpen}
+      onClose={closeAddEditModal}
+      onAddEdit={()=> {console.log("Add successfdully")}}
+      />
     </>
   );
 };
