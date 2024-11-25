@@ -25,11 +25,35 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import {
+  DeleteNotice,
+  GetAllNotices,
   GetGenderWiseCounts,
   GetStudentProfessorsCount,
 } from "./AdminDashboard's";
 import { valueFormatter } from "../../Utils/PieCharts";
 import { AddEditNoticeModal, DeleteModal } from "../AllModals/Modals";
+import LoadingGif from "../../assets/Images/Animation.gif";
+import { format } from "date-fns";
+interface NoticesProps {
+  noticeId: number;
+  shortDescription: string;
+  longDescription: string;
+  date: Date;
+  title: string;
+  imageName: string;
+  imageUrl: string;
+}
+
+interface StudentProfessorsCountProps {
+  studentCount: number;
+  professorCount: number;
+}
+
+interface GenderWiseCount {
+  Gender: string;
+  GenderCount: number;
+}
+
 const AdminDashboard: React.FC = () => {
   const radius = 50;
   const [studentCount, setStudentCount] = useState<number>();
@@ -45,47 +69,62 @@ const AdminDashboard: React.FC = () => {
   const isMenuOpen = Boolean(anchorNoticeboard);
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isAddNoticeModalOpen, setIsAddNoticeModalOpen] = useState<boolean>(false);
+  const [isAddNoticeModalOpen, setIsAddNoticeModalOpen] =
+    useState<boolean>(false);
 
-  const [deleteItemId, setDeleteItemId] = useState<number | null>(null);
-  const [noticeEditItemId, setnoticeEditItemId] = useState<number | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<number>(0);
+  const [noticeEditItemId, setnoticeEditItemId] = useState<number>(0);
 
+  const [notices, setNotices] = useState<NoticesProps[]>([]);
 
-  const handleNoticeboardViewMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const [loading, setLoading] = useState<Boolean>(true);
+
+  const handleNoticeboardViewMenu = (
+    event: React.MouseEvent<HTMLElement>,
+    noticeId: number
+  ) => {
     setAnchorNoticeboard(event.currentTarget);
+    setDeleteItemId(noticeId);
+    setnoticeEditItemId(noticeId);
   };
 
   const handleMenuClose = () => {
     setAnchorNoticeboard(null);
+    setDeleteItemId(0);
+    setnoticeEditItemId(0);
   };
 
-  const handleDeleteClick = (id: number) => {
-    setDeleteItemId(id);
+  const handleDeleteClick = () => {
     setIsModalOpen(true);
     setAnchorNoticeboard(null);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setDeleteItemId(null);
+    setDeleteItemId(0);
   };
 
-  const handleDelete = (id: number | null) => {
+  const handleDelete = (id: number) => {
     console.log(`Deleting item with ID: ${id}`);
     setAnchorNoticeboard(null);
+
+    DeleteNotice(id);
 
     // After deletion, close the modal
     closeModal();
   };
 
-  const handleAddEditModelOpen = (id: number | null) => {
-    setnoticeEditItemId(id);
+  const handleAddEditModelOpen = () => {
+    console.log(noticeEditItemId);
     setIsAddNoticeModalOpen(true);
-  }
+    if (noticeEditItemId != 0) {
+      setAnchorNoticeboard(null);
+    }
+  };
 
   const closeAddEditModal = () => {
     setIsAddNoticeModalOpen(false);
-    setnoticeEditItemId(null);
+    setnoticeEditItemId(0);
   };
 
   useEffect(() => {
@@ -95,31 +134,69 @@ const AdminDashboard: React.FC = () => {
     }
   }, [navigate]);
 
+  // useEffect(() => {
+  //   setLoading(true);
+  //   const fetchGenderWiseCounts = async () => {
+  //     const GenderWiseCounts = await GetGenderWiseCounts();
+  //     const updatedPieData = GenderWiseCounts.map(
+  //       (item: { Gender: string; GenderCount: number }) => ({
+  //         label: item.Gender + ": " + item.GenderCount,
+  //         value: item.GenderCount,
+  //       })
+  //     );
+  //     setPieData(updatedPieData);
+  //   };
+
+  //   const fetchStudentProfessorsCount = async () => {
+  //     const studentProfessorCount: StudentProfessorsCountProps =
+  //       await GetStudentProfessorsCount();
+  //     setStudentCount(studentProfessorCount.studentCount);
+  //     setProfessorCount(studentProfessorCount.professorCount);
+  //   };
+
+  //   const fetchAllNotices = async () => {
+  //     const data: NoticesProps[] | null = await GetAllNotices();
+  //     if (data != null) {
+  //       setNotices(data);
+  //     }
+  //   };
+
+  //     fetchAllNotices();
+  //     fetchGenderWiseCounts();
+  //     fetchStudentProfessorsCount();
+  // }, []);
+
   useEffect(() => {
-    const fetchGenderWiseCounts = async () => {
-      const GenderWiseCounts = await GetGenderWiseCounts();
-      const updatedPieData = GenderWiseCounts.map(
-        (item: { Gender: string; GenderCount: number }) => ({
-          label: item.Gender + ": " + item.GenderCount,
-          value: item.GenderCount,
-        })
-      );
-      setPieData(updatedPieData);
-    };
+    const fetchData = async () => {
+      try {
+        const [genderWiseCounts, studentProfessorsCount, allNotices] =
+          await Promise.all([
+            GetGenderWiseCounts(),
+            GetStudentProfessorsCount(),
+            GetAllNotices(),
+          ]);
 
-    interface StudentProfessorsCountProps {
-      studentCount: number;
-      professorCount: number;
-    }
-    const fetchStudentProfessorsCount = async () => {
-      const studentProfessorCount: StudentProfessorsCountProps =
-        await GetStudentProfessorsCount();
-      setStudentCount(studentProfessorCount.studentCount);
-      setProfessorCount(studentProfessorCount.professorCount);
-    };
+        const updatedPieData = genderWiseCounts.map(
+          (item: GenderWiseCount) => ({
+            label: `${item.Gender}: ${item.GenderCount}`,
+            value: item.GenderCount,
+          })
+        );
 
-    fetchGenderWiseCounts();
-    fetchStudentProfessorsCount();
+        setPieData(updatedPieData);
+
+        setStudentCount(studentProfessorsCount.studentCount);
+        setProfessorCount(studentProfessorsCount.professorCount);
+        if (allNotices) {
+          setNotices(allNotices);
+        }
+      } catch (error) {
+        console.log("error ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   const menuId = "primary-search-account-menu";
@@ -139,9 +216,9 @@ const AdminDashboard: React.FC = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem>Edit</MenuItem>
+      <MenuItem onClick={handleAddEditModelOpen}>Edit</MenuItem>
       <MenuItem>View</MenuItem>
-      <MenuItem onClick={() => handleDeleteClick(1)}>Delete</MenuItem>
+      <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
     </Menu>
   );
 
@@ -323,6 +400,21 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <>
+      {loading && (
+        <Box
+          sx={{
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            height: "100vh",
+            zIndex: "9000",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          className="loading-spinner"
+        >
+          <img src={LoadingGif} alt="loading-gif" />
+        </Box>
+      )}
       {/* BOX FOR ALL CARDS */}
 
       <Box sx={{ flexGrow: 1 }}>
@@ -526,153 +618,179 @@ const AdminDashboard: React.FC = () => {
               justifyContent: "space-between",
               alignItems: "center",
               width: "100%",
+              position: "sticky",
             }}
           >
             <h3>Notice Board</h3>
-            <button className="notice-board-add-btn" onClick={() => handleAddEditModelOpen(null)}>+</button>
-          </Box>
-          <Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  marginTop: 2,
-                  gap: 2,
-                  alignItems: "center",
-                  width: {
-                    xs: "100%",
-                    sm: "100%",
-                    md: "50%",
-                    lg: "50%",
-                    xl: "50%",
-                  },
-                }}
-              >
-                <img
-                  className="notice-board-imgs"
-                  src={demoImage}
-                  alt="notice-board-img"
-                />
-                <Typography sx={{ fontWeight: "600", wordBreak: "break-word" }}>
-                  School annual sports day celebration 2024
-                </Typography>
-              </Box>
-              <Box
-                sx={{
-                  display: {
-                    sm: "none",
-                    xs: "none",
-                    md: "flex",
-                    lg: "flex",
-                    xl: "flex",
-                  },
-                  marginTop: 2,
-                  gap: 2,
-                  alignItems: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#4c8cf8",
-                    padding: 1,
-                    borderRadius: "5px",
-                  }}
-                >
-                  <Typography color="white">20 July, 2023</Typography>
-                </Box>
-              </Box>
-
-              <Box
-                sx={{
-                  display: {
-                    sm: "none",
-                    xs: "none",
-                    md: "flex",
-                    lg: "flex",
-                    xl: "flex",
-                  },
-                  marginTop: 2,
-                  gap: 0,
-                  alignItems: "center",
-                }}
-              >
-                <button className="notice-board-view-btn">
-                  <VisibilityIcon sx={{ fontSize: "20px" }} />
-                </button>
-                <Typography sx={{ fontWeight: "600" }}>20K</Typography>
-              </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  marginTop: 2,
-                  gap: 0,
-                  alignItems: "center",
-                }}
-              >
-                <button
-                  onClick={handleNoticeboardViewMenu}
-                  style={{
-                    backgroundColor: "transparent",
-                    border: "none",
-                    marginRight: "10px",
-                  }}
-                >
-                  <MoreHorizIcon sx={{ fontSize: "20px" }} />
-                </button>
-              </Box>
-            </Box>
-            <Box
-              sx={{
-                display: {
-                  sm: "flex",
-                  xs: "flex",
-                  md: "none",
-                  lg: "none",
-                  xl: "none",
-                },
-                gap: 3,
-              }}
+            <button
+              className="notice-board-add-btn"
+              onClick={handleAddEditModelOpen}
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  marginTop: 2,
-                  gap: 2,
-                  alignItems: "center",
-                }}
-              >
+              +
+            </button>
+          </Box>
+          <Box
+            sx={{
+              overflowY: "auto",
+              maxHeight: "calc(400px - 48px)",
+            }}
+          >
+            {notices.map((notice) => (
+              <Box key={notice.noticeId}>
+                <Box
+                  key={notice.noticeId}
+                  sx={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginTop: 2,
+                      gap: 2,
+                      alignItems: "center",
+                      width: {
+                        xs: "100%",
+                        sm: "100%",
+                        md: "50%",
+                        lg: "50%",
+                        xl: "50%",
+                      },
+                    }}
+                  >
+                    <img
+                      className="notice-board-imgs"
+                      src={notice.imageUrl}
+                      alt="notice-board-img"
+                    />
+                    <Typography
+                      sx={{ fontWeight: "600", wordBreak: "break-word" }}
+                    >
+                      {notice.title}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: {
+                        sm: "none",
+                        xs: "none",
+                        md: "flex",
+                        lg: "flex",
+                        xl: "flex",
+                      },
+                      marginTop: 2,
+                      gap: 2,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "#4c8cf8",
+                        padding: 1,
+                        borderRadius: "5px",
+                      }}
+                    >
+                      <Typography color="white">
+                        {format(notice.date, "dd MMM, yyyy")}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: {
+                        sm: "none",
+                        xs: "none",
+                        md: "flex",
+                        lg: "flex",
+                        xl: "flex",
+                      },
+                      marginTop: 2,
+                      gap: 0,
+                      alignItems: "center",
+                    }}
+                  >
+                    <button className="notice-board-view-btn">
+                      <VisibilityIcon sx={{ fontSize: "20px" }} />
+                    </button>
+                    <Typography sx={{ fontWeight: "600" }}>20K</Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginTop: 2,
+                      gap: 0,
+                      alignItems: "center",
+                    }}
+                  >
+                    <button
+                      onClick={(e) =>
+                        handleNoticeboardViewMenu(e, notice.noticeId)
+                      }
+                      style={{
+                        backgroundColor: "transparent",
+                        border: "none",
+                        marginRight: "10px",
+                      }}
+                    >
+                      <MoreHorizIcon sx={{ fontSize: "20px" }} />
+                    </button>
+                  </Box>
+                </Box>
                 <Box
                   sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "#4c8cf8",
-                    padding: 1,
-                    borderRadius: "5px",
+                    display: {
+                      sm: "flex",
+                      xs: "flex",
+                      md: "none",
+                      lg: "none",
+                      xl: "none",
+                    },
+                    gap: 3,
                   }}
                 >
-                  <Typography color="white">20 July, 2023</Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginTop: 2,
+                      gap: 2,
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        backgroundColor: "#4c8cf8",
+                        padding: 1,
+                        borderRadius: "5px",
+                      }}
+                    >
+                      <Typography color="white">
+                        {format(notice.date, "dd MMM, yyyy")}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: "flex",
+                      marginTop: 2,
+                      gap: 0,
+                      alignItems: "center",
+                    }}
+                  >
+                    <button className="notice-board-view-btn">
+                      <VisibilityIcon sx={{ fontSize: "20px" }} />
+                    </button>
+                    <Typography sx={{ fontWeight: "600" }}>20K</Typography>
+                  </Box>
                 </Box>
               </Box>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  marginTop: 2,
-                  gap: 0,
-                  alignItems: "center",
-                }}
-              >
-                <button className="notice-board-view-btn">
-                  <VisibilityIcon sx={{ fontSize: "20px" }} />
-                </button>
-                <Typography sx={{ fontWeight: "600" }}>20K</Typography>
-              </Box>
-            </Box>
+            ))}
           </Box>
         </Box>
         <div className="event-calender-div">
@@ -723,10 +841,10 @@ const AdminDashboard: React.FC = () => {
         onDelete={() => handleDelete(deleteItemId)}
       />
 
-      <AddEditNoticeModal 
-      isOpen={isAddNoticeModalOpen}
-      onClose={closeAddEditModal}
-      onAddEdit={()=> {console.log("Add successfdully")}}
+      <AddEditNoticeModal
+        isOpen={isAddNoticeModalOpen}
+        onClose={closeAddEditModal}
+        noticeId={noticeEditItemId}
       />
     </>
   );

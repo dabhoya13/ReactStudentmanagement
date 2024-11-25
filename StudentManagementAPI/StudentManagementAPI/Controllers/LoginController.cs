@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using StudentManagementAPI.Models;
+using StudentManagementAPI.Services;
 using StudentManagementAPI.Services.MainServices;
 using System.Net;
 
@@ -17,7 +18,7 @@ namespace StudentManagementAPI.Controllers
         private readonly IConfiguration _configuration; 
 
 
-        public LoginController(IStudentServices studentServices, IConfiguration configuration)
+        public LoginController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices)
         {
             this._response = new();
             _studentServices = studentServices;

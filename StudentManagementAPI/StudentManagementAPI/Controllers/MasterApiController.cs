@@ -34,6 +34,7 @@ namespace StudentManagementAPI.Controllers
         {
             { "Login", typeof(LoginController) },
             { "Student", typeof(StudentController) },
+            { "Hod", typeof(HodController) },
 
         };
 
@@ -72,7 +73,7 @@ namespace StudentManagementAPI.Controllers
                         object controller = null;
                         if (controllers.TryGetValue(apiRequest.ControllerName, out Type controllerType))
                         {
-                            controller = Activator.CreateInstance(controllerType, _studentServices, _configuration);
+                            controller = Activator.CreateInstance(controllerType, _studentServices, _configuration,_jwtService);
                             MethodInfo methodInfo = controller.GetType().GetMethod(apiRequest.MethodName);
                             if (methodInfo != null)
                             {
@@ -147,7 +148,7 @@ namespace StudentManagementAPI.Controllers
                 object controller = null;
                 if (controllers.TryGetValue(apiRequest.ControllerName, out Type controllerType))
                 {
-                    controller = Activator.CreateInstance(controllerType, _studentServices, _configuration);
+                    controller = Activator.CreateInstance(controllerType, _studentServices, _configuration, _jwtService);
                     MethodInfo methodInfo = controller.GetType().GetMethod(apiRequest.MethodName);
                     if (methodInfo != null)
                     {

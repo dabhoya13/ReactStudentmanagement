@@ -18,7 +18,10 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Widgets } from "@mui/icons-material";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import { CallAPI, CallAPIForFileUpload } from "../../APICall/callApi";
+import { useNavigate } from "react-router-dom";
+import { GetNoticeDetailsById } from "../Hod/AdminDashboard's";
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -113,17 +116,18 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
 interface NoticeAddEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddEdit: () => void;
+  noticeId: number;
 }
 
 export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
   isOpen,
   onClose,
-  onAddEdit,
+  noticeId,
 }) => {
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [imagePreview, setImagePreview] = useState<string | null>(null); 
-
+  const navigate = useNavigate();
   const currentDateMinusOneDay = dayjs().subtract(1, "day");
   const validationSchema = Yup.object({
     title: Yup.string().required("Please Enter Title"),
@@ -137,7 +141,15 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
     file: Yup.mixed().required("Please Upload Image."),
   });
 
-  const formik = useFormik({
+  interface FormValues {
+    title: string | null;
+    shortDescription: string | null;
+    longDescription: string | null;
+    date: any;
+    file: File | null;
+  }
+
+  const formik = useFormik<FormValues>({
     initialValues: {
       title: "",
       shortDescription: "",
@@ -147,18 +159,38 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
     },
     validationSchema,
     onSubmit: async (values) => {
+      let formattedDate = null;
+      formattedDate = new Date(values.date)
+        .toISOString()
+        .slice(0, 19)
+        .replace("T", " ");
+
       let noticeModel = {
+        NoticeId: noticeId,
         Title: values.title,
         ShortDescription: values.shortDescription,
         LongDescription: values.longDescription,
-        Date: values.date,
+        Date: formattedDate,
+        ImageName: values.file?.name,
       };
 
+      console.log(values);
       const formData = {
-        ControllerName: "Login",
-        MethodName: "CheckLoginDetails",
+        ControllerName: "Hod",
+        MethodName: "UpsertNoticeDetails",
         DataObject: JSON.stringify(noticeModel),
+        RoleIds: ["1"],
       };
+
+      var response = await CallAPI(formData);
+      if (response.isSuccess == true) {
+        var response1 = await CallAPIForFileUpload(values.file);
+        if (response1.statusCode == 200) {
+          window.location.reload();
+        }
+      } else {
+        navigate("/login");
+      }
     },
     // var response = await CallLoginAPI(formData);
     //   if (response.result != null && response.result.data.jwtToken != null) {
@@ -166,20 +198,42 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
     // },
   });
 
-  const handleFileChange = (event : React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const loadingData = async () => {
+      setIsLoading(true);
+      if (noticeId != 0) {
+        try {
+          const response = await GetNoticeDetailsById(noticeId);
+          formik.setValues({
+            title: response?.title ?? "",
+            longDescription: response?.longDescription ?? "",
+            shortDescription : response?.shortDescription ?? "",
+            date: response?.date ?? "",
+            file: null,
+          })
+        } catch (error) {
+          console.error("Failed to load notice data", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    loadingData();
+  });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];
-    if(file)
-    {
-      formik.setFieldValue("file",file);
-      
+    if (file) {
+      formik.setFieldValue("file", file);
+
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
-      }
+      };
 
       reader.readAsDataURL(file);
     }
-  }
+  };
 
   return (
     <BootstrapDialog
@@ -191,7 +245,7 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
         sx={{ m: 0, p: 2, backgroundColor: "#4c8cf8", color: "white" }}
         id="customized-dialog-title"
       >
-        Model title
+        {noticeId != 0 ? "Edit Notice" : "Add Notice"}
       </DialogTitle>
       <IconButton
         aria-label="close"
@@ -304,13 +358,16 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
             />
           </Box>
 
-          <Box className="Dashboard-fileUpload-box" sx={{ marginTop: 3, display: "flex", flexDirection: "column" }}>
+          <Box
+            className="Dashboard-fileUpload-box"
+            sx={{ marginTop: 3, display: "flex", flexDirection: "column" }}
+          >
             <span className="mb-3">Select Image:</span>
             <button type="button" className="upload-btn d-flex gap-2">
               Upload
             </button>
             <input
-            className="mb-3"
+              className="mb-3"
               type="file"
               id="myinputfile"
               name="file"
@@ -327,7 +384,11 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
             {/* Preview the image */}
             {imagePreview && (
               <Box sx={{ marginTop: 2 }}>
-                <img src={imagePreview} alt="File Preview" style={{ maxWidth: "200px", maxHeight: "200px" }} />
+                <img
+                  src={imagePreview}
+                  alt="File Preview"
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                />
               </Box>
             )}
           </Box>
@@ -337,7 +398,7 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
             type="submit"
             sx={{ backgroundColor: "#6a6cf6", color: "white", marginTop: 2 }}
           >
-            Login
+            Submit
           </Button>
         </form>
       </DialogContent>

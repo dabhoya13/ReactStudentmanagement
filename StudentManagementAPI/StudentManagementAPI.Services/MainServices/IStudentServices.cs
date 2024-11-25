@@ -19,5 +19,11 @@ namespace StudentManagementAPI.Services.MainServices
         Task<IList<GenderWiseCountDto>> GetStudentCountByGender();
 
         Task<StudentProfessorCount> GetStudentProfessorCount();
+
+        Task UpsertNoticeDetails(NoticeDto noticeDto);
+
+        Task<IList<NoticeDto>> GetALlNotices();
+
+        Task DeleteNotice(int NoticeId);
     }
 }

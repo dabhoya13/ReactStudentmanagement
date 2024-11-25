@@ -69,3 +69,41 @@ export const CallAPI = async (formData: MainFormDataProps): Promise<any> => {
     throw new Error();
   }
 };
+
+export const CallAPIForFileUpload = async (File: File | null): Promise<any> => {
+  const _baseAddress = "https://localhost:7199/api/";
+  try {
+    var token = sessionStorage.getItem("token");
+    if (token != null) {
+      var url = _baseAddress + "Hod/UploadFiles";
+      const formData = new FormData();
+      if (File) {
+        formData.append("File", File);
+      }
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          // "Content-Type": "multipart/form-data",
+          token: `${token}`,
+        },
+        body:formData,
+      });
+      var data = await response.json();
+      if (data.statusCode === 401 || data.statusCode === 500 ) {
+        sessionStorage.clear();
+        window.location.href = "/login";
+        return null;
+      }
+      return data;
+    } else {
+      sessionStorage.clear();
+      window.location.href = "/login";
+      return null;
+    }
+  } catch (error) {
+    throw new Error();
+  }
+};
+
+
+

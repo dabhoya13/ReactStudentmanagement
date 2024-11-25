@@ -53,3 +53,71 @@ export const GetStudentProfessorsCount = async (): Promise<StudentProfessorsCoun
         };
     }
 }
+
+interface NoticeProps{
+    noticeId:number,
+    shortDescription : string,
+    longDescription : string,
+    date : Date,
+    title:string,
+    imageName:string,
+    imageUrl : string,
+
+}
+export const GetAllNotices = async (): Promise<NoticeProps[] | null> => {
+    const formData = {
+        ControllerName : "Hod",
+        MethodName : "GetAllNotices",
+        DataObject : JSON.stringify(null),
+        RoleIds :  [ "1" ],
+    }
+
+    var response = await CallAPI(formData);
+    if(response != null && response.result != null)
+    {
+        const notices :NoticeProps[] = response.result.data;
+        return notices;
+    }else{
+        return null;
+    }
+}
+
+export const DeleteNotice = async (NoticeId : number) => {
+    if(NoticeId != 0)
+    {
+        const formData = {
+            ControllerName :"Hod",
+            MethodName : "DeleteNotice",
+            DataObject  :JSON.stringify(NoticeId),
+            RoleIds : ["1"],
+        }
+
+        var response = await CallAPI(formData);
+        if(response.isSuccess == true )
+        {
+            window.location.reload();
+        }else{
+            window.location.href = "/login";
+        }
+    }
+}
+
+
+
+export const GetNoticeDetailsById = async (NoticeId : number) : Promise<NoticeProps | null> => {
+    if(NoticeId != 0)
+    {
+        const formData = {
+            ControllerName :"Hod",
+            MethodName : "GetNoticeDetailsById",
+            DataObject  :JSON.stringify(NoticeId),
+            RoleIds : ["1"],
+        }
+
+        var response = await CallAPI(formData);
+        const NoticeProps : NoticeProps = response.result.data;
+        return NoticeProps
+    }else{
+        return null;
+    }
+}

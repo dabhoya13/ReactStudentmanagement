@@ -1,3 +1,4 @@
+using Microsoft.Extensions.FileProviders;
 using StudentManagementAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,7 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
     // Configure session options as needed (optional)
-    options.IdleTimeout = TimeSpan.FromMinutes(1);
+    options.IdleTimeout = TimeSpan.FromHours(2);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -36,10 +37,17 @@ builder.Services.AddCors(options =>
                       .AllowAnyMethod()
                       .AllowAnyHeader()
                       .AllowCredentials();
+
             });
 });
 
 var app = builder.Build();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "NoticeImages")),
+    RequestPath = "/NoticeImages"
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

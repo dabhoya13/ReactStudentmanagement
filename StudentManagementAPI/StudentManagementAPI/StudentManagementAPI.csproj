@@ -15,4 +15,8 @@
     <ProjectReference Include="..\StudentManagementAPI.Services\StudentManagementAPI.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Uploads\NoticeImages\" />
+  </ItemGroup>
+
 </Project>

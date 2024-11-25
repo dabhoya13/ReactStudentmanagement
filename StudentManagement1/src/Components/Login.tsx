@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  Link,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Link, TextField, Typography } from "@mui/material";
 import SignInImage from "../assets/Images/signin-image.jpg";
 import LogoImage from "../assets/Images/logo2.svg";
 import * as Yup from "yup";
@@ -18,11 +12,11 @@ interface LoginProps {
   setAuthenticated: (auth: boolean) => void;
 }
 
-
-
 const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
   const navigate = useNavigate();
-  const [invalidUsernamePassword, setInvlidUsernamePassword] = useState<string>();
+  const [loading, setLoading] = useState(false);
+  const [invalidUsernamePassword, setInvlidUsernamePassword] =
+    useState<string>();
   const validationSchema = Yup.object({
     Username: Yup.string().required("Please Enter Username"),
     Password: Yup.string()
@@ -41,6 +35,7 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
     },
     validationSchema,
     onSubmit: async (values) => {
+      setLoading(true);
       let studentModel = {
         UserName: values.Username,
         Password: values.Password,
@@ -52,19 +47,25 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
         DataObject: JSON.stringify(studentModel),
       };
 
-      var response = await CallLoginAPI(formData);
-      if (response.result != null && response.result.data.jwtToken != null) {
-        var token = response.result.data.jwtToken;
-        sessionStorage.setItem("token", token);
-        setAuthenticated(true);
-        const user = getUserFromToken();
-        if (user?.Role == "1") {
-          navigate("/admin/adminDashboard");
-        }else{
-          navigate("/student/dashboard");
+      try {
+        var response = await CallLoginAPI(formData);
+        if (response.result != null && response.result.data.jwtToken != null) {
+          var token = response.result.data.jwtToken;
+          sessionStorage.setItem("token", token);
+          setAuthenticated(true);
+          const user = getUserFromToken();
+          if (user?.Role == "1") {
+            navigate("/admin/adminDashboard");
+          } else {
+            navigate("/student/dashboard");
+          }
+        } else {
+          setInvlidUsernamePassword("Invalid Username or Password");
         }
-      }else{
+      } catch (error) {
         setInvlidUsernamePassword("Invalid Username or Password");
+      } finally {
+        setLoading(false);
       }
     },
   });
@@ -127,7 +128,6 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
             display: { sx: "none", xs: "none", md: "block", xl: "block" },
           }}
         >
-          
           <img src={SignInImage} alt="signin-img" />
         </Box>
         <Box
@@ -145,7 +145,9 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
             your Account
           </Box>
           <form className="login-form" onSubmit={formik.handleSubmit}>
-          <Typography sx={{color:"red",marginTop:2}}>{invalidUsernamePassword}</Typography>
+            <Typography sx={{ color: "red", marginTop: 2 }}>
+              {invalidUsernamePassword}
+            </Typography>
             <Box
               sx={{ marginTop: 3, display: "flex", flexDirection: "column" }}
             >
@@ -198,9 +200,10 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
             <Button
               fullWidth
               type="submit"
+              disabled={loading}
               sx={{ backgroundColor: "#6a6cf6", color: "white", marginTop: 2 }}
             >
-              Login
+                {loading ? "Loading..." : "Login"}
             </Button>
           </form>
         </Box>

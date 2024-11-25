@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using static StudentManagementAPI.DataContext.Enums;
@@ -104,6 +105,12 @@ namespace StudentManagementAPI.Services.MainServices
             if (controllerName == "Login" && methodName == "CheckLoginDetails")
             {
                 return GetDataModel<StudentLoginDto>(dataObj);
+            }else if(controllerName == "Hod" && methodName == "UpsertNoticeDetails")
+            {
+                return GetDataModel<NoticeDto>(dataObj);
+            }else if(controllerName == "Hod" && methodName == "DeleteNotice")
+            {
+                return Convert.ToInt32(dataObj);
             }
             else
             {
@@ -173,6 +180,74 @@ namespace StudentManagementAPI.Services.MainServices
             {
                 StudentProfessorCount studentProfessorCount= await DbClient.ExecuteOneRecordProcedure<StudentProfessorCount>("[dbo].[Get_StudentProfessors_Count]", null);
                 return studentProfessorCount;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpsertNoticeDetails(NoticeDto noticeDto)
+        {
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("ShortDescription");
+                table.Columns.Add("LongDescription");
+                table.Columns.Add("Title");
+                table.Columns.Add("ImageName");
+                table.Columns.Add("Date");
+
+                var row = table.NewRow();
+                row["ShortDescription"] = noticeDto.ShortDescription;
+                row["LongDescription"] = noticeDto.LongDescription;
+                row["Title"] = noticeDto.Title;
+                row["ImageName"] = noticeDto.ImageName;
+                row["Date"] = (noticeDto.Date).ToString("MM-dd-yyyy HH:mm:ss");
+                table.Rows.Add(row);
+
+                if(noticeDto.NoticeId > 0)
+                {
+                    Collection<DbParameters> parameters = new();
+                    parameters.Add(new DbParameters { Name = "@notice_table", Value = table, DBType = DbType.Object, TypeName = "Notice_Table" });
+                    parameters.Add(new DbParameters { Name = "@noticeId", Value = noticeDto.NoticeId, DBType = DbType.Int32 });
+
+                    await DbClient.ExecuteProcedure("[dbo].[Add_Edit_Notice_details]", parameters,ExecuteType.ExecuteNonQuery);
+                }
+                else
+                {
+
+                    Collection<DbParameters> addParameters = new();
+                    addParameters.Add(new DbParameters { Name = "@notice_table", Value = table, DBType = DbType.Object, TypeName = "Notice_Table" });
+                    await DbClient.ExecuteProcedure("[dbo].[Add_Edit_Notice_details]", addParameters, ExecuteType.ExecuteNonQuery);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<NoticeDto>> GetALlNotices()
+        {
+            try
+            {
+                IList<NoticeDto> noticeDtos= await DbClient.ExecuteProcedure<NoticeDto>("[dbo].[GetAll_Notice_details]", null);
+                return noticeDtos;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task DeleteNotice(int NoticeId)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@noticeId", Value = NoticeId, DBType = DbType.Int32 });
+                await DbClient.ExecuteProcedure("[dbo].[Delete_Notice_ById]", parameters,ExecuteType.ExecuteNonQuery);
             }
             catch (Exception ex)
             {

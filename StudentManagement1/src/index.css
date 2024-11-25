@@ -177,7 +177,7 @@ ADMIN DASHBOARD CSS START
 
 .pie-chart-count{
   position: absolute;
-  margin-top: 175px;
+  margin-top: 170px;
 }
 
 @media (max-width: 1581px) {
@@ -249,4 +249,14 @@ ADMIN DASHBOARD CSS START
   right: 3%;
   margin-top: 33px;
   width: 102px !important;
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  color: #007bff;
 }
