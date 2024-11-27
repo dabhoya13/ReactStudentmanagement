@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { getUserFromToken } from "../../Utils/Auth/Auth";
 import {
   Box,
+  Button,
   Card,
   CardContent,
   Grid2,
@@ -19,7 +20,11 @@ import { BarChart } from "@mui/x-charts";
 import demoImage from "../../assets/Images/demo.jpg";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
+import {
+  DateCalendar,
+  DatePicker,
+  LocalizationProvider,
+} from "@mui/x-date-pickers";
 
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -27,13 +32,20 @@ import dayjs, { Dayjs } from "dayjs";
 import {
   DeleteNotice,
   GetAllNotices,
+  GetAttendanceByMonthYear,
   GetGenderWiseCounts,
+  GetNoticeDetailsById,
   GetStudentProfessorsCount,
 } from "./AdminDashboard's";
 import { valueFormatter } from "../../Utils/PieCharts";
-import { AddEditNoticeModal, DeleteModal } from "../AllModals/Modals";
+import {
+  AddEditNoticeModal,
+  ChangeAttendanceGraphModal,
+  DeleteModal,
+} from "../AllModals/Modals";
 import LoadingGif from "../../assets/Images/Animation.gif";
-import { format } from "date-fns";
+import { format, isToday } from "date-fns";
+import { Today } from "@mui/icons-material";
 interface NoticesProps {
   noticeId: number;
   shortDescription: string;
@@ -54,6 +66,28 @@ interface GenderWiseCount {
   GenderCount: number;
 }
 
+interface NoticeProps {
+  noticeId: number;
+  shortDescription: string;
+  longDescription: string;
+  date: Date;
+  title: string;
+  imageName: string;
+  imageUrl: string;
+}
+
+interface GetAttendanceProps {
+  month: number;
+  year: number;
+  half: number;
+}
+
+interface AttendanceCountProps {
+  totalPresent: number;
+  totalAbsent: number;
+  date: string;
+}
+
 const AdminDashboard: React.FC = () => {
   const radius = 50;
   const [studentCount, setStudentCount] = useState<number>();
@@ -64,6 +98,8 @@ const AdminDashboard: React.FC = () => {
     { label: "Male", value: 10 },
     { label: "Female", value: 30 },
   ]);
+
+  const [barChartData, setBarChartData] = useState<any[]>([]);
   const [anchorNoticeboard, setAnchorNoticeboard] =
     useState<null | HTMLElement>(null);
   const isMenuOpen = Boolean(anchorNoticeboard);
@@ -71,6 +107,8 @@ const AdminDashboard: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isAddNoticeModalOpen, setIsAddNoticeModalOpen] =
     useState<boolean>(false);
+  const [openMonthYearSelect, setOpenMonthYearSelect] =
+    React.useState<boolean>(false);
 
   const [deleteItemId, setDeleteItemId] = useState<number>(0);
   const [noticeEditItemId, setnoticeEditItemId] = useState<number>(0);
@@ -78,7 +116,7 @@ const AdminDashboard: React.FC = () => {
   const [notices, setNotices] = useState<NoticesProps[]>([]);
 
   const [loading, setLoading] = useState<Boolean>(true);
-
+  const [formData, setFormData] = useState<NoticeProps | null>();
   const handleNoticeboardViewMenu = (
     event: React.MouseEvent<HTMLElement>,
     noticeId: number
@@ -88,45 +126,109 @@ const AdminDashboard: React.FC = () => {
     setnoticeEditItemId(noticeId);
   };
 
+  // This method is use for close Notice Board's EDIT/VIEW/DELETE menu
   const handleMenuClose = () => {
     setAnchorNoticeboard(null);
     setDeleteItemId(0);
     setnoticeEditItemId(0);
   };
 
+  // This Method is use for when Press Delete On Notice board menu then open delete modal
+
   const handleDeleteClick = () => {
     setIsModalOpen(true);
     setAnchorNoticeboard(null);
   };
 
+  //  This Method is use for close delete menu
   const closeModal = () => {
     setIsModalOpen(false);
     setDeleteItemId(0);
   };
 
+  // This method is use for delete notice
   const handleDelete = (id: number) => {
     console.log(`Deleting item with ID: ${id}`);
     setAnchorNoticeboard(null);
 
     DeleteNotice(id);
 
-    // After deletion, close the modal
     closeModal();
   };
 
-  const handleAddEditModelOpen = () => {
+  // This method is use for open add new notice Modal
+  const handleAddModelOpen = () => {
+    setnoticeEditItemId(0);
+    setFormData(null);
+    setIsAddNoticeModalOpen(true);
+  };
+
+  // This method is use for Open Edit exising Notice modal
+  const handleEditModelOpen = async () => {
     console.log(noticeEditItemId);
+
+    if (noticeEditItemId != 0) {
+      try {
+        const response = await GetNoticeDetailsById(noticeEditItemId);
+        if (response != null) {
+          setFormData(response);
+        }
+      } catch (error) {
+        console.error("Failed to load notice data", error);
+      } finally {
+      }
+    }
+
     setIsAddNoticeModalOpen(true);
     if (noticeEditItemId != 0) {
       setAnchorNoticeboard(null);
     }
   };
 
+  // This method is use for close add and edit modal
   const closeAddEditModal = () => {
     setIsAddNoticeModalOpen(false);
     setnoticeEditItemId(0);
   };
 
+  // This method is use to open attendance graph select month/year modal
+  const handleMonthYearSelectOpen = () => {
+    setOpenMonthYearSelect(true);
+  };
+
+  // This method is use to close attendance graph select month/year modal
+  const handleMonthYearSelectClose = () => {
+    setOpenMonthYearSelect(false);
+  };
+
+  const ChangeGraphDataWithMonthAndYear = async (data: {
+    date: Date;
+    halfs: number;
+  }) => {
+    const originalDate = new Date(data.date);
+    const getAttendanceProps: GetAttendanceProps = {
+      half: data.halfs,
+      month: originalDate.getMonth() + 1,
+      year: originalDate.getFullYear(),
+    };
+    const result = await GetAttendanceByMonthYear(getAttendanceProps);
+    const updatedAttendanceData = result.map((item: AttendanceCountProps) => {
+      const fullDate = new Date(item.date);
+      const date = fullDate.getDate().toString();
+      const month = fullDate.getMonth() + 1;
+      const dateMonth = `${date}/${month}`;
+
+      return {
+        label: dateMonth,
+        totalPresent: item.totalPresent,
+        totalAbsent: item.totalAbsent,
+      };
+    });
+    setBarChartData(updatedAttendanceData);
+    handleMonthYearSelectClose();
+  };
+
+  // This UseEffect is use for redirect to login if JWTToken is null
   useEffect(() => {
     const user = getUserFromToken();
     if (!user || user.Role != "1") {
@@ -166,15 +268,34 @@ const AdminDashboard: React.FC = () => {
   //     fetchStudentProfessorsCount();
   // }, []);
 
+  //
+
+  // This UseEffect is use for fetch data of gender count for graph studentprofessorCount and all notices
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [genderWiseCounts, studentProfessorsCount, allNotices] =
-          await Promise.all([
-            GetGenderWiseCounts(),
-            GetStudentProfessorsCount(),
-            GetAllNotices(),
-          ]);
+        const currentDate = new Date();
+        var half = 1;
+        if (currentDate.getDate() > 15) {
+          half = 2;
+        }
+        const getAttendanceProps: GetAttendanceProps = {
+          half: half,
+          month: currentDate.getMonth() + 1,
+          year: currentDate.getFullYear(),
+        };
+
+        const [
+          genderWiseCounts,
+          studentProfessorsCount,
+          allNotices,
+          barChartAttendanceData,
+        ] = await Promise.all([
+          GetGenderWiseCounts(),
+          GetStudentProfessorsCount(),
+          GetAllNotices(),
+          GetAttendanceByMonthYear(getAttendanceProps),
+        ]);
 
         const updatedPieData = genderWiseCounts.map(
           (item: GenderWiseCount) => ({
@@ -183,8 +304,22 @@ const AdminDashboard: React.FC = () => {
           })
         );
 
-        setPieData(updatedPieData);
+        const updatedAttendanceData = barChartAttendanceData.map(
+          (item: AttendanceCountProps) => {
+            const fullDate = new Date(item.date);
+            const date = fullDate.getDate().toString();
+            const month = fullDate.getMonth() + 1;
+            const dateMonth = `${date}/${month}`;
 
+            return {
+              label: dateMonth,
+              totalPresent: item.totalPresent,
+              totalAbsent: item.totalAbsent,
+            };
+          }
+        );
+        setPieData(updatedPieData);
+        setBarChartData(updatedAttendanceData);
         setStudentCount(studentProfessorsCount.studentCount);
         setProfessorCount(studentProfessorsCount.professorCount);
         if (allNotices) {
@@ -216,7 +351,7 @@ const AdminDashboard: React.FC = () => {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleAddEditModelOpen}>Edit</MenuItem>
+      <MenuItem onClick={handleEditModelOpen}>Edit</MenuItem>
       <MenuItem>View</MenuItem>
       <MenuItem onClick={handleDeleteClick}>Delete</MenuItem>
     </Menu>
@@ -553,22 +688,64 @@ const AdminDashboard: React.FC = () => {
             width: { lg: "70%", md: "100%", sm: "100%" },
           }}
         >
-          <h3 style={{ marginLeft: 5 }}>Attendance</h3>
+          <Box
+            className="dashboard-Attendance-header"
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <h3 style={{ marginLeft: 5 }}>Attendance</h3>
+            <Button
+              onClick={handleMonthYearSelectOpen}
+              sx={{
+                backgroundColor: "grey",
+                color: "white",
+                borderRadius: "5px",
+              }}
+            >
+              Select Month/Year
+            </Button>
+            {/* <Box sx={{ display: "flex", gap:2 }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer
+                  components={["DatePicker", "DatePicker", "DatePicker"]}
+                >
+                  <DatePicker
+                  value={dayjs()}
+                    label={"Select month/year"}
+                    views={["month", "year"]}
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+              <select className="attendance-half-dropdown">
+                <option value={1}>Months's FirstHalf</option>
+                <option value={1}>Months's SecondHalf</option>
+              </select>
+            </Box> */}
+          </Box>
           <BarChart
             borderRadius={40}
             xAxis={
               [
                 {
                   scaleType: "band",
-                  data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                  data: barChartData.map((item) => item.label),
                   categoryGapRatio: 0.5,
                   barGapRatio: 0.4,
                 },
               ] as any
             }
             series={[
-              { data: [100, 600, 300, 600, 700, 400], label: "Total Present" },
-              { data: [200, 500, 600, 600, 700, 400], label: "Total Absent" },
+              {
+                data: barChartData.map((item) => item.totalPresent),
+                label: "Total Present",
+              },
+              {
+                data: barChartData.map((item) => item.totalAbsent),
+                label: "Total Absent",
+              },
             ]}
             grid={{ horizontal: true }}
             colors={["#1fe6d1", "#4b8bf8"]}
@@ -624,7 +801,7 @@ const AdminDashboard: React.FC = () => {
             <h3>Notice Board</h3>
             <button
               className="notice-board-add-btn"
-              onClick={handleAddEditModelOpen}
+              onClick={handleAddModelOpen}
             >
               +
             </button>
@@ -686,12 +863,20 @@ const AdminDashboard: React.FC = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        backgroundColor: "#4c8cf8",
+                        backgroundColor: isToday(new Date(notice.date))
+                          ? "#4c8cf8"
+                          : "transparent",
                         padding: 1,
                         borderRadius: "5px",
                       }}
                     >
-                      <Typography color="white">
+                      <Typography
+                        sx={{
+                          color: isToday(new Date(notice.date))
+                            ? "white"
+                            : "grey",
+                        }}
+                      >
                         {format(notice.date, "dd MMM, yyyy")}
                       </Typography>
                     </Box>
@@ -845,6 +1030,13 @@ const AdminDashboard: React.FC = () => {
         isOpen={isAddNoticeModalOpen}
         onClose={closeAddEditModal}
         noticeId={noticeEditItemId}
+        initialData={formData}
+      />
+
+      <ChangeAttendanceGraphModal
+        isOpen={openMonthYearSelect}
+        onClose={handleMonthYearSelectClose}
+        onSubmit={ChangeGraphDataWithMonthAndYear}
       />
     </>
   );

@@ -108,9 +108,12 @@ namespace StudentManagementAPI.Services.MainServices
             }else if(controllerName == "Hod" && methodName == "UpsertNoticeDetails")
             {
                 return GetDataModel<NoticeDto>(dataObj);
-            }else if(controllerName == "Hod" && methodName == "DeleteNotice")
+            }else if((controllerName == "Hod" && methodName == "DeleteNotice") || (controllerName == "Hod" && methodName == "GetNoticeDetailsById"))
             {
                 return Convert.ToInt32(dataObj);
+            }else if(controllerName == "Hod" && methodName == "GetAttendanceTotalCountsByMonthYear")
+            {
+                return GetDataModel<AttendanceMonthYearDto>(dataObj);
             }
             else
             {
@@ -248,6 +251,39 @@ namespace StudentManagementAPI.Services.MainServices
                 Collection<DbParameters> parameters = new();
                 parameters.Add(new DbParameters { Name = "@noticeId", Value = NoticeId, DBType = DbType.Int32 });
                 await DbClient.ExecuteProcedure("[dbo].[Delete_Notice_ById]", parameters,ExecuteType.ExecuteNonQuery);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<NoticeDto> GetNoticeById(int NoticeId)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@noticeId", Value = NoticeId, DBType = DbType.Int32 });
+                NoticeDto noticeDto = await DbClient.ExecuteOneRecordProcedure<NoticeDto>("[dbo].[Get_Notice_ById]", parameters);
+                return noticeDto;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<AttendanceCountDto>> GetAttendanceCountByMonthYear(AttendanceMonthYearDto attendanceMonthYearDto)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@month", Value = attendanceMonthYearDto.Month, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@year", Value = attendanceMonthYearDto.Year, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@half", Value = attendanceMonthYearDto.Half, DBType = DbType.Int32 });
+
+                IList<AttendanceCountDto> attendanceCountDtos = await DbClient.ExecuteProcedure<AttendanceCountDto>("[dbo].[get_Attendance_counts_by_MonthYear]", parameters);
+                return attendanceCountDtos;
             }
             catch (Exception ex)
             {

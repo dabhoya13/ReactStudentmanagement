@@ -33,6 +33,11 @@ builder.Services.AddCors(options =>
                        .AllowAnyHeader()
                        .AllowCredentials(); // Allow credentials
 
+                builder.WithOrigins("https://localhost:7199") // Backend origin
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+
                 builder.WithOrigins("http://localhost:5173")
                       .AllowAnyMethod()
                       .AllowAnyHeader()
@@ -43,6 +48,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseCors("AllowSpecificOrigin");
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "NoticeImages")),
@@ -55,7 +61,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowSpecificOrigin");
 app.UseRouting();
 app.UseSession();
 app.UseHttpsRedirection();

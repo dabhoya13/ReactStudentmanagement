@@ -4,9 +4,15 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
+  DialogProps,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
   Link,
+  MenuItem,
+  OutlinedInput,
+  Select,
   styled,
   TextField,
   Typography,
@@ -22,6 +28,8 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { CallAPI, CallAPIForFileUpload } from "../../APICall/callApi";
 import { useNavigate } from "react-router-dom";
 import { GetNoticeDetailsById } from "../Hod/AdminDashboard's";
+import React from "react";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -113,20 +121,33 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
   );
 };
 
+interface NoticeProps {
+  noticeId: number;
+  shortDescription: string;
+  longDescription: string;
+  date: Date;
+  title: string;
+  imageName: string;
+  imageUrl: string;
+}
+
 interface NoticeAddEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   noticeId: number;
+  initialData?: NoticeProps | null;
 }
 
 export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
   isOpen,
   onClose,
   noticeId,
+  initialData,
 }) => {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const [scroll, setScroll] = React.useState<DialogProps["scroll"]>("body"); // Change default scroll to 'body'
+  const [oldImage, setOldImage] = useState<boolean>(false);
   const navigate = useNavigate();
   const currentDateMinusOneDay = dayjs().subtract(1, "day");
   const validationSchema = Yup.object({
@@ -137,8 +158,14 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
     longDescription: Yup.string().required("Please Enter LongDescription"),
     date: Yup.date()
       .required("Please Select Date")
-      .min(currentDateMinusOneDay, "Selected date cannot be in past"),
-    file: Yup.mixed().required("Please Upload Image."),
+      .test("is-after", "Selected date cannot be in past", (value) => {
+        // Convert the value to a dayjs object if it's not already one
+        return dayjs(value).isAfter(currentDateMinusOneDay, "day");
+      }),
+    file:
+      noticeId != null && noticeId != 0
+        ? Yup.mixed().notRequired()
+        : Yup.mixed().required("Please Upload Image."),
   });
 
   interface FormValues {
@@ -183,11 +210,13 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
       };
 
       var response = await CallAPI(formData);
-      if (response.isSuccess == true) {
+      if (response.isSuccess == true && noticeModel.ImageName != null) {
         var response1 = await CallAPIForFileUpload(values.file);
         if (response1.statusCode == 200) {
           window.location.reload();
         }
+      } else if (response.isSuccess == true) {
+        window.location.reload();
       } else {
         navigate("/login");
       }
@@ -200,26 +229,40 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
 
   useEffect(() => {
     const loadingData = async () => {
+      console.log("loading data");
       setIsLoading(true);
       if (noticeId != 0) {
         try {
-          const response = await GetNoticeDetailsById(noticeId);
+          if (initialData?.imageUrl) {
+            setImagePreview(initialData.imageUrl);
+            setOldImage(true);
+          }
           formik.setValues({
-            title: response?.title ?? "",
-            longDescription: response?.longDescription ?? "",
-            shortDescription : response?.shortDescription ?? "",
-            date: response?.date ?? "",
+            title: initialData?.title ?? "",
+            longDescription: initialData?.longDescription ?? "",
+            shortDescription: initialData?.shortDescription ?? "",
             file: null,
-          })
+            date: initialData?.date ? dayjs(initialData.date) : null,
+          });
         } catch (error) {
           console.error("Failed to load notice data", error);
         } finally {
           setIsLoading(false);
         }
+      } else {
+        setImagePreview(null);
+        setOldImage(false);
+        formik.setValues({
+          title: "",
+          longDescription: "",
+          shortDescription: "",
+          file: null,
+          date: null,
+        });
       }
     };
     loadingData();
-  });
+  }, [initialData]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.currentTarget.files?.[0];
@@ -232,6 +275,7 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
       };
 
       reader.readAsDataURL(file);
+      setOldImage(false);
     }
   };
 
@@ -240,6 +284,8 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
       onClose={onClose}
       aria-labelledby="customized-dialog-title"
       open={isOpen}
+      scroll={scroll}
+      sx={{ maxHeight: "100vh", overflowY: "auto" }}
     >
       <DialogTitle
         sx={{ m: 0, p: 2, backgroundColor: "#4c8cf8", color: "white" }}
@@ -371,7 +417,6 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
               type="file"
               id="myinputfile"
               name="file"
-              required
               onChange={(event) => handleFileChange(event)}
               onBlur={formik.handleBlur}
             />
@@ -380,7 +425,19 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
                 {formik.errors.file}
               </Typography>
             )}
-
+            {oldImage && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  backgroundColor: "white",
+                  zIndex: 100000,
+                  marginTop: "45px",
+                  width: "50%",
+                }}
+              >
+                <Typography>{initialData?.imageName}</Typography>
+              </Box>
+            )}
             {/* Preview the image */}
             {imagePreview && (
               <Box sx={{ marginTop: 2 }}>
@@ -403,5 +460,117 @@ export const AddEditNoticeModal: React.FC<NoticeAddEditModalProps> = ({
         </form>
       </DialogContent>
     </BootstrapDialog>
+  );
+};
+
+interface FormValues {
+  date: any;
+  halfs: number;
+}
+interface ChangeAttendanceGraphModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: FormValues) => void;
+}
+
+export const ChangeAttendanceGraphModal: React.FC<
+  ChangeAttendanceGraphModalProps
+> = ({ isOpen, onClose, onSubmit }) => {
+  const validationSchema = Yup.object({
+    date: Yup.date().required("Please Select Date"),
+    halfs: Yup.number().required("Please Select Halfs."),
+  });
+
+  const formik = useFormik<FormValues>({
+    initialValues: {
+      date: dayjs(),
+      halfs: 1,
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      console.log("submit");
+      onSubmit(values);
+    },
+  });
+
+  return (
+    <Dialog disableEscapeKeyDown open={isOpen} onClose={onClose}>
+      <DialogTitle>Select Month/Year and Half</DialogTitle>
+      <DialogContent>
+        <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+          <form onSubmit={formik.handleSubmit}>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer
+                  components={["DatePicker", "DatePicker", "DatePicker"]}
+                >
+                  <DatePicker
+                    onChange={(date) => formik.setFieldValue("date", date)}
+                    value={formik.values.date}
+                    label={"Select month/year"}
+                    views={["month", "year"]}
+                    slotProps={{
+                      textField: {
+                        error: formik.touched.date && !!formik.errors.date,
+                        helperText:
+                          formik.touched.date &&
+                          typeof formik.errors.date === "string"
+                            ? formik.errors.date
+                            : "",
+                      },
+                    }}
+                  />
+                </DemoContainer>
+              </LocalizationProvider>
+            </FormControl>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              <Select
+              name="halfs"
+                labelId="demo-dialog-select-label"
+                id="demo-dialog-select"
+                className="attendance-half-dropdown"
+                value={formik.values.halfs}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={formik.touched.halfs && !!formik.errors.halfs}
+              >
+                <MenuItem value={1}>Months's FirstHalf</MenuItem>
+                <MenuItem value={2}>Months's SecondHalf</MenuItem>
+              </Select>
+              {formik.touched.halfs && !!formik.errors.halfs && (
+                <Typography variant="body2" color="error">
+                  {formik.errors.halfs}
+                </Typography>
+              )}
+            </FormControl>
+            <Box sx={{ display: "flex", gap: 2 }}>
+              <Button
+                fullWidth
+                onClick={onClose}
+                sx={{
+                  backgroundColor: "grey",
+                  color: "white",
+                  marginTop: 2,
+                }}
+              >
+                Cancel
+              </Button>
+
+              <Button
+                fullWidth
+                type="submit"
+                sx={{
+                  backgroundColor: "#6a6cf6",
+                  color: "white",
+                  marginTop: 2,
+                }}
+              >
+                Select
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 };

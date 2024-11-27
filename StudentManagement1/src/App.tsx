@@ -3,8 +3,6 @@ import Login from "./Components/Login";
 import { useEffect, useState } from "react";
 import { CheckAuthenticated } from "./Utils/Auth/Auth";
 import Dashboard from "./Components/Students/Dashboard";
-import Header from "./Components/Layouts/HodLayouts/Header";
-import Sidebar from "./Components/Layouts/HodLayouts/Sidebar";
 import Layout from "./Components/Layouts/HodLayouts/Layout";
 import AllStudents from "./Components/Hod/AllStudents";
 import AllProfessors from "./Components/Hod/AllProfessors";

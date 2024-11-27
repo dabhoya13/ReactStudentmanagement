@@ -141,5 +141,51 @@ namespace StudentManagementAPI.Controllers
             return _response;
         }
 
+        [HttpGet("GetNoticeDetailsById")]
+        public async Task<ActionResult<APIResponse>> GetNoticeDetailsById(int NoticeId)
+        {
+            try
+            {
+                NoticeDto noticeDto = await _studentServices.GetNoticeById(NoticeId);
+                RoleBaseResponse<NoticeDto> roleBaseResponse= new()
+                {
+                    data = noticeDto,
+                };
+
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                _response.result = roleBaseResponse;
+            }catch(Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetAttendanceTotalCountsByMonthYear")]
+        public async Task<ActionResult<APIResponse>> GetAttendanceTotalCountsByMonthYear(AttendanceMonthYearDto attendanceMonthYearDto)
+        {
+            try
+            {
+                IList<AttendanceCountDto> attendanceCountDtos= await _studentServices.GetAttendanceCountByMonthYear(attendanceMonthYearDto);
+                RoleBaseResponse<IList<AttendanceCountDto>> roleBaseResponse = new()
+                {
+                    data = attendanceCountDtos,
+                };
+
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                _response.result = roleBaseResponse;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
     }
 }

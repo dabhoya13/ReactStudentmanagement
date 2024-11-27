@@ -25,5 +25,9 @@ namespace StudentManagementAPI.Services.MainServices
         Task<IList<NoticeDto>> GetALlNotices();
 
         Task DeleteNotice(int NoticeId);
+
+        Task<NoticeDto> GetNoticeById(int NoticeId);
+
+        Task<IList<AttendanceCountDto>> GetAttendanceCountByMonthYear(AttendanceMonthYearDto attendanceMonthYearDto);
     }
 }

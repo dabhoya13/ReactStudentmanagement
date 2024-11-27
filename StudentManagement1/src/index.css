@@ -260,3 +260,14 @@ ADMIN DASHBOARD CSS START
   font-size: 20px;
   color: #007bff;
 }
+
+.attendance-half-dropdown{
+  height: 55px;
+  margin-top: 8px;
+}
+
+@media (max-width: 610px) {
+  .dashboard-Attendance-header{
+    flex-direction: column;
+  }
+}
