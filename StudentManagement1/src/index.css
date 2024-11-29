@@ -271,3 +271,57 @@ ADMIN DASHBOARD CSS START
     flex-direction: column;
   }
 }
+
+
+
+/* ----------------------------------------------------------------------------
+
+ALL Student Page CSS START
+
+----------------------------------------------------------------------------- */
+
+.student-table
+{
+  width: 100%;
+}
+
+.student-table thead  {
+  padding: 15px !important;
+}
+.student-table thead tr {
+  
+  background-color: #595959;
+  color: white;
+}
+
+.student-table thead tr th{
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.student-table tbody tr td{
+  padding: 15px;
+  text-align: center;
+  vertical-align: middle;
+  word-break: normal;
+}
+.student-table tbody tr:nth-child(odd) {
+  background-color: white;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.student-table tbody tr:nth-child(even) {
+  background-color: transparent;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+
+  
+}
+.absent-td{
+  color: red;
+}
+
+.present-td{
+  color: green;
+}

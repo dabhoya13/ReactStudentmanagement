@@ -816,7 +816,7 @@ const AdminDashboard: React.FC = () => {
               <Box key={notice.noticeId}>
                 <Box
                   key={notice.noticeId}
-                  sx={{ display: "flex", justifyContent: "space-between" }}
+                  sx={{ display: "flex", justifyContent: "space-between",marginTop:1.5 }}
                 >
                   <Box
                     sx={{
@@ -1022,6 +1022,7 @@ const AdminDashboard: React.FC = () => {
 
       <DeleteModal
         isOpen={isModalOpen}
+        text="Notice"
         onClose={closeModal}
         onDelete={() => handleDelete(deleteItemId)}
       />

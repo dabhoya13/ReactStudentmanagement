@@ -78,7 +78,7 @@ export const CallAPIForFileUpload = async (File: File | null): Promise<any> => {
       var url = _baseAddress + "Hod/UploadFiles";
       const formData = new FormData();
       if (File) {
-        formData.append("File", File);
+        formData.append("file", File);
       }
       const response = await fetch(url, {
         method: "PUT",

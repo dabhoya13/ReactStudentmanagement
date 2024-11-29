@@ -32,6 +32,7 @@ import React from "react";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 interface DeleteModalProps {
   isOpen: boolean;
+  text:string;
   onClose: () => void;
   onDelete: () => void;
 }
@@ -51,6 +52,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 export const DeleteModal: React.FC<DeleteModalProps> = ({
   isOpen,
+  text,
   onClose,
   onDelete,
 }) => {
@@ -64,7 +66,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
         sx={{ m: 0, p: 2, backgroundColor: "#4c8cf8", color: "white" }}
         id="customized-dialog-title"
       >
-        Delete Notice
+        Delete {text}
       </DialogTitle>
       <IconButton
         aria-label="close"
@@ -80,7 +82,7 @@ export const DeleteModal: React.FC<DeleteModalProps> = ({
       </IconButton>
       <DialogContent dividers>
         <Typography gutterBottom>
-          Are you Sure you want to delete this notice?
+          Are you Sure you want to delete this {text}?
         </Typography>
       </DialogContent>
       <DialogActions sx={{ display: "flex", gap: 1 }}>

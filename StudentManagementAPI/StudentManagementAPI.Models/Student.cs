@@ -46,6 +46,8 @@ namespace StudentManagementAPI.Models
         public bool IsBlocked { get; set; }
 
         public int Gender { get; set; }
+
+        public bool Status { get; set; }
     }
 
     public class GenderWiseCountDto

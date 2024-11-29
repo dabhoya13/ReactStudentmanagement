@@ -90,18 +90,9 @@ namespace StudentManagementAPI.Controllers
                                 }
                                 else
                                 {
-                                    if (apiRequest.MethodName == "GetAllStudents")
-                                    {
-                                        var result = await (Task<ActionResult<APIResponse>>)methodInfo.Invoke(controller, header["token"]);
-                                        //var actionResult = (ActionResult<APIResponse>)result;
-                                        _response = result.Value;
-                                    }
-                                    else
-                                    {
                                         var result = await (Task<ActionResult<APIResponse>>)methodInfo.Invoke(controller, null);
                                         //var actionResult = (ActionResult<APIResponse>)result;
                                         _response = result.Value;
-                                    }
                                 }
                             }
                             else

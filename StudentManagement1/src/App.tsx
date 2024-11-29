@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { CheckAuthenticated } from "./Utils/Auth/Auth";
 import Dashboard from "./Components/Students/Dashboard";
 import Layout from "./Components/Layouts/HodLayouts/Layout";
-import AllStudents from "./Components/Hod/AllStudents";
 import AllProfessors from "./Components/Hod/AllProfessors";
+import AllStudents from './Components/Hod/AllStudents';
 import StudentLayout from "./Components/Layouts/StudentLayout/StudentLayout";
 import AdminDashboard from "./Components/Hod/AdminDashboard";
 const App: React.FC = () => {

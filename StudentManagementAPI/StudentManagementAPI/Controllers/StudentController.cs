@@ -17,7 +17,7 @@ namespace StudentManagementAPI.Controllers
         private readonly IConfiguration _configuration;
 
 
-        public StudentController(IStudentServices studentServices, IConfiguration configuration,IJwtServices jwtServices)
+        public StudentController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices)
         {
             this._response = new();
             _studentServices = studentServices;
@@ -106,11 +106,29 @@ namespace StudentManagementAPI.Controllers
                     _response.IsSuccess = true;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _response.IsSuccess = false;
                 _response.StatusCode = HttpStatusCode.InternalServerError;
                 _response.ErroMessages = new List<string> { ex.Message };
+            }
+            return _response;
+        }
+
+        [HttpPut("DeleteStudent")]
+        public async Task<ActionResult<APIResponse>> DeleteStudentById(int StudentId)
+        {
+            try
+            {
+                await _studentServices.DeleteStudentById(StudentId);
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
             }
             return _response;
         }

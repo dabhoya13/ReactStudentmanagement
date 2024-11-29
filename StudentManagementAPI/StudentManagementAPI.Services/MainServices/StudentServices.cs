@@ -114,6 +114,12 @@ namespace StudentManagementAPI.Services.MainServices
             }else if(controllerName == "Hod" && methodName == "GetAttendanceTotalCountsByMonthYear")
             {
                 return GetDataModel<AttendanceMonthYearDto>(dataObj);
+            }else if(controllerName == "Hod" && methodName == "GetAllStudents")
+            {
+                return GetDataModel<PaginationDto>(dataObj);
+            }else if(controllerName == "Student" && methodName == "DeleteStudentById")
+            {
+                return Convert.ToInt32(dataObj);
             }
             else
             {
@@ -284,6 +290,46 @@ namespace StudentManagementAPI.Services.MainServices
 
                 IList<AttendanceCountDto> attendanceCountDtos = await DbClient.ExecuteProcedure<AttendanceCountDto>("[dbo].[get_Attendance_counts_by_MonthYear]", parameters);
                 return attendanceCountDtos;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<T>> GetDataWithPagination<T>(PaginationDto paginationDto, string sp)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@Search_Query", Value = paginationDto.SearchQuery ?? "", DBType = DbType.String });
+                parameters.Add(new DbParameters { Name = "@Sort_Column_Name", Value = paginationDto.OrderBy ?? "", DBType = DbType.String });
+                parameters.Add(new DbParameters { Name = "@Start_index", Value = paginationDto.StartIndex, DBType = DbType.Int64 });
+                parameters.Add(new DbParameters { Name = "@Page_Size", Value = paginationDto.PageSize, DBType = DbType.Int64 });
+                //if (paginationDto.FromDate != null && paginationDto.ToDate != null)
+                //{
+                //    parameters.Add(new DbParameters { Name = "@FromDate", Value = paginationDto.FromDate, DBType = DbType.Date });
+                //    parameters.Add(new DbParameters { Name = "@ToDate", Value = paginationDto.ToDate, DBType = DbType.Date });
+
+                //}
+                //IList<Book> books = DbClient.ExecuteProcedure<Book>("[dbo].[Get_Books_List]", parameters);
+                IList<T> data =await DbClient.ExecuteProcedure<T>(sp, parameters);
+
+                return data;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task DeleteStudentById(int StudentId)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@studentId", Value = StudentId, DBType = DbType.Int32 });
+                await DbClient.ExecuteProcedure("[dbo].[Delete_Student_ById]", parameters,ExecuteType.ExecuteNonQuery);
             }
             catch (Exception ex)
             {
