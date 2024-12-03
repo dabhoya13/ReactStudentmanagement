@@ -16,6 +16,9 @@ interface StudentDataProps {
   courseId: number;
   email: string;
   status: boolean;
+  gender:number | null;
+  imageName:string;
+  imageUrl:string;
 }
 
 interface PaginationResponseProps {
@@ -54,8 +57,6 @@ export const getAllStudentsData = async (
       totalPages: response.result.totalPages,
       startIndex: response.result.startIndex,
     };
-
-    console.log(paginatioResponse);
     return paginatioResponse;
   }
   return null;
@@ -77,5 +78,25 @@ export const DeleteStudent = async (StudentId: number) => {
     } else {
       window.location.href = "/login";
     }
+  }
+};
+
+
+export const GetStudentDetailsById = async (
+  StudentId: number
+): Promise<StudentDataProps | null> => {
+  if (StudentId != 0) {
+    const formData = {
+      ControllerName: "Student",
+      MethodName: "GetStudentDetailsById",
+      DataObject: JSON.stringify(StudentId),
+      RoleIds: ["1"],
+    };
+
+    var response = await CallAPI(formData);
+    const studentDataProps: StudentDataProps = response.result.data;
+    return studentDataProps;
+  } else {
+    return null;
   }
 };

@@ -85,7 +85,7 @@ const Sidebar: React.FC = (props: Props) => {
           </ListItem>
           <ListItem
             className={
-              location.pathname === "/students"
+              location.pathname === "/admin/allstudents"
                 ? "list-items selected"
                 : "list-items"
             }
@@ -99,7 +99,7 @@ const Sidebar: React.FC = (props: Props) => {
           </ListItem>
           <ListItem
             className={
-              location.pathname === "/professors"
+              location.pathname === "/admin/allProfessors"
                 ? "list-items selected"
                 : "list-items"
             }

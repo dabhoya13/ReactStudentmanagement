@@ -33,5 +33,13 @@ namespace StudentManagementAPI.Services.MainServices
         Task<IList<T>> GetDataWithPagination<T>(PaginationDto paginationDto, string sp);
 
         Task DeleteStudentById(int StudentId);
+
+        Task<T> GetOneRecordFromId<T>(string Procedure, int Id);
+
+        Task UpsertStudentDetails(Student student);
+
+        Task<Student> CheckUsernameExistOrNot(string userName);
+
+        Task<IList<T>> GetAllRecordsWithoutPagination<T>(string procedureName);
     }
 }

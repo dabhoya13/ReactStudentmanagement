@@ -35,7 +35,7 @@ namespace StudentManagementAPI.Controllers
             { "Login", typeof(LoginController) },
             { "Student", typeof(StudentController) },
             { "Hod", typeof(HodController) },
-
+            { "Course", typeof(CourseController) },
         };
 
 

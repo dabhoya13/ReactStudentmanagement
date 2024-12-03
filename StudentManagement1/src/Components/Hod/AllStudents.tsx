@@ -10,11 +10,16 @@ import FirstPageRoundedIcon from "@mui/icons-material/FirstPageRounded";
 import LastPageRoundedIcon from "@mui/icons-material/LastPageRounded";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import { DeleteStudent, getAllStudentsData } from "./AllStudent's";
+import {
+  DeleteStudent,
+  getAllStudentsData,
+  GetStudentDetailsById,
+} from "./AllStudent's";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import { DeleteModal } from "../AllModals/Modals";
+import LoadingGif from "../../assets/Images/Animation.gif";
+import { AddEditStudentModal, DeleteModal, ViewStudentProfileModal } from "../AllModals/Modals";
 
 interface StudentDataProps {
   studentId: number;
@@ -26,6 +31,9 @@ interface StudentDataProps {
   courseId: number;
   email: string;
   status: boolean;
+  gender: number | null;
+  imageName:string;
+  imageUrl:string;
 }
 
 interface PaginationProps {
@@ -46,8 +54,16 @@ const AllStudents: React.FC = () => {
   const [rowsPerPage, setRowsPerPage] = useState(2);
   const [studentData, setStudentData] = useState<PaginationResponseProps>();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [deleteStudentId, setDeleteStudentId] = useState<number>(0);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
+  const [isOpenAddEditModelOpen, setIsOpenAddEditModelOpen] =
+    useState<boolean>(false);
+  const [editStudentId, setEditStudentId] = useState<number>(0);
+
+  const [formData, setFormData] = useState<StudentDataProps | null>();
+  const [viewStudentData, setViewStudentData] = useState<StudentDataProps | null>();
+  const [loading, setLoading] = useState<boolean>(false);
   //  This Method is use for close delete menu
   const closeModal = () => {
     setIsModalOpen(false);
@@ -57,13 +73,85 @@ const AllStudents: React.FC = () => {
   const openModal = (id: number) => {
     setIsModalOpen(true);
     setDeleteStudentId(id);
-  }
+  };
   // This method is use for delete notice
   const handleDelete = (id: number) => {
     DeleteStudent(id);
     closeModal();
   };
 
+  // This Method is use for Open AddStudent Model
+  const openAddStudentModel = () => {
+    setIsOpenAddEditModelOpen(true);
+  };
+
+  // This method is use for Open Edit exising Student modal
+  const openEditModel = async (studentId: number) => {
+    setEditStudentId(studentId);
+    if (studentId != 0) {
+      try {
+        const response = await GetStudentDetailsById(studentId);
+        if (response != null) {
+          setFormData(response);
+        }
+      } catch (error) {
+        console.error("Failed to load notice data", error);
+      } finally {
+      }
+    }
+
+    setIsOpenAddEditModelOpen(true);
+  };
+
+  //  This Method is use for close delete menu
+  const closeStudentAddEditModal = () => {
+    setIsOpenAddEditModelOpen(false);
+    setEditStudentId(0);
+  };
+
+
+   // This Method is use for Open View Profile Model
+   const openViewProfileModel = async (studentId : number) => {
+    if (studentId != 0) {
+      try {
+        const response = await GetStudentDetailsById(studentId);
+        if (response != null) {
+          setViewStudentData(response);
+        }
+      } catch (error) {
+        console.error("Failed to load notice data", error);
+      } finally {
+      }
+    }
+    setIsProfileModalOpen(true);
+
+  };
+
+  //  This Method is use for close delete menu
+  const closeViewProfileModel = () => {
+    setIsProfileModalOpen(false);
+  };
+
+
+
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setPage(newPage);
+  };
+
+  const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const value = (event.target as HTMLInputElement).value;
+    setSearchQuery(value);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   useEffect(() => {
     const getStudentsData = async () => {
@@ -74,37 +162,33 @@ const AllStudents: React.FC = () => {
       };
 
       const result = await getAllStudentsData(pagination);
-      console.log("result", result);
       if (result != null) {
         setStudentData(result);
       }
     };
 
+    setLoading(true);
     getStudentsData();
-  }, [rowsPerPage, page,searchQuery]);
-  console.log("StudentData", studentData);
-  
-  const handleChangePage = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setPage(newPage);
-  };
-
-  const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const value  = (event.target as HTMLInputElement).value;
-    setSearchQuery(value);
-  }
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    setLoading(false);
+  }, [rowsPerPage, page, searchQuery]);
 
   return (
     <>
+      {loading && (
+        <Box
+          sx={{
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            height: "100vh",
+            zIndex: "9000",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+          className="loading-spinner"
+        >
+          <img src={LoadingGif} alt="loading-gif" />
+        </Box>
+      )}
       <h1>All Students</h1>
       <Box sx={{ marginTop: 1 }}>
         <Box
@@ -157,6 +241,7 @@ const AllStudents: React.FC = () => {
               Download Report
             </Button>
             <Button
+              onClick={() => openAddStudentModel()}
               sx={{
                 background: "linear-gradient(45deg, #FFEB3B, #FF9800)",
                 fontWeight: "600",
@@ -218,9 +303,15 @@ const AllStudents: React.FC = () => {
                         color: "grey",
                       }}
                     >
-                      <RemoveRedEyeIcon />
-                      <DeleteOutlineIcon onClick={() => openModal(row.studentId)} />
-                      <ModeEditIcon />
+                      <RemoveRedEyeIcon 
+                        onClick={() => openViewProfileModel(row.studentId)}
+                      />
+                      <DeleteOutlineIcon
+                        onClick={() => openModal(row.studentId)}
+                      />
+                      <ModeEditIcon
+                        onClick={() => openEditModel(row.studentId)}
+                      />
                       {/* <Button sx={{width:"10px"}}>
                       </Button>
                       <Button>
@@ -263,11 +354,26 @@ const AllStudents: React.FC = () => {
           </table>
         </Box>
       </Box>
-      <DeleteModal 
-      isOpen={isModalOpen}
-      onClose={closeModal}
-      onDelete={() => handleDelete(deleteStudentId)}
-      text="Student" />
+      <DeleteModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onDelete={() => handleDelete(deleteStudentId)}
+        text="Student"
+      />
+
+      <AddEditStudentModal
+        isOpen={isOpenAddEditModelOpen}
+        onClose={closeStudentAddEditModal}
+        studentId={editStudentId}
+        initialData={formData}
+      />
+
+      <ViewStudentProfileModal 
+      isOpen={isProfileModalOpen}
+      onClose={closeViewProfileModel}
+      initialData={viewStudentData}
+      />
+
     </>
   );
 };

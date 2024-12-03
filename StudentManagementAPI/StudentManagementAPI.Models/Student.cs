@@ -18,7 +18,7 @@ namespace StudentManagementAPI.Models
         [StringLength(50)]
         public string LastName { get; set; } = null!;
 
-        public DateTime? BirthDate { get; set; }
+        public DateTime BirthDate { get; set; }
 
         public DateTime? CreatedDate { get; set; } = DateTime.Now;
 
@@ -48,6 +48,10 @@ namespace StudentManagementAPI.Models
         public int Gender { get; set; }
 
         public bool Status { get; set; }
+
+        public string ImageName { get; set; }
+
+        public string ImageUrl { get; set; }
     }
 
     public class GenderWiseCountDto

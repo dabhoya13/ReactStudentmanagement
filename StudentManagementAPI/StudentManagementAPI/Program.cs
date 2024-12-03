@@ -54,7 +54,11 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "NoticeImages")),
     RequestPath = "/NoticeImages"
 });
-
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "StudentProfiles")),
+    RequestPath = "/StudentProfiles"
+});
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -101,6 +101,60 @@ namespace StudentManagementAPI.Controllers
             }
         }
 
+        [HttpPut("UploadStudentProfiles")]
+        public async Task<ActionResult<APIResponse>> UploadStudentProfiles(IFormFile file)
+        {
+            try
+            {
+                var header = this.Request.Headers;
+                if (!_jwtServices.ValidateToken(header["token"], out JwtSecurityToken jwtSecurityToken))
+                {
+
+                    _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
+                    _response.IsSuccess = false;
+                    return Unauthorized(_response);
+                }
+                else
+                {
+                    if (file == null || file.Length == 0)
+                    {
+                        _response.ErroMessages = new List<string>() { "No file provided" };
+                        _response.StatusCode = HttpStatusCode.BadRequest;
+                        _response.IsSuccess = false;
+                        return BadRequest(_response);
+                    }
+
+                    var fileName = Path.GetFileName(file.FileName);
+                    var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "StudentProfiles");
+                    var filePath = Path.Combine(uploadsFolderPath, fileName);
+                    if (!Directory.Exists(uploadsFolderPath))
+                    {
+                        Directory.CreateDirectory(uploadsFolderPath);
+                    }
+
+                    if (!System.IO.File.Exists(filePath))
+                    {
+                        using var stream = new FileStream(filePath, FileMode.Create);
+                        await file.CopyToAsync(stream);
+                    }
+
+
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
+                    return Ok(_response);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+                return _response;
+            }
+        }
+
         [HttpGet]
         public async Task<ActionResult<APIResponse>> GetAllNotices()
         {

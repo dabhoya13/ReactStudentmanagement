@@ -132,5 +132,97 @@ namespace StudentManagementAPI.Controllers
             }
             return _response;
         }
+
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("CheckUsernameExist")]
+        public async Task<ActionResult<APIResponse>> CheckUsernameExist(string userName)
+        {
+            try
+            {
+                Student student =  await _studentServices.CheckUsernameExistOrNot(userName);
+                RoleBaseResponse<Student> roleBaseResponse = new()
+                {
+                    data = student,
+                };
+                _response.result= roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("{studentId:int}", Name = "GetStudentDetailsById")]
+        public async Task<ActionResult<APIResponse>> GetStudentDetailsById(int studentId)
+        {
+            try
+            {
+                if (studentId == 0)
+                {
+                    _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.ErroMessages = new List<string> { "Invalid StudentId" };
+                    _response.IsSuccess = false;
+                    return _response;
+                }
+
+                Student student = await _studentServices.GetOneRecordFromId<Student>("[dbo].[Get_Student_Details_ById]", studentId);
+                RoleBaseResponse<Student> roleBaseResponse = new()
+                {
+                    data = student
+                };
+                if (student.StudentId > 0)
+                {
+                    _response.result = roleBaseResponse;
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
+                }
+                else
+                {
+                    _response.ErroMessages = new List<string> { "Student Not Fount" };
+                    _response.IsSuccess = false;
+                    _response.StatusCode = HttpStatusCode.NotFound;
+                    return _response;
+                }
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { ex.Message.ToString() };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+
+        }
+
+
+        [HttpPost("UpsertStudentDetails")]
+        public async Task<ActionResult<APIResponse>> UpsertStudentDetails(Student student)
+        {
+            try
+            {
+                await _studentServices.UpsertStudentDetails(student);
+                _response.IsSuccess = true;
+                _response.result = null;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
     }
 }

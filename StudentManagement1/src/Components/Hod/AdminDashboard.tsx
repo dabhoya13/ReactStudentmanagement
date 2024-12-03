@@ -56,10 +56,6 @@ interface NoticesProps {
   imageUrl: string;
 }
 
-interface StudentProfessorsCountProps {
-  studentCount: number;
-  professorCount: number;
-}
 
 interface GenderWiseCount {
   Gender: string;

@@ -43,7 +43,7 @@ namespace StudentManagementAPI.Services.MainServices
                 Collection<DbParameters> parameters = new Collection<DbParameters>();
                 parameters.Add(new DbParameters() { Name = "@UserName", Value = studentLoginDto.UserName, DBType = DbType.String });
                 parameters.Add(new DbParameters() { Name = "@PassWord", Value = studentLoginDto.Password, DBType = DbType.String });
-                LoginInformationDto loginInformationDto =await DbClient.ExecuteOneRecordProcedure<LoginInformationDto>("[dbo].[Get_UserName_Password]", parameters);
+                LoginInformationDto loginInformationDto = await DbClient.ExecuteOneRecordProcedure<LoginInformationDto>("[dbo].[Get_UserName_Password]", parameters);
                 if (loginInformationDto != null && loginInformationDto.StudentId > 0)
                 {
                     LoginInformationDto jwtClaimsDto = new()
@@ -105,21 +105,33 @@ namespace StudentManagementAPI.Services.MainServices
             if (controllerName == "Login" && methodName == "CheckLoginDetails")
             {
                 return GetDataModel<StudentLoginDto>(dataObj);
-            }else if(controllerName == "Hod" && methodName == "UpsertNoticeDetails")
+            }
+            else if (controllerName == "Hod" && methodName == "UpsertNoticeDetails")
             {
                 return GetDataModel<NoticeDto>(dataObj);
-            }else if((controllerName == "Hod" && methodName == "DeleteNotice") || (controllerName == "Hod" && methodName == "GetNoticeDetailsById"))
+            }
+            else if ((controllerName == "Hod" && methodName == "DeleteNotice") || (controllerName == "Hod" && methodName == "GetNoticeDetailsById"))
             {
                 return Convert.ToInt32(dataObj);
-            }else if(controllerName == "Hod" && methodName == "GetAttendanceTotalCountsByMonthYear")
+            }
+            else if (controllerName == "Hod" && methodName == "GetAttendanceTotalCountsByMonthYear")
             {
                 return GetDataModel<AttendanceMonthYearDto>(dataObj);
-            }else if(controllerName == "Hod" && methodName == "GetAllStudents")
+            }
+            else if (controllerName == "Hod" && methodName == "GetAllStudents")
             {
                 return GetDataModel<PaginationDto>(dataObj);
-            }else if(controllerName == "Student" && methodName == "DeleteStudentById")
+            }
+            else if ((controllerName == "Student" && methodName == "DeleteStudentById")
+                    || (controllerName == "Student" && methodName == "GetStudentDetailsById"))
             {
                 return Convert.ToInt32(dataObj);
+            }else if(controllerName == "Student" && methodName == "CheckUsernameExist")
+            {
+                return dataObj.ToString();
+            }else if(controllerName == "Student" && methodName == "UpsertStudentDetails")
+            {
+                return GetDataModel<Student>(dataObj);
             }
             else
             {
@@ -174,9 +186,10 @@ namespace StudentManagementAPI.Services.MainServices
         {
             try
             {
-                IList<GenderWiseCountDto> genderWiseCount =await DbClient.ExecuteProcedure<GenderWiseCountDto>("[dbo].[Get_StudentCount_ByGender]", null);
+                IList<GenderWiseCountDto> genderWiseCount = await DbClient.ExecuteProcedure<GenderWiseCountDto>("[dbo].[Get_StudentCount_ByGender]", null);
                 return genderWiseCount;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 throw;
             }
@@ -187,7 +200,7 @@ namespace StudentManagementAPI.Services.MainServices
         {
             try
             {
-                StudentProfessorCount studentProfessorCount= await DbClient.ExecuteOneRecordProcedure<StudentProfessorCount>("[dbo].[Get_StudentProfessors_Count]", null);
+                StudentProfessorCount studentProfessorCount = await DbClient.ExecuteOneRecordProcedure<StudentProfessorCount>("[dbo].[Get_StudentProfessors_Count]", null);
                 return studentProfessorCount;
             }
             catch (Exception ex)
@@ -215,13 +228,13 @@ namespace StudentManagementAPI.Services.MainServices
                 row["Date"] = (noticeDto.Date).ToString("MM-dd-yyyy HH:mm:ss");
                 table.Rows.Add(row);
 
-                if(noticeDto.NoticeId > 0)
+                if (noticeDto.NoticeId > 0)
                 {
                     Collection<DbParameters> parameters = new();
                     parameters.Add(new DbParameters { Name = "@notice_table", Value = table, DBType = DbType.Object, TypeName = "Notice_Table" });
                     parameters.Add(new DbParameters { Name = "@noticeId", Value = noticeDto.NoticeId, DBType = DbType.Int32 });
 
-                    await DbClient.ExecuteProcedure("[dbo].[Add_Edit_Notice_details]", parameters,ExecuteType.ExecuteNonQuery);
+                    await DbClient.ExecuteProcedure("[dbo].[Add_Edit_Notice_details]", parameters, ExecuteType.ExecuteNonQuery);
                 }
                 else
                 {
@@ -241,7 +254,7 @@ namespace StudentManagementAPI.Services.MainServices
         {
             try
             {
-                IList<NoticeDto> noticeDtos= await DbClient.ExecuteProcedure<NoticeDto>("[dbo].[GetAll_Notice_details]", null);
+                IList<NoticeDto> noticeDtos = await DbClient.ExecuteProcedure<NoticeDto>("[dbo].[GetAll_Notice_details]", null);
                 return noticeDtos;
             }
             catch (Exception ex)
@@ -256,7 +269,7 @@ namespace StudentManagementAPI.Services.MainServices
             {
                 Collection<DbParameters> parameters = new();
                 parameters.Add(new DbParameters { Name = "@noticeId", Value = NoticeId, DBType = DbType.Int32 });
-                await DbClient.ExecuteProcedure("[dbo].[Delete_Notice_ById]", parameters,ExecuteType.ExecuteNonQuery);
+                await DbClient.ExecuteProcedure("[dbo].[Delete_Notice_ById]", parameters, ExecuteType.ExecuteNonQuery);
             }
             catch (Exception ex)
             {
@@ -313,7 +326,7 @@ namespace StudentManagementAPI.Services.MainServices
 
                 //}
                 //IList<Book> books = DbClient.ExecuteProcedure<Book>("[dbo].[Get_Books_List]", parameters);
-                IList<T> data =await DbClient.ExecuteProcedure<T>(sp, parameters);
+                IList<T> data = await DbClient.ExecuteProcedure<T>(sp, parameters);
 
                 return data;
             }
@@ -323,18 +336,92 @@ namespace StudentManagementAPI.Services.MainServices
             }
         }
 
+        public async Task<IList<T>> GetAllRecordsWithoutPagination<T>(string procedureName) 
+        {
+            IList<T> allrecords = await DbClient.ExecuteProcedure<T>(procedureName, null);
+            return allrecords;
+        }
+
         public async Task DeleteStudentById(int StudentId)
         {
             try
             {
                 Collection<DbParameters> parameters = new();
                 parameters.Add(new DbParameters { Name = "@studentId", Value = StudentId, DBType = DbType.Int32 });
-                await DbClient.ExecuteProcedure("[dbo].[Delete_Student_ById]", parameters,ExecuteType.ExecuteNonQuery);
+                await DbClient.ExecuteProcedure("[dbo].[Delete_Student_ById]", parameters, ExecuteType.ExecuteNonQuery);
             }
             catch (Exception ex)
             {
                 throw;
             }
         }
+
+        public async Task<T> GetOneRecordFromId<T>(string Procedure, int Id)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@Id", Value = Id, DBType = DbType.Int64 });
+            T newobj = await DbClient.ExecuteOneRecordProcedure<T>(Procedure, parameters);
+            return newobj;
+
+        }
+
+        public async Task UpsertStudentDetails(Student student)
+        {
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("FirstName");
+                table.Columns.Add("LastName");
+                table.Columns.Add("UserName");
+                table.Columns.Add("Email");
+                table.Columns.Add("CourseId");
+                table.Columns.Add("Password");
+                table.Columns.Add("BirthDate");
+                table.Columns.Add("Gender");
+                table.Columns.Add("ImageName");
+
+
+                var row = table.NewRow();
+                row["FirstName"] = student.FirstName;
+                row["LastName"] = student.LastName;
+                row["UserName"] = student.UserName;
+                row["Email"] = student.Email;
+                row["CourseId"] = student.CourseId;
+                row["Password"] = "Kp@123123";
+                row["BirthDate"] = student.BirthDate.ToString("MM-dd-yyyy HH:mm:ss");
+                row["Gender"] = student.Gender;
+                row["ImageName"] = student.ImageName;
+
+                table.Rows.Add(row);
+
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@student_table", Value = table, DBType = DbType.Object, TypeName = "Student_Table" });
+                if (student.StudentId > 0)
+                {
+                    parameters.Add(new DbParameters { Name = "@studentId", Value = student.StudentId, DBType = DbType.Int32 });
+                }
+                await DbClient.ExecuteProcedure("[dbo].[Add_Edit_Student_details]", parameters, ExecuteType.ExecuteNonQuery);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Student> CheckUsernameExistOrNot(string userName)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@userName", Value = userName, DBType = DbType.String});
+                Student student = await DbClient.ExecuteOneRecordProcedure<Student>("[dbo].[Check_Username_exist]", parameters);
+                return student;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }

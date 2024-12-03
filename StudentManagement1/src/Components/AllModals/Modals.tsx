@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Dialog,
@@ -6,7 +7,9 @@ import {
   DialogContent,
   DialogProps,
   DialogTitle,
+  Divider,
   FormControl,
+  FormHelperText,
   IconButton,
   InputLabel,
   Link,
@@ -22,7 +25,7 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Widgets } from "@mui/icons-material";
+import { Email, Widgets } from "@mui/icons-material";
 import dayjs from "dayjs";
 import { ChangeEvent, useEffect, useState } from "react";
 import { CallAPI, CallAPIForFileUpload } from "../../APICall/callApi";
@@ -30,9 +33,16 @@ import { useNavigate } from "react-router-dom";
 import { GetNoticeDetailsById } from "../Hod/AdminDashboard's";
 import React from "react";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import demoImage from "../../assets/Images/profile-image.jfif";
+import EmailIcon from "@mui/icons-material/Email";
+import PhoneAndroidIcon from "@mui/icons-material/PhoneAndroid";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import DateRangeIcon from "@mui/icons-material/DateRange";
+import MaleIcon from "@mui/icons-material/Male";
+import FemaleIcon from "@mui/icons-material/Female";
 interface DeleteModalProps {
   isOpen: boolean;
-  text:string;
+  text: string;
   onClose: () => void;
   onDelete: () => void;
 }
@@ -527,7 +537,7 @@ export const ChangeAttendanceGraphModal: React.FC<
             </FormControl>
             <FormControl sx={{ m: 1, minWidth: 120 }}>
               <Select
-              name="halfs"
+                name="halfs"
                 labelId="demo-dialog-select-label"
                 id="demo-dialog-select"
                 className="attendance-half-dropdown"
@@ -574,5 +584,703 @@ export const ChangeAttendanceGraphModal: React.FC<
         </Box>
       </DialogContent>
     </Dialog>
+  );
+};
+
+interface StudentProps {
+  studentId: number;
+  firstName: string;
+  lastName: string;
+  birthDate: Date;
+  userName: string;
+  courseId: number;
+  email: string;
+  gender: number | null;
+  imageName: string;
+  imageUrl: string;
+  courseName: string | null;
+}
+
+interface StudentAddEditModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  studentId: number;
+  initialData?: StudentProps | null;
+}
+
+interface CoursesProps {
+  courseName: string;
+  courseId: number;
+}
+
+export const AddEditStudentModal: React.FC<StudentAddEditModalProps> = ({
+  isOpen,
+  onClose,
+  studentId,
+  initialData,
+}) => {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [courses, setCourses] = useState<CoursesProps[]>([]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [oldImage, setOldImage] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+  const currentDateMinusOneDay = dayjs().subtract(0, "day");
+  const validationSchema = Yup.object({
+    firstName: Yup.string().required("Please Enter FirstName").max(50),
+    lastName: Yup.string().required("Please Enter LastName").max(50),
+    userName: Yup.string().required("Please Enter UserName").max(50),
+    courseId: Yup.number()
+      .required("Please Select Course")
+      .min(1, "Please Select Course"),
+    birthDate: Yup.date()
+      .required("Please Select BirthDate")
+      .test("is-after", "Selected date cannot be in future", (value) => {
+        // Convert the value to a dayjs object if it's not already one
+        return dayjs(value).isBefore(currentDateMinusOneDay, "day");
+      }),
+    email: Yup.string()
+      .required("Please Enter an Email Address")
+      .email("Please Enter Valid Email Address"),
+    gender: Yup.number()
+      .required("Please Select Gender")
+      .min(1, "Please Select Gender"),
+    file:
+      studentId != null && studentId != 0
+        ? Yup.mixed().notRequired()
+        : Yup.mixed().required("Please Upload Image."),
+  });
+
+  interface FormValues {
+    firstName: string | null;
+    lastName: string | null;
+    userName: string | null;
+    birthDate: any;
+    courseId: number;
+    email: string | null;
+    gender: number;
+    file: File | null;
+  }
+
+  const formik = useFormik<FormValues>({
+    initialValues: {
+      firstName: "",
+      lastName: "",
+      birthDate: null,
+      userName: "",
+      courseId: 0,
+      email: "",
+      gender: 0,
+      file: null,
+    },
+    validationSchema,
+    onSubmit: async (values) => {
+      let studentModel = {
+        StudentId: studentId,
+        FirstName: values.firstName,
+        LastName: values.lastName,
+        UserName: values.userName,
+        BirthDate: new Date(values.birthDate),
+        Email: values.email,
+        Gender: values.gender,
+        CourseId: values.courseId,
+        ImageName: values.file?.name,
+      };
+      const formData = {
+        ControllerName: "Student",
+        MethodName: "UpsertStudentDetails",
+        DataObject: JSON.stringify(studentModel),
+        RoleIds: ["1"],
+      };
+
+      if (studentId == 0) {
+        const checkUsernameformData = {
+          ControllerName: "Student",
+          MethodName: "CheckUsernameExist",
+          DataObject: JSON.stringify(values.userName),
+          RoleIds: ["1"],
+        };
+        var checkUsernameResponse = await CallAPI(checkUsernameformData);
+        console.log("checkusername", checkUsernameResponse);
+
+        if (checkUsernameResponse.result.data.userName != null) {
+          formik.setFieldError("userName", "UserName already exists");
+          return;
+        } else {
+          formik.setFieldError("userName", "");
+          var response = await CallAPI(formData);
+          if (response.isSuccess == true && studentModel.ImageName != null) {
+            var response1 = await CallAPIForFileUpload(values.file);
+            if (response1.statusCode == 200) {
+              window.location.reload();
+            }
+          } else if (response.isSuccess == true) {
+            window.location.reload();
+          } else {
+            navigate("/login");
+          }
+        }
+      } else {
+        var response = await CallAPI(formData);
+        if (response.isSuccess == true && studentModel.ImageName != null) {
+          var response1 = await CallAPIForFileUpload(values.file);
+          if (response1.statusCode == 200) {
+            window.location.reload();
+          }
+        } else if (response.isSuccess == true) {
+          window.location.reload();
+        } else {
+          navigate("/login");
+        }
+      }
+    },
+  });
+
+  useEffect(() => {
+    const getCourses = async () => {
+      const formData = {
+        ControllerName: "Course",
+        MethodName: "GetAllCourses",
+        DataObject: JSON.stringify(null),
+        RoleIds: ["1"],
+      };
+
+      var response = await CallAPI(formData);
+      if (response.isSuccess == true) {
+        const courses: CoursesProps[] = response.result.data;
+        setCourses(courses);
+      }
+    };
+    getCourses();
+  }, []);
+
+  useEffect(() => {
+    const loadingData = async () => {
+      setIsLoading(true);
+      if (studentId != 0) {
+        try {
+          if (initialData?.imageUrl) {
+            setImagePreview(initialData.imageUrl);
+            setOldImage(true);
+          }
+          console.log("initial data ::", initialData);
+          formik.setValues({
+            firstName: initialData?.firstName ?? "",
+            lastName: initialData?.lastName ?? "",
+            userName: initialData?.userName ?? "",
+            email: initialData?.email ?? "",
+            courseId: initialData?.courseId ?? 0,
+            birthDate: initialData?.birthDate
+              ? dayjs(initialData.birthDate)
+              : null,
+            gender: initialData?.gender ?? 0,
+            file: null,
+          });
+        } catch (error) {
+          console.error("Failed to load notice data", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setImagePreview(null);
+        setOldImage(false);
+        formik.setValues({
+          firstName: "",
+          lastName: "",
+          userName: "",
+          email: "",
+          courseId: 0,
+          birthDate: null,
+          gender: 0,
+          file: null,
+        });
+      }
+    };
+    loadingData();
+  }, [initialData]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    if (file) {
+      formik.setFieldValue("file", file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+
+      reader.readAsDataURL(file);
+      setOldImage(false);
+    }
+  };
+
+  return (
+    <BootstrapDialog
+      onClose={onClose}
+      aria-labelledby="customized-dialog-title"
+      open={isOpen}
+      scroll="body"
+      sx={{ maxHeight: "100vh", overflowY: "auto" }}
+    >
+      <DialogTitle
+        sx={{ m: 0, p: 2, backgroundColor: "#4c8cf8", color: "white" }}
+        id="customized-dialog-title"
+      >
+        {studentId != 0 ? "Edit Student" : "Add Student"}
+      </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={(theme) => ({
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
+      >
+        <CloseIcon sx={{ color: "white" }} />
+      </IconButton>
+      <DialogContent dividers>
+        <form className="login-form w-100 row" onSubmit={formik.handleSubmit}>
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{ display: "flex", flexDirection: "column" }}
+          >
+            <span>First Name:</span>
+            <TextField
+              margin="normal"
+              required
+              className="login-textfield"
+              fullWidth
+              id="firstName"
+              label="FirstName"
+              name="firstName"
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.firstName && !!formik.errors.firstName}
+              helperText={formik.touched.firstName && formik.errors.firstName}
+              sx={{
+                marginTop: 1,
+                "& .MuiFormHelperText-root": { color: "red" },
+              }}
+            />
+          </Box>
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{ display: "flex", flexDirection: "column" }}
+          >
+            <span>Last Name:</span>
+            <TextField
+              required
+              fullWidth
+              className="login-textfield"
+              id="lastName"
+              label="Last Name"
+              name="lastName"
+              value={formik.values.lastName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.lastName && !!formik.errors.lastName}
+              helperText={formik.touched.lastName && formik.errors.lastName}
+              sx={{
+                marginTop: 1,
+                "& .MuiFormHelperText-root": { color: "red" },
+              }}
+            />
+          </Box>
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{
+              marginTop: { sm: "8px", xs: "8px" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <span>Select BirthDate:</span>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                sx={{ marginTop: 1 }}
+                onChange={(date) => formik.setFieldValue("birthDate", date)}
+                value={formik.values.birthDate}
+                disableFuture
+                format="DD/MM/YYYY"
+                slotProps={{
+                  textField: {
+                    error:
+                      formik.touched.birthDate && !!formik.errors.birthDate,
+                    helperText:
+                      formik.touched.birthDate &&
+                      typeof formik.errors.birthDate === "string"
+                        ? formik.errors.birthDate
+                        : "",
+                    fullWidth: true,
+                  },
+                }}
+              />
+            </LocalizationProvider>
+          </Box>
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{
+              marginTop: { sm: "8px", xs: "8px" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <span>Select Course:</span>
+            <FormControl
+              fullWidth
+              sx={{ marginTop: 1 }}
+              error={formik.touched.courseId && !!formik.errors.courseId}
+            >
+              <InputLabel id="courseId-label">Course</InputLabel>
+              <Select
+                labelId="courseId-label"
+                id="courseId"
+                value={formik.values.courseId}
+                label="Course"
+                name="courseId"
+                onChange={(e) => {
+                  console.log(e.target.value);
+                  formik.setFieldValue("courseId", e.target.value);
+                }}
+                onBlur={formik.handleBlur}
+              >
+                <MenuItem value={0}>
+                  <em>None</em>
+                </MenuItem>
+                {courses.map((course) => (
+                  <MenuItem value={course.courseId} key={course.courseId}>
+                    {course.courseName}
+                  </MenuItem>
+                ))}
+              </Select>
+              {formik.touched.courseId && formik.errors.courseId && (
+                <FormHelperText>{formik.errors.courseId}</FormHelperText>
+              )}
+            </FormControl>
+          </Box>
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{
+              marginTop: { sm: "8px", xs: "8px" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <span>Select Gender:</span>
+            <FormControl
+              fullWidth
+              sx={{ marginTop: 1 }}
+              error={formik.touched.gender && !!formik.errors.gender}
+            >
+              <InputLabel id="gender-label">Gender</InputLabel>
+              <Select
+                labelId="gender-label"
+                id="gender"
+                value={formik.values.gender}
+                label="Gender"
+                name="gender"
+                onChange={(e) => formik.setFieldValue("gender", e.target.value)}
+                onBlur={formik.handleBlur}
+              >
+                <MenuItem value={0}>
+                  <em>None</em>
+                </MenuItem>
+                <MenuItem value={1}>Male</MenuItem>
+                <MenuItem value={2}>Female</MenuItem>
+              </Select>
+              {formik.touched.gender && formik.errors.gender && (
+                <FormHelperText>{formik.errors.gender}</FormHelperText>
+              )}
+            </FormControl>
+          </Box>
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{
+              marginTop: { sm: "8px", xs: "8px" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <span>UserName:</span>
+            <TextField
+              required
+              fullWidth
+              className="login-textfield"
+              id="userName"
+              label="UserName"
+              name="userName"
+              value={formik.values.userName}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.userName && !!formik.errors.userName}
+              helperText={formik.touched.userName && formik.errors.userName}
+              sx={{
+                marginTop: 1,
+                "& .MuiFormHelperText-root": { color: "red" },
+              }}
+            />
+          </Box>
+
+          <Box
+            className="col-12 col-md-6 col-lg-6 col-sm-12"
+            sx={{
+              marginTop: { sm: "8px", xs: "8px" },
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <span>Email:</span>
+            <TextField
+              required
+              fullWidth
+              className="login-textfield"
+              id="email"
+              label="Email"
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.email && !!formik.errors.email}
+              helperText={formik.touched.email && formik.errors.email}
+              sx={{
+                marginTop: 1,
+                "& .MuiFormHelperText-root": { color: "red" },
+              }}
+            />
+          </Box>
+          <Box
+            className="Dashboard-fileUpload-box"
+            sx={{ marginTop: 3, display: "flex", flexDirection: "column" }}
+          >
+            <span className="mb-3">Select Image:</span>
+            <button type="button" className="upload-btn d-flex gap-2">
+              Upload
+            </button>
+            <input
+              className="mb-3"
+              type="file"
+              id="myinputfile"
+              name="file"
+              onChange={(event) => handleFileChange(event)}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.file && !!formik.errors.file && (
+              <Typography variant="body2" color="error">
+                {formik.errors.file}
+              </Typography>
+            )}
+            {oldImage && (
+              <Box
+                sx={{
+                  position: "absolute",
+                  backgroundColor: "white",
+                  zIndex: 100000,
+                  marginTop: "45px",
+                  width: "50%",
+                }}
+              >
+                <Typography>{initialData?.imageName}</Typography>
+              </Box>
+            )}
+            {/* Preview the image */}
+            {imagePreview && (
+              <Box sx={{ marginTop: 2 }}>
+                <img
+                  src={imagePreview}
+                  alt="File Preview"
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                />
+              </Box>
+            )}
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 3 }}>
+            <Button
+              fullWidth
+              type="submit"
+              sx={{ backgroundColor: "#800000", color: "white", marginTop: 2 }}
+            >
+              Cancel
+            </Button>
+            <Button
+              fullWidth
+              type="submit"
+              sx={{ backgroundColor: "#6a6cf6", color: "white", marginTop: 2 }}
+            >
+              Submit
+            </Button>
+          </Box>
+        </form>
+      </DialogContent>
+    </BootstrapDialog>
+  );
+};
+
+interface ModelProps {
+  isOpen: boolean;
+  onClose: () => void;
+  initialData?: StudentProps | null;
+}
+export const ViewStudentProfileModal: React.FC<ModelProps> = ({
+  isOpen,
+  onClose,
+  initialData,
+}) => {
+  return (
+    <BootstrapDialog
+      onClose={onClose}
+      aria-labelledby="customized-dialog-title"
+      open={isOpen}
+      scroll="body"
+      sx={{ maxHeight: "100vh", overflowY: "auto" }}
+    >
+      <DialogTitle
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          m: 0,
+          p: 2,
+          backgroundColor: "#4c8cf8",
+          borderRadius: "0px 0px 20px 20px",
+          color: "white",
+        }}
+        id="customized-dialog-title"
+      >
+        Profile
+        <Box
+          sx={{
+            marginTop: 2,
+            borderRadius: "50%",
+            height: "150px",
+            border: "5px solid white",
+            width: "150px",
+          }}
+        >
+          <Avatar
+            sx={{ width: "100%", height: "100%" }}
+            alt="Travis Howard"
+            src={initialData?.imageUrl ?? demoImage}
+          />
+        </Box>
+        <Typography
+          sx={{ color: "white", fontWeight: "600", marginTop: 2, fontSize: 18 }}
+        >
+          {initialData?.firstName + " " + initialData?.lastName}
+        </Typography>
+        <Typography
+          sx={{ color: "#F3E5AB", fontWeight: "450", marginTop: 0.2 }}
+        >
+          {initialData?.courseName}
+        </Typography>
+      </DialogTitle>
+      <IconButton
+        aria-label="close"
+        onClick={onClose}
+        sx={(theme) => ({
+          position: "absolute",
+          right: 8,
+          top: 8,
+          color: theme.palette.grey[500],
+        })}
+      >
+        <CloseIcon sx={{ color: "white" }} />
+      </IconButton>
+      <DialogContent dividers>
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <EmailIcon />
+          </Box>
+          <Box>
+            Email
+            <Typography sx={{ fontWeight: "600" }}>
+              {initialData?.courseName}
+            </Typography>
+          </Box>
+        </Box>
+        <Divider sx={{ my: 2, border: 1 }} variant="middle" />
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <PhoneAndroidIcon />
+          </Box>
+          <Box>
+            Mobile
+            <Typography sx={{ fontWeight: "600" }}>898956563222</Typography>
+          </Box>
+        </Box>
+        <Divider sx={{ my: 2, border: 1 }} variant="middle" />
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <DateRangeIcon />
+          </Box>
+          <Box>
+            BirthDate
+            <Typography sx={{ fontWeight: "600" }}>
+              {new Date(
+                initialData?.birthDate ?? new Date()
+              ).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+            </Typography>
+          </Box>
+        </Box>
+        <Divider sx={{ my: 2, border: 1 }} variant="middle" />
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {initialData?.gender == 1 ? <MaleIcon />: <FemaleIcon />}
+          </Box>
+          <Box>
+            Gender
+            <Typography sx={{ fontWeight: "600" }}>{initialData?.gender == 1 ? "Male" : "Female"}</Typography>
+          </Box>
+        </Box>
+        <Divider sx={{ my: 2, border: 1 }} variant="middle" />
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <AccountCircleIcon />
+          </Box>
+          <Box>
+            UserName
+            <Typography sx={{ fontWeight: "600" }}>{initialData?.userName}</Typography>
+          </Box>
+        </Box>
+      </DialogContent>
+    </BootstrapDialog>
   );
 };

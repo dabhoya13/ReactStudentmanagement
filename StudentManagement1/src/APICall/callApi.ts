@@ -75,7 +75,7 @@ export const CallAPIForFileUpload = async (File: File | null): Promise<any> => {
   try {
     var token = sessionStorage.getItem("token");
     if (token != null) {
-      var url = _baseAddress + "Hod/UploadFiles";
+      var url = _baseAddress + "Hod/UploadStudentProfiles";
       const formData = new FormData();
       if (File) {
         formData.append("file", File);
