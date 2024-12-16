@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="EPPlus" Version="7.5.1" />
+    <PackageReference Include="EPPlus.System.Drawing" Version="7.5.0" />
+    <PackageReference Include="Hl7.Fhir.R4" Version="5.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
+    <PackageReference Include="Select.HtmlToPdf.NetCore" Version="24.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
@@ -16,7 +21,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Uploads\NoticeImages\" />
+    <None Include="wwwroot\Uploads\NoticeImages\Annual-Day-pic.jpg" />
+    <None Include="wwwroot\Uploads\NoticeImages\annual-Day.jpg" />
+    <None Include="wwwroot\Uploads\NoticeImages\download %284%29.jfif" />
+    <None Include="wwwroot\Uploads\NoticeImages\mid-term-schedule.jfif" />
+    <None Include="wwwroot\Uploads\NoticeImages\painting_competition.jpg" />
+    <None Include="wwwroot\Uploads\NoticeImages\profile-image.jfif" />
+    <None Include="wwwroot\Uploads\PdfTemplate\PdfFooter.html" />
+    <None Include="wwwroot\Uploads\PdfTemplate\PdfHeader.html" />
+    <None Include="wwwroot\Uploads\PdfTemplate\PdfTemplate.html" />
+    <None Include="wwwroot\Uploads\StudentProfiles\Animation.gif" />
+    <None Include="wwwroot\Uploads\StudentProfiles\default.png" />
+    <None Include="wwwroot\Uploads\StudentProfiles\profile-image.jfif" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Uploads\HodProfiles\" />
   </ItemGroup>
 
 </Project>

@@ -186,6 +186,10 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "Hl7.Fhir.R4": {
+              "target": "Package",
+              "version": "[5.5.0, )"
+            },
             "Microsoft.AspNetCore.Http": {
               "target": "Package",
               "version": "[2.2.2, )"
@@ -274,9 +278,29 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.5.1, )"
+            },
+            "EPPlus.System.Drawing": {
+              "target": "Package",
+              "version": "[7.5.0, )"
+            },
+            "Hl7.Fhir.R4": {
+              "target": "Package",
+              "version": "[5.5.0, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.0, )"
+            },
+            "Select.HtmlToPdf.NetCore": {
+              "target": "Package",
+              "version": "[24.1.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

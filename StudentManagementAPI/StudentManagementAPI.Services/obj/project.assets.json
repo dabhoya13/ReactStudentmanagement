@@ -47,6 +47,66 @@
           }
         }
       },
+      "Fhir.Metrics/1.2.2": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/Fhir.Metrics.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Fhir.Metrics.dll": {}
+        }
+      },
+      "Hl7.Fhir.Base/5.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Fhir.Metrics": "1.2.2",
+          "Newtonsoft.Json": "13.0.3",
+          "System.ComponentModel.Annotations": "5.0.0",
+          "System.Reflection.Emit.Lightweight": "4.7.0"
+        },
+        "compile": {
+          "lib/net6.0/Hl7.Fhir.Base.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Hl7.Fhir.Base.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Hl7.Fhir.Conformance/5.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Hl7.Fhir.Base": "5.5.0"
+        },
+        "compile": {
+          "lib/net6.0/Hl7.Fhir.Conformance.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Hl7.Fhir.Conformance.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Hl7.Fhir.R4/5.5.0": {
+        "type": "package",
+        "dependencies": {
+          "Hl7.Fhir.Conformance": "5.5.0"
+        },
+        "compile": {
+          "lib/net6.0/Hl7.Fhir.R4.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Hl7.Fhir.R4.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Microsoft.AspNetCore.Http/2.2.2": {
         "type": "package",
         "dependencies": {
@@ -702,13 +762,17 @@
           }
         }
       },
-      "System.ComponentModel.Annotations/4.5.0": {
+      "System.ComponentModel.Annotations/5.0.0": {
         "type": "package",
         "compile": {
-          "ref/netcoreapp2.0/_._": {}
+          "ref/netstandard2.1/System.ComponentModel.Annotations.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "lib/netcoreapp2.0/_._": {}
+          "lib/netstandard2.1/System.ComponentModel.Annotations.dll": {
+            "related": ".xml"
+          }
         }
       },
       "System.Configuration.ConfigurationManager/6.0.1": {
@@ -823,6 +887,15 @@
         }
       },
       "System.Numerics.Vectors/4.5.0": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/_._": {}
+        }
+      },
+      "System.Reflection.Emit.Lightweight/4.7.0": {
         "type": "package",
         "compile": {
           "ref/netcoreapp2.0/_._": {}
@@ -1117,6 +1190,71 @@
         "azureicon.png",
         "lib/netstandard2.0/Azure.Identity.dll",
         "lib/netstandard2.0/Azure.Identity.xml"
+      ]
+    },
+    "Fhir.Metrics/1.2.2": {
+      "sha512": "600yqTbqREfogkwWH+MrXwq7fFI/gO5xn1+f7EYHlN69kXZhEpyG3V574PJiErfMQS1IpDNs4QT0aAu3KGlGFQ==",
+      "type": "package",
+      "path": "fhir.metrics/1.2.2",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "fhir.metrics.1.2.2.nupkg.sha512",
+        "fhir.metrics.nuspec",
+        "icon-fhir-32.png",
+        "lib/netstandard2.0/Fhir.Metrics.dll"
+      ]
+    },
+    "Hl7.Fhir.Base/5.5.0": {
+      "sha512": "agirW3E95c4VZIqvH5hpE4GhGiXCy54Xp53OtGrOd3IOjDZaq43yBlSCWsmKwmm8802PHNvkJ1uBaH2eGz58WQ==",
+      "type": "package",
+      "path": "hl7.fhir.base/5.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "hl7.fhir.base.5.5.0.nupkg.sha512",
+        "hl7.fhir.base.nuspec",
+        "icon-firely-sdk-128.png",
+        "lib/net6.0/Hl7.Fhir.Base.dll",
+        "lib/net6.0/Hl7.Fhir.Base.xml",
+        "lib/netstandard2.0/Hl7.Fhir.Base.dll",
+        "lib/netstandard2.0/Hl7.Fhir.Base.xml"
+      ]
+    },
+    "Hl7.Fhir.Conformance/5.5.0": {
+      "sha512": "hCmpckftpSZ2oK0tNauo41O4PUXCETn+pkeM+viDKnevkbod7Z0ibhu+kwbuER+B0WzOwT1uneBOa2liuwkMOQ==",
+      "type": "package",
+      "path": "hl7.fhir.conformance/5.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "hl7.fhir.conformance.5.5.0.nupkg.sha512",
+        "hl7.fhir.conformance.nuspec",
+        "icon-firely-sdk-128.png",
+        "lib/net6.0/Hl7.Fhir.Conformance.dll",
+        "lib/net6.0/Hl7.Fhir.Conformance.xml",
+        "lib/netstandard2.0/Hl7.Fhir.Conformance.dll",
+        "lib/netstandard2.0/Hl7.Fhir.Conformance.xml"
+      ]
+    },
+    "Hl7.Fhir.R4/5.5.0": {
+      "sha512": "GfaY43O548+r6qtYQXCojFwUUgfhf0AR6v0vS22tJ4cpxajbFeAKseX+YnaEFviRdqhK7A37iG8Ee9EmRMU2bg==",
+      "type": "package",
+      "path": "hl7.fhir.r4/5.5.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "hl7.fhir.r4.5.5.0.nupkg.sha512",
+        "hl7.fhir.r4.nuspec",
+        "icon-firely-sdk-128.png",
+        "lib/net6.0/Hl7.Fhir.R4.dll",
+        "lib/net6.0/Hl7.Fhir.R4.xml",
+        "lib/netstandard2.0/Hl7.Fhir.R4.dll",
+        "lib/netstandard2.0/Hl7.Fhir.R4.xml"
       ]
     },
     "Microsoft.AspNetCore.Http/2.2.2": {
@@ -2017,13 +2155,14 @@
         "system.clientmodel.nuspec"
       ]
     },
-    "System.ComponentModel.Annotations/4.5.0": {
-      "sha512": "UxYQ3FGUOtzJ7LfSdnYSFd7+oEv6M8NgUatatIN2HxNtDdlcvFAf+VIq4Of9cDMJEJC0aSRv/x898RYhB4Yppg==",
+    "System.ComponentModel.Annotations/5.0.0": {
+      "sha512": "dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
       "type": "package",
-      "path": "system.componentmodel.annotations/4.5.0",
+      "path": "system.componentmodel.annotations/5.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
+        "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
         "lib/MonoAndroid10/_._",
@@ -2031,11 +2170,11 @@
         "lib/net45/_._",
         "lib/net461/System.ComponentModel.Annotations.dll",
         "lib/netcore50/System.ComponentModel.Annotations.dll",
-        "lib/netcoreapp2.0/_._",
         "lib/netstandard1.4/System.ComponentModel.Annotations.dll",
         "lib/netstandard2.0/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.1/System.ComponentModel.Annotations.dll",
+        "lib/netstandard2.1/System.ComponentModel.Annotations.xml",
         "lib/portable-net45+win8/_._",
-        "lib/uap10.0.16299/_._",
         "lib/win8/_._",
         "lib/xamarinios10/_._",
         "lib/xamarinmac20/_._",
@@ -2057,7 +2196,6 @@
         "ref/netcore50/ru/System.ComponentModel.Annotations.xml",
         "ref/netcore50/zh-hans/System.ComponentModel.Annotations.xml",
         "ref/netcore50/zh-hant/System.ComponentModel.Annotations.xml",
-        "ref/netcoreapp2.0/_._",
         "ref/netstandard1.1/System.ComponentModel.Annotations.dll",
         "ref/netstandard1.1/System.ComponentModel.Annotations.xml",
         "ref/netstandard1.1/de/System.ComponentModel.Annotations.xml",
@@ -2093,14 +2231,15 @@
         "ref/netstandard1.4/zh-hant/System.ComponentModel.Annotations.xml",
         "ref/netstandard2.0/System.ComponentModel.Annotations.dll",
         "ref/netstandard2.0/System.ComponentModel.Annotations.xml",
+        "ref/netstandard2.1/System.ComponentModel.Annotations.dll",
+        "ref/netstandard2.1/System.ComponentModel.Annotations.xml",
         "ref/portable-net45+win8/_._",
-        "ref/uap10.0.16299/_._",
         "ref/win8/_._",
         "ref/xamarinios10/_._",
         "ref/xamarinmac20/_._",
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._",
-        "system.componentmodel.annotations.4.5.0.nupkg.sha512",
+        "system.componentmodel.annotations.5.0.0.nupkg.sha512",
         "system.componentmodel.annotations.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -2302,6 +2441,64 @@
         "ref/xamarinwatchos10/_._",
         "system.numerics.vectors.4.5.0.nupkg.sha512",
         "system.numerics.vectors.nuspec",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
+    "System.Reflection.Emit.Lightweight/4.7.0": {
+      "sha512": "a4OLB4IITxAXJeV74MDx49Oq2+PsF6Sml54XAFv+2RyWwtDBcabzoxiiJRhdhx+gaohLh4hEGCLQyBozXoQPqA==",
+      "type": "package",
+      "path": "system.reflection.emit.lightweight/4.7.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net45/_._",
+        "lib/netcore50/System.Reflection.Emit.Lightweight.dll",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.Reflection.Emit.Lightweight.dll",
+        "lib/netstandard1.0/System.Reflection.Emit.Lightweight.xml",
+        "lib/netstandard1.3/System.Reflection.Emit.Lightweight.dll",
+        "lib/netstandard2.0/System.Reflection.Emit.Lightweight.dll",
+        "lib/netstandard2.0/System.Reflection.Emit.Lightweight.xml",
+        "lib/netstandard2.1/_._",
+        "lib/portable-net45+wp8/_._",
+        "lib/wp80/_._",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net45/_._",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard1.0/System.Reflection.Emit.Lightweight.dll",
+        "ref/netstandard1.0/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/de/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/es/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/fr/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/it/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/ja/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/ko/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/ru/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/zh-hans/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard1.0/zh-hant/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard2.0/System.Reflection.Emit.Lightweight.dll",
+        "ref/netstandard2.0/System.Reflection.Emit.Lightweight.xml",
+        "ref/netstandard2.1/_._",
+        "ref/portable-net45+wp8/_._",
+        "ref/wp80/_._",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "runtimes/aot/lib/netcore50/System.Reflection.Emit.Lightweight.dll",
+        "runtimes/aot/lib/netcore50/System.Reflection.Emit.Lightweight.xml",
+        "system.reflection.emit.lightweight.4.7.0.nupkg.sha512",
+        "system.reflection.emit.lightweight.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
@@ -2859,6 +3056,7 @@
   },
   "projectFileDependencyGroups": {
     "net7.0": [
+      "Hl7.Fhir.R4 >= 5.5.0",
       "Microsoft.AspNetCore.Http >= 2.2.2",
       "Microsoft.AspNetCore.Http.Abstractions >= 2.2.0",
       "Microsoft.Extensions.Configuration.Abstractions >= 7.0.0",
@@ -2919,6 +3117,10 @@
       "net7.0": {
         "targetAlias": "net7.0",
         "dependencies": {
+          "Hl7.Fhir.R4": {
+            "target": "Package",
+            "version": "[5.5.0, )"
+          },
           "Microsoft.AspNetCore.Http": {
             "target": "Package",
             "version": "[2.2.2, )"

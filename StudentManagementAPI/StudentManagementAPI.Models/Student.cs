@@ -20,7 +20,7 @@ namespace StudentManagementAPI.Models
 
         public DateTime BirthDate { get; set; }
 
-        public DateTime? CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
 
 
         public int CourseId { get; set; }
@@ -67,4 +67,30 @@ namespace StudentManagementAPI.Models
 
         public int ProfessorCount { get; set; } 
     }
+
+    public class ExportStudent
+    {
+        [Key]
+        [Required]
+        public int StudentId { get; set; }
+
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
+        public string? BirthDate { get; set; }
+
+        public string? CourseName { get; set; } = null;
+
+        [Required(ErrorMessage = "UserName is Required")]
+        public string UserName { get; set; } = null!;
+
+        public string Gender { get; set; }
+
+        public string Email { get; set; }
+
+        public string CreatedDate { get; set; }
+
+    }
+
 }

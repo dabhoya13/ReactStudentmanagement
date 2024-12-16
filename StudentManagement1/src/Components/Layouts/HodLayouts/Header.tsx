@@ -13,54 +13,100 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
-import React from "react";
-import profilePicture from '../../../assets/Images/profile-image.jfif';
+import React, { useEffect, useState } from "react";
+import { ViewHodProfileModal } from "../../AllModals/Modals";
+import { GetHodDetailsById } from "../../Hod/MyProfile's";
+
+interface HodProps {
+  Id: number;
+  firstName: string;
+  lastName: string;
+  birthDate: Date;
+  userName: string;
+  email: string;
+  mobileNumber: string;
+  countryId: number;
+  cityId: number;
+  stateId: number;
+  countryCode: string;
+  imageName: string;
+  imageUrl: string;
+  countryName: string;
+  cityName: String;
+  stateName: String;
+  postalCode: string;
+}
+
 const Header: React.FC = () => {
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState<null | HTMLElement>(null);
-  
-    const isMenuOpen = Boolean(anchorEl);
-    const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-  
-    const handleProfileMenuOpen = (event : React.MouseEvent<HTMLElement>) => {
-      setAnchorEl(event.currentTarget);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
+    React.useState<null | HTMLElement>(null);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState<boolean>(false);
+
+  const profilePicture = sessionStorage.getItem("ProfilePicture") ?? "";
+  const isMenuOpen = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const [hodData, setHodData] = useState<HodProps | null>();
+
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileMoreAnchorEl(null);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    handleMobileMenuClose();
+  };
+
+  const openViewProfileModal = () => {
+    setIsProfileMenuOpen(true);
+  };
+
+  const closeViewProfileModal = () => {
+    setIsProfileMenuOpen(false);
+  };
+
+  useEffect(() => {
+    const FetchHodDetails = async () => {
+      const hodId = Number(sessionStorage.getItem("HodId"));
+      if (hodId != null && hodId != 0) {
+        const hodDetails = await GetHodDetailsById(hodId);
+        if (hodDetails != null) {
+          setHodData(hodDetails);
+        }
+      }
     };
 
-    const handleMobileMenuOpen = (event : React.MouseEvent<HTMLElement>) => {
-        setMobileMoreAnchorEl(event.currentTarget);
-      };
-  
-    const handleMobileMenuClose = () => {
-      setMobileMoreAnchorEl(null);
-    };
-  
-    const handleMenuClose = () => {
-      setAnchorEl(null);
-      handleMobileMenuClose();
-    };
-
+    FetchHodDetails();
+  }, []);
 
   const menuId = "primary-search-account-menu";
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={isMenuOpen}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  );
+  // const renderMenu = (
+  //   <Menu
+  //     anchorEl={anchorEl}
+  //     anchorOrigin={{
+  //       vertical: "top",
+  //       horizontal: "right",
+  //     }}
+  //     id={menuId}
+  //     keepMounted
+  //     transformOrigin={{
+  //       vertical: "top",
+  //       horizontal: "right",
+  //     }}
+  //     open={isMenuOpen}
+  //     onClose={handleMenuClose}
+  //   >
+  //     <MenuItem onClick={openViewProfileModal}>Profile</MenuItem>
+  //   </Menu>
+  // );
 
   const mobileMenuId = "primary-search-account-menu-mobile";
   const renderMobileMenu = (
@@ -99,7 +145,7 @@ const Header: React.FC = () => {
         </IconButton>
         <p>Notifications</p>
       </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      <MenuItem onClick={openViewProfileModal}>
         <IconButton
           size="large"
           aria-label="account of current user"
@@ -162,7 +208,7 @@ const Header: React.FC = () => {
                 aria-label="account of current user"
                 aria-controls={menuId}
                 aria-haspopup="true"
-                onClick={handleProfileMenuOpen}
+                onClick={openViewProfileModal}
                 color="inherit"
               >
                 {/* <AccountCircle className="profile-picture" /> */}
@@ -190,7 +236,12 @@ const Header: React.FC = () => {
         </Toolbar>
       </AppBar>
       {renderMobileMenu}
-      {renderMenu}
+
+      <ViewHodProfileModal
+        isOpen={isProfileMenuOpen}
+        onClose={closeViewProfileModal}
+        initialData={hodData}
+      />
     </Box>
   );
 };

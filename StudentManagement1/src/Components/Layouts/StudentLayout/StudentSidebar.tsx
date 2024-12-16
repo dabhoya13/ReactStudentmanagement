@@ -71,7 +71,7 @@ const StudentSidebar: React.FC = (props: Props) => {
         <List>
           <ListItem
             className={
-              location.pathname === "/admin/adminDashboard"
+              location.pathname === "/student/dashboard"
                 ? "list-items selected"
                 : "list-items"
             }
@@ -81,6 +81,21 @@ const StudentSidebar: React.FC = (props: Props) => {
             <ListItemButton className="list-items-btn">
               <DashboardIcon />
               <ListItemText primary="Dashboard" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              location.pathname === "/student/attendance"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/attendance")}
+          >
+            <ListItemButton className="list-items-btn">
+              <DashboardIcon />
+              <ListItemText primary="Attendance" />
             </ListItemButton>
           </ListItem>
         </List>
@@ -132,7 +147,7 @@ const StudentSidebar: React.FC = (props: Props) => {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: "block", sm: "block", md:"none" },
+            display: { xs: "block", sm: "block", md: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
@@ -144,7 +159,7 @@ const StudentSidebar: React.FC = (props: Props) => {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: "none", sm: "none" , md: "block"},
+            display: { xs: "none", sm: "none", md: "block" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,

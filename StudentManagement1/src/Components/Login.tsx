@@ -51,7 +51,20 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
         var response = await CallLoginAPI(formData);
         if (response.result != null && response.result.data.jwtToken != null) {
           var token = response.result.data.jwtToken;
+          if (response.result.data.id != null) {
+            sessionStorage.setItem("HodId", response.result.data.id);
+            sessionStorage.setItem("ProfilePicture",response.result.data.imageUrl);
+          } else {
+            sessionStorage.setItem("UserId", response.result.data.studentId);
+          }
           sessionStorage.setItem("token", token);
+          sessionStorage.setItem("UserName", response.result.data.userName);
+          sessionStorage.setItem("Email", response.result.data.email);
+          sessionStorage.setItem(
+            "FullName",
+            response.result.data.firstName + " " + response.result.data.lastName
+          );
+
           setAuthenticated(true);
           const user = getUserFromToken();
           if (user?.Role == "1") {
@@ -203,7 +216,7 @@ const Login: React.FC<LoginProps> = ({ setAuthenticated }) => {
               disabled={loading}
               sx={{ backgroundColor: "#6a6cf6", color: "white", marginTop: 2 }}
             >
-                {loading ? "Loading..." : "Login"}
+              {loading ? "Loading..." : "Login"}
             </Button>
           </form>
         </Box>

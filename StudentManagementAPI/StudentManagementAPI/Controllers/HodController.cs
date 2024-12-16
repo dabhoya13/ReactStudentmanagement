@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Azure;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StudentManagementAPI.Models;
 using StudentManagementAPI.Services;
@@ -19,7 +21,7 @@ namespace StudentManagementAPI.Controllers
         private readonly IJwtServices _jwtServices;
 
 
-        public HodController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices)
+        public HodController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices, IMapper mapper)
         {
             this._response = new();
             _studentServices = studentServices;
@@ -48,7 +50,7 @@ namespace StudentManagementAPI.Controllers
         }
 
         [HttpPut("UploadFiles")]
-        public async Task<ActionResult<APIResponse>> UploadFiles(IFormFile file)
+        public async Task<ActionResult<APIResponse>> UploadFiles(IFormFile file,[FromHeader]string folderName)
         {
             try
             {
@@ -72,61 +74,7 @@ namespace StudentManagementAPI.Controllers
                     }
 
                     var fileName = Path.GetFileName(file.FileName);
-                    var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "NoticeImages");
-                    var filePath = Path.Combine(uploadsFolderPath, fileName);
-                    if (!Directory.Exists(uploadsFolderPath))
-                    {
-                        Directory.CreateDirectory(uploadsFolderPath);
-                    }
-
-                    if(!System.IO.File.Exists(filePath))
-                    {
-                        using var stream = new FileStream(filePath, FileMode.Create);
-                        await file.CopyToAsync(stream);
-                    }
-                 
-
-                    _response.StatusCode = HttpStatusCode.OK;
-                    _response.IsSuccess = true;
-                    return Ok(_response);
-                }
-            }
-            catch (Exception ex)
-            {
-
-                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
-                _response.StatusCode = HttpStatusCode.InternalServerError;
-                _response.IsSuccess = false;
-                return _response;
-            }
-        }
-
-        [HttpPut("UploadStudentProfiles")]
-        public async Task<ActionResult<APIResponse>> UploadStudentProfiles(IFormFile file)
-        {
-            try
-            {
-                var header = this.Request.Headers;
-                if (!_jwtServices.ValidateToken(header["token"], out JwtSecurityToken jwtSecurityToken))
-                {
-
-                    _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
-                    _response.StatusCode = HttpStatusCode.Unauthorized;
-                    _response.IsSuccess = false;
-                    return Unauthorized(_response);
-                }
-                else
-                {
-                    if (file == null || file.Length == 0)
-                    {
-                        _response.ErroMessages = new List<string>() { "No file provided" };
-                        _response.StatusCode = HttpStatusCode.BadRequest;
-                        _response.IsSuccess = false;
-                        return BadRequest(_response);
-                    }
-
-                    var fileName = Path.GetFileName(file.FileName);
-                    var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "StudentProfiles");
+                    var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", folderName);
                     var filePath = Path.Combine(uploadsFolderPath, fileName);
                     if (!Directory.Exists(uploadsFolderPath))
                     {
@@ -154,6 +102,60 @@ namespace StudentManagementAPI.Controllers
                 return _response;
             }
         }
+
+        //[HttpPut("UploadStudentProfiles")]
+        //public async Task<ActionResult<APIResponse>> UploadStudentProfiles(IFormFile file)
+        //{
+        //    try
+        //    {
+        //        var header = this.Request.Headers;
+        //        if (!_jwtServices.ValidateToken(header["token"], out JwtSecurityToken jwtSecurityToken))
+        //        {
+
+        //            _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
+        //            _response.StatusCode = HttpStatusCode.Unauthorized;
+        //            _response.IsSuccess = false;
+        //            return Unauthorized(_response);
+        //        }
+        //        else
+        //        {
+        //            if (file == null || file.Length == 0)
+        //            {
+        //                _response.ErroMessages = new List<string>() { "No file provided" };
+        //                _response.StatusCode = HttpStatusCode.BadRequest;
+        //                _response.IsSuccess = false;
+        //                return BadRequest(_response);
+        //            }
+
+        //            var fileName = Path.GetFileName(file.FileName);
+        //            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "StudentProfiles");
+        //            var filePath = Path.Combine(uploadsFolderPath, fileName);
+        //            if (!Directory.Exists(uploadsFolderPath))
+        //            {
+        //                Directory.CreateDirectory(uploadsFolderPath);
+        //            }
+
+        //            if (!System.IO.File.Exists(filePath))
+        //            {
+        //                using var stream = new FileStream(filePath, FileMode.Create);
+        //                await file.CopyToAsync(stream);
+        //            }
+
+
+        //            _response.StatusCode = HttpStatusCode.OK;
+        //            _response.IsSuccess = true;
+        //            return Ok(_response);
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+        //        _response.StatusCode = HttpStatusCode.InternalServerError;
+        //        _response.IsSuccess = false;
+        //        return _response;
+        //    }
+        //}
 
         [HttpGet]
         public async Task<ActionResult<APIResponse>> GetAllNotices()
@@ -205,7 +207,7 @@ namespace StudentManagementAPI.Controllers
             try
             {
                 NoticeDto noticeDto = await _studentServices.GetNoticeById(NoticeId);
-                RoleBaseResponse<NoticeDto> roleBaseResponse= new()
+                RoleBaseResponse<NoticeDto> roleBaseResponse = new()
                 {
                     data = noticeDto,
                 };
@@ -213,7 +215,8 @@ namespace StudentManagementAPI.Controllers
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
                 _response.result = roleBaseResponse;
-            }catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
                 _response.StatusCode = HttpStatusCode.InternalServerError;
@@ -227,7 +230,7 @@ namespace StudentManagementAPI.Controllers
         {
             try
             {
-                IList<AttendanceCountDto> attendanceCountDtos= await _studentServices.GetAttendanceCountByMonthYear(attendanceMonthYearDto);
+                IList<AttendanceCountDto> attendanceCountDtos = await _studentServices.GetAttendanceCountByMonthYear(attendanceMonthYearDto);
                 RoleBaseResponse<IList<AttendanceCountDto>> roleBaseResponse = new()
                 {
                     data = attendanceCountDtos,
@@ -282,6 +285,126 @@ namespace StudentManagementAPI.Controllers
             }
             return _response;
 
+        }
+
+
+        [HttpGet("GetHodDetailsById")]
+        public async Task<ActionResult<APIResponse>> GetHodDetailsById(int Id)
+        {
+            try
+            {
+                ProfessorHodDto professorHod = await _studentServices.GetOneRecordFromId<ProfessorHodDto>("[dbo].[Get_Hod_Details_By_Id]", Id);
+                RoleBaseResponse<ProfessorHodDto> roleBaseResponse = new()
+                {
+                    data = professorHod,
+                };
+
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                _response.result = roleBaseResponse;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetAllCountiesStatesCities")]
+        public async Task<ActionResult<APIResponse>> GetAllCountiesStatesCities()
+        {
+            try
+            {
+                LocationDto locationDto = await _studentServices.GetAllCountriesStatesCitites();
+                RoleBaseResponse<LocationDto> roleBaseResponse = new()
+                {
+                    data = locationDto
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpPut("UpdateProfessorHodDetails")]
+        public async Task<ActionResult<APIResponse>> UpdateProfessorHodDetails(ProfessorHodDto professorHodDto)
+        {
+            try
+            {
+                await _studentServices.UpdateProfessorHodDetails(professorHodDto);
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpPatch("UpdateHodProfilePicture")]
+        public async Task<ActionResult<APIResponse>> UpdateHodProfilePicture(ProfessorHodDto professorHodDto)
+        {
+            try
+            {
+                await _studentServices.UpdateHodProfilePicture(professorHodDto);
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpPatch("UpdateHodPersonalInfo")]
+        public async Task<ActionResult<APIResponse>> UpdateHodPersonalInfo(ProfessorHodDto professorHodDto)
+        {
+            try
+            {
+                await _studentServices.UpdateHodPersonalInfo(professorHodDto);
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpPatch("UpdateHodAddressInfo")]
+        public async Task<ActionResult<APIResponse>> UpdateHodAddressInfo(ProfessorHodDto professorHodDto)
+        {
+            try
+            {
+                await _studentServices.UpdateHodAddressInfo(professorHodDto);
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
         }
     }
 }

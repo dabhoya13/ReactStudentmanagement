@@ -1,8 +1,15 @@
 using Microsoft.Extensions.FileProviders;
+using StudentManagementAPI.MapperConfig;
 using StudentManagementAPI.Services;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
+ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
+HttpClientHandler clientHandler = new HttpClientHandler();
+clientHandler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => { return true; };
 
+// Pass the handler to httpclient(from you are calling api)
+HttpClient client = new HttpClient(clientHandler);
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -22,7 +29,7 @@ builder.Services.AddDataProtection();
 builder.Services.AddDataLayerServices();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IJwtServices, JwtServices>();
-
+builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin",
@@ -51,13 +58,18 @@ var app = builder.Build();
 app.UseCors("AllowSpecificOrigin");
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "NoticeImages")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"wwwroot", "Uploads", "NoticeImages")),
     RequestPath = "/NoticeImages"
 });
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads", "StudentProfiles")),
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(),"wwwroot", "Uploads", "StudentProfiles")),
     RequestPath = "/StudentProfiles"
+});
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "HodProfiles")),
+    RequestPath = "/HodProfiles"
 });
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

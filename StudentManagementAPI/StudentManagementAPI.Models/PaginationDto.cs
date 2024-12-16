@@ -18,4 +18,14 @@ namespace StudentManagementAPI.Models
 
         public string? OrderDirection { get; set; } = null;
     }
+
+    public class ExportPdfViewModel
+    {
+        public string? SearchQuery { get; set; } = null;
+        public string FullName { get; set; }
+
+        public string? Email { get; set;}
+        public string? UserName { get; set; }
+
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
@@ -23,12 +24,14 @@ namespace StudentManagementAPI.Controllers
         private readonly IStudentServices _studentServices;
         private readonly IJwtServices _jwtService;
         private readonly IConfiguration _configuration;
-        public MasterAPIController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices)
+        private readonly IMapper _mapper;
+        public MasterAPIController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices,IMapper mapper)
         {
             _studentServices = studentServices;
             this._response = new();
             _configuration = configuration;
             _jwtService = jwtServices;
+            _mapper = mapper;
         }
         public Dictionary<string, Type> controllers = new()
         {
@@ -73,7 +76,7 @@ namespace StudentManagementAPI.Controllers
                         object controller = null;
                         if (controllers.TryGetValue(apiRequest.ControllerName, out Type controllerType))
                         {
-                            controller = Activator.CreateInstance(controllerType, _studentServices, _configuration,_jwtService);
+                            controller = Activator.CreateInstance(controllerType, _studentServices, _configuration,_jwtService,_mapper);
                             MethodInfo methodInfo = controller.GetType().GetMethod(apiRequest.MethodName);
                             if (methodInfo != null)
                             {
@@ -139,7 +142,7 @@ namespace StudentManagementAPI.Controllers
                 object controller = null;
                 if (controllers.TryGetValue(apiRequest.ControllerName, out Type controllerType))
                 {
-                    controller = Activator.CreateInstance(controllerType, _studentServices, _configuration, _jwtService);
+                    controller = Activator.CreateInstance(controllerType, _studentServices, _configuration, _jwtService, _mapper);
                     MethodInfo methodInfo = controller.GetType().GetMethod(apiRequest.MethodName);
                     if (methodInfo != null)
                     {

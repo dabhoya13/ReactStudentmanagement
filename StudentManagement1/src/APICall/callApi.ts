@@ -53,10 +53,11 @@ export const CallAPI = async (formData: MainFormDataProps): Promise<any> => {
           "Content-Type": "application/json",
           token: `${token}`,
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
       var data = await response.json();
-      if (data.statusCode === 401 || data.statusCode === 500 ) {
+      if (data.statusCode === 401 || data.statusCode === 500) {
         sessionStorage.clear();
         window.location.href = "/login";
         return null;
@@ -70,26 +71,28 @@ export const CallAPI = async (formData: MainFormDataProps): Promise<any> => {
   }
 };
 
-export const CallAPIForFileUpload = async (File: File | null): Promise<any> => {
+export const CallAPIForFileUpload = async (File: File | null, FolderName:string): Promise<any> => {
   const _baseAddress = "https://localhost:7199/api/";
   try {
     var token = sessionStorage.getItem("token");
     if (token != null) {
-      var url = _baseAddress + "Hod/UploadStudentProfiles";
+      var url = _baseAddress + "Hod/UploadFiles";
       const formData = new FormData();
       if (File) {
         formData.append("file", File);
+
       }
       const response = await fetch(url, {
         method: "PUT",
         headers: {
           // "Content-Type": "multipart/form-data",
+          folderName : FolderName,
           token: `${token}`,
         },
-        body:formData,
+        body: formData,
       });
       var data = await response.json();
-      if (data.statusCode === 401 || data.statusCode === 500 ) {
+      if (data.statusCode === 401 || data.statusCode === 500) {
         sessionStorage.clear();
         window.location.href = "/login";
         return null;
@@ -104,6 +107,3 @@ export const CallAPIForFileUpload = async (File: File | null): Promise<any> => {
     throw new Error();
   }
 };
-
-
-

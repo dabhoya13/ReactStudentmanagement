@@ -1,3 +1,4 @@
+import { Email } from "@mui/icons-material";
 import { CallAPI } from "../../APICall/callApi";
 
 interface PaginationProps {
@@ -16,9 +17,9 @@ interface StudentDataProps {
   courseId: number;
   email: string;
   status: boolean;
-  gender:number | null;
-  imageName:string;
-  imageUrl:string;
+  gender: number | null;
+  imageName: string;
+  imageUrl: string;
 }
 
 interface PaginationResponseProps {
@@ -62,7 +63,6 @@ export const getAllStudentsData = async (
   return null;
 };
 
-
 export const DeleteStudent = async (StudentId: number) => {
   if (StudentId != 0) {
     const formData = {
@@ -81,7 +81,6 @@ export const DeleteStudent = async (StudentId: number) => {
   }
 };
 
-
 export const GetStudentDetailsById = async (
   StudentId: number
 ): Promise<StudentDataProps | null> => {
@@ -98,5 +97,88 @@ export const GetStudentDetailsById = async (
     return studentDataProps;
   } else {
     return null;
+  }
+};
+
+export const ExcelExportReport = async (SearchQuery: string | null) => {
+  try {
+    const paginationDto = {
+      SearchQuery: SearchQuery,
+    };
+    const formData = {
+      ControllerName: "Student",
+      MethodName: "ExportExcelReport",
+      DataObject: JSON.stringify(paginationDto),
+      RoleIds: ["1"],
+    };
+    var response = await CallAPI(formData);
+    if (response.result != null) {
+      console.log(response);
+
+      const base64String = response.result;
+      const binaryString = atob(base64String); // Decode the base64 string
+      const byteArray = new Uint8Array(binaryString.length);
+
+      // Convert binary string to byte array
+      for (let i = 0; i < binaryString.length; i++) {
+        byteArray[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([byteArray], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Students_List.xlsx";
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+  } catch (err) {
+    throw new Error();
+  }
+};
+
+export const PDFExportReport = async (SearchQuery: string | null) => {
+  try {
+    const fullName = sessionStorage.getItem("FullName");
+    const email= sessionStorage.getItem("Email");
+    const userName = sessionStorage.getItem("UserName");
+
+    const exportPdfViewModel = {
+      SearchQuery: SearchQuery,
+      FullName: fullName,
+      UserName:userName,
+      Email:email
+    };
+
+    const formData = {
+      ControllerName: "Student",
+      MethodName: "ExportPdfReport",
+      DataObject: JSON.stringify(exportPdfViewModel),
+      RoleIds: ["1"],
+    };
+    var response = await CallAPI(formData);
+    if (response.result != null) {
+      console.log(response);
+      const base64String = response.result;
+      const binaryString = atob(base64String); // Decode the base64 string
+      const byteArray = new Uint8Array(binaryString.length);
+
+      // Convert binary string to byte array
+      for (let i = 0; i < binaryString.length; i++) {
+        byteArray[i] = binaryString.charCodeAt(i);
+      }
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      if (blob.size > 0) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "Students_List.pdf";
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    }
+  } catch (err) {
+    throw new Error();
   }
 };

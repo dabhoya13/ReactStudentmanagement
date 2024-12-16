@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v7.0": {
       "StudentManagementAPI.Services/1.0.0": {
         "dependencies": {
+          "Hl7.Fhir.R4": "5.5.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Abstractions": "2.2.0",
           "Microsoft.Extensions.Configuration.Abstractions": "7.0.0",
@@ -53,6 +54,50 @@
           "lib/netstandard2.0/Azure.Identity.dll": {
             "assemblyVersion": "1.11.4.0",
             "fileVersion": "1.1100.424.31005"
+          }
+        }
+      },
+      "Fhir.Metrics/1.2.2": {
+        "runtime": {
+          "lib/netstandard2.0/Fhir.Metrics.dll": {
+            "assemblyVersion": "1.2.2.0",
+            "fileVersion": "1.2.2.0"
+          }
+        }
+      },
+      "Hl7.Fhir.Base/5.5.0": {
+        "dependencies": {
+          "Fhir.Metrics": "1.2.2",
+          "Newtonsoft.Json": "13.0.3",
+          "System.ComponentModel.Annotations": "5.0.0",
+          "System.Reflection.Emit.Lightweight": "4.7.0"
+        },
+        "runtime": {
+          "lib/net6.0/Hl7.Fhir.Base.dll": {
+            "assemblyVersion": "5.5.0.0",
+            "fileVersion": "5.5.0.0"
+          }
+        }
+      },
+      "Hl7.Fhir.Conformance/5.5.0": {
+        "dependencies": {
+          "Hl7.Fhir.Base": "5.5.0"
+        },
+        "runtime": {
+          "lib/net6.0/Hl7.Fhir.Conformance.dll": {
+            "assemblyVersion": "5.5.0.0",
+            "fileVersion": "5.5.0.0"
+          }
+        }
+      },
+      "Hl7.Fhir.R4/5.5.0": {
+        "dependencies": {
+          "Hl7.Fhir.Conformance": "5.5.0"
+        },
+        "runtime": {
+          "lib/net6.0/Hl7.Fhir.R4.dll": {
+            "assemblyVersion": "5.5.0.0",
+            "fileVersion": "5.5.0.0"
           }
         }
       },
@@ -319,7 +364,7 @@
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "7.0.0",
           "Microsoft.Extensions.Primitives": "7.0.0",
-          "System.ComponentModel.Annotations": "4.5.0"
+          "System.ComponentModel.Annotations": "5.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Extensions.Options.dll": {
@@ -500,7 +545,7 @@
           }
         }
       },
-      "System.ComponentModel.Annotations/4.5.0": {},
+      "System.ComponentModel.Annotations/5.0.0": {},
       "System.Configuration.ConfigurationManager/6.0.1": {
         "dependencies": {
           "System.Security.Cryptography.ProtectedData": "6.0.0",
@@ -569,6 +614,7 @@
         }
       },
       "System.Numerics.Vectors/4.5.0": {},
+      "System.Reflection.Emit.Lightweight/4.7.0": {},
       "System.Runtime/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0",
@@ -697,6 +743,34 @@
       "sha512": "sha512-Sf4BoE6Q3jTgFkgBkx7qztYOFELBCo+wQgpYDwal/qJ1unBH73ywPztIJKXBXORRzAeNijsuxhk94h0TIMvfYg==",
       "path": "azure.identity/1.11.4",
       "hashPath": "azure.identity.1.11.4.nupkg.sha512"
+    },
+    "Fhir.Metrics/1.2.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-600yqTbqREfogkwWH+MrXwq7fFI/gO5xn1+f7EYHlN69kXZhEpyG3V574PJiErfMQS1IpDNs4QT0aAu3KGlGFQ==",
+      "path": "fhir.metrics/1.2.2",
+      "hashPath": "fhir.metrics.1.2.2.nupkg.sha512"
+    },
+    "Hl7.Fhir.Base/5.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-agirW3E95c4VZIqvH5hpE4GhGiXCy54Xp53OtGrOd3IOjDZaq43yBlSCWsmKwmm8802PHNvkJ1uBaH2eGz58WQ==",
+      "path": "hl7.fhir.base/5.5.0",
+      "hashPath": "hl7.fhir.base.5.5.0.nupkg.sha512"
+    },
+    "Hl7.Fhir.Conformance/5.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hCmpckftpSZ2oK0tNauo41O4PUXCETn+pkeM+viDKnevkbod7Z0ibhu+kwbuER+B0WzOwT1uneBOa2liuwkMOQ==",
+      "path": "hl7.fhir.conformance/5.5.0",
+      "hashPath": "hl7.fhir.conformance.5.5.0.nupkg.sha512"
+    },
+    "Hl7.Fhir.R4/5.5.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-GfaY43O548+r6qtYQXCojFwUUgfhf0AR6v0vS22tJ4cpxajbFeAKseX+YnaEFviRdqhK7A37iG8Ee9EmRMU2bg==",
+      "path": "hl7.fhir.r4/5.5.0",
+      "hashPath": "hl7.fhir.r4.5.5.0.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Http/2.2.2": {
       "type": "package",
@@ -957,12 +1031,12 @@
       "path": "system.clientmodel/1.0.0",
       "hashPath": "system.clientmodel.1.0.0.nupkg.sha512"
     },
-    "System.ComponentModel.Annotations/4.5.0": {
+    "System.ComponentModel.Annotations/5.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UxYQ3FGUOtzJ7LfSdnYSFd7+oEv6M8NgUatatIN2HxNtDdlcvFAf+VIq4Of9cDMJEJC0aSRv/x898RYhB4Yppg==",
-      "path": "system.componentmodel.annotations/4.5.0",
-      "hashPath": "system.componentmodel.annotations.4.5.0.nupkg.sha512"
+      "sha512": "sha512-dMkqfy2el8A8/I76n2Hi1oBFEbG1SfxD2l5nhwXV3XjlnOmwxJlQbYpJH4W51odnU9sARCSAgv7S3CyAFMkpYg==",
+      "path": "system.componentmodel.annotations/5.0.0",
+      "hashPath": "system.componentmodel.annotations.5.0.0.nupkg.sha512"
     },
     "System.Configuration.ConfigurationManager/6.0.1": {
       "type": "package",
@@ -1012,6 +1086,13 @@
       "sha512": "sha512-QQTlPTl06J/iiDbJCiepZ4H//BVraReU4O4EoRw1U02H5TLUIT7xn3GnDp9AXPSlJUDyFs4uWjWafNX6WrAojQ==",
       "path": "system.numerics.vectors/4.5.0",
       "hashPath": "system.numerics.vectors.4.5.0.nupkg.sha512"
+    },
+    "System.Reflection.Emit.Lightweight/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-a4OLB4IITxAXJeV74MDx49Oq2+PsF6Sml54XAFv+2RyWwtDBcabzoxiiJRhdhx+gaohLh4hEGCLQyBozXoQPqA==",
+      "path": "system.reflection.emit.lightweight/4.7.0",
+      "hashPath": "system.reflection.emit.lightweight.4.7.0.nupkg.sha512"
     },
     "System.Runtime/4.3.0": {
       "type": "package",

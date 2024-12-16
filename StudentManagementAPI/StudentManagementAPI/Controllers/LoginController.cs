@@ -1,4 +1,5 @@
-﻿using Azure;
+﻿using AutoMapper;
+using Azure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -15,10 +16,10 @@ namespace StudentManagementAPI.Controllers
     {
         private APIResponse _response;
         private readonly IStudentServices _studentServices;
-        private readonly IConfiguration _configuration; 
+        private readonly IConfiguration _configuration;
 
 
-        public LoginController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices)
+        public LoginController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices,IMapper mapper)
         {
             this._response = new();
             _studentServices = studentServices;
@@ -59,7 +60,6 @@ namespace StudentManagementAPI.Controllers
                     }
                     else
                     {
-
                         RoleBaseResponse<LoginInformationDto> roleBaseResponse = new()
                         {
                             data = loginInformationDto1,

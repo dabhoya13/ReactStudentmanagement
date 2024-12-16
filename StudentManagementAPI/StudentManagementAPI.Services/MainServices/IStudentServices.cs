@@ -41,5 +41,18 @@ namespace StudentManagementAPI.Services.MainServices
         Task<Student> CheckUsernameExistOrNot(string userName);
 
         Task<IList<T>> GetAllRecordsWithoutPagination<T>(string procedureName);
+
+        Task<IList<Student>> GetExportStudentList(string searchQuery);
+
+        Task<LocationDto> GetAllCountriesStatesCitites();
+
+        Task UpdateProfessorHodDetails(ProfessorHodDto professorHodDto);
+
+        Task UpdateHodProfilePicture(ProfessorHodDto professorHodDto);
+
+        Task UpdateHodPersonalInfo(ProfessorHodDto professorHodDto);
+
+        Task UpdateHodAddressInfo(ProfessorHodDto professorHodDto);
+
     }
 }

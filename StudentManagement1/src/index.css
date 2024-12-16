@@ -175,7 +175,7 @@ ADMIN DASHBOARD CSS START
   box-shadow: 0 0 5px rgba(33, 33, 33, 0.2);
 }
 
-.pie-chart-count{
+.pie-chart-count {
   position: absolute;
   margin-top: 170px;
 }
@@ -210,13 +210,12 @@ ADMIN DASHBOARD CSS START
   }
 }
 
-
-.Dashboard-fileUpload-box #myinputfile::-webkit-file-upload-button{
+.Dashboard-fileUpload-box #myinputfile::-webkit-file-upload-button {
   -webkit-appearance: none;
   float: right;
   position: absolute;
   margin: -10px 0 0 0;
-  right: 3%;
+  right: 7%;
   padding-top: 12px;
   border: 1px solid #aaaaaa;
   border-radius: 4px;
@@ -246,7 +245,7 @@ ADMIN DASHBOARD CSS START
   border-radius: 0 10px 10px 0;
   font-size: 18px;
   position: absolute;
-  right: 3%;
+  right: 7%;
   margin-top: 33px;
   width: 102px !important;
 }
@@ -261,18 +260,16 @@ ADMIN DASHBOARD CSS START
   color: #007bff;
 }
 
-.attendance-half-dropdown{
+.attendance-half-dropdown {
   height: 55px;
   margin-top: 8px;
 }
 
 @media (max-width: 610px) {
-  .dashboard-Attendance-header{
+  .dashboard-Attendance-header {
     flex-direction: column;
   }
 }
-
-
 
 /* ----------------------------------------------------------------------------
 
@@ -280,28 +277,26 @@ ALL Student Page CSS START
 
 ----------------------------------------------------------------------------- */
 
-.student-table
-{
+.student-table {
   width: 100%;
 }
 
-.student-table thead  {
+.student-table thead {
   padding: 15px !important;
 }
 .student-table thead tr {
-  
   background-color: #595959;
   color: white;
 }
 
-.student-table thead tr th{
+.student-table thead tr th {
   text-align: center;
   vertical-align: middle;
   font-weight: 500;
   padding: 10px;
 }
 
-.student-table tbody tr td{
+.student-table tbody tr td {
   padding: 15px;
   text-align: center;
   vertical-align: middle;
@@ -315,13 +310,95 @@ ALL Student Page CSS START
 .student-table tbody tr:nth-child(even) {
   background-color: transparent;
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
-
-  
 }
-.absent-td{
+.absent-td {
   color: red;
 }
 
-.present-td{
+.present-td {
   color: green;
+}
+
+@media (max-width: 1077px) {
+  .allstudents-search-main-box {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.myprofile-picture {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ----------------------------------------------------------------------------
+
+Student Fill Attendance  Page CSS START
+
+----------------------------------------------------------------------------- */
+
+.select-month-dropdown-div select,.select-year-dropdown-div select{
+  width: 50%;
+  height: 50px;
+  padding-left: 10px;
+}
+
+.fill-attendance-dropdown {
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  background-color: transparent;
+  appearance: "none";
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0;
+  text-align: center;
+}
+
+.fill-attendance-dropdown:focus-visible {
+  border: 1px solid transparent !important;
+}
+.fill-attendance-td {
+  border: 2px solid blue !important;
+}
+
+.fill-attendance-disabled {
+  border: none;
+}
+
+.weekend-td {
+  background-color: #e6e6e6 !important;
+}
+
+.attendance-table td {
+  padding: 0 !important;
+}
+
+.fill-attendance-dropdown option {
+  display: flex;
+  text-align: center;
+}
+.attendance-table tbody,
+.attendance-table thead,
+.attendance-table td,
+.attendance-table th {
+  border: 1px solid #cacaca;
+}
+
+.attendance-table thead  {
+  padding: 10px !important;
+}
+
+@media (max-width: 1200px) {
+  .select-month-dropdown-div,.select-year-dropdown-div{
+    flex-direction: column;
+    gap: 5px !important;
+  }
+}
+
+
+@media (max-width: 1000px) {
+  .select-month-dropdown-div select,.select-year-dropdown-div select{
+    width: 80%;
+  }
 }

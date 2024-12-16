@@ -118,20 +118,36 @@ namespace StudentManagementAPI.Services.MainServices
             {
                 return GetDataModel<AttendanceMonthYearDto>(dataObj);
             }
-            else if (controllerName == "Hod" && methodName == "GetAllStudents")
+            else if ((controllerName == "Hod" && methodName == "GetAllStudents") ||
+                     (controllerName == "Student" && methodName == "ExportExcelReport"))
             {
                 return GetDataModel<PaginationDto>(dataObj);
             }
             else if ((controllerName == "Student" && methodName == "DeleteStudentById")
-                    || (controllerName == "Student" && methodName == "GetStudentDetailsById"))
+                    || (controllerName == "Student" && methodName == "GetStudentDetailsById")
+                    || (controllerName == "Hod" && methodName == "GetHodDetailsById"))
             {
                 return Convert.ToInt32(dataObj);
-            }else if(controllerName == "Student" && methodName == "CheckUsernameExist")
+            }
+            else if (
+                    (controllerName == "Student" && methodName == "CheckUsernameExist"))
             {
                 return dataObj.ToString();
-            }else if(controllerName == "Student" && methodName == "UpsertStudentDetails")
+            }
+            else if (controllerName == "Student" && methodName == "UpsertStudentDetails")
             {
                 return GetDataModel<Student>(dataObj);
+            }
+            else if ((controllerName == "Student" && methodName == "ExportPdfReport"))
+            {
+                return GetDataModel<ExportPdfViewModel>(dataObj);
+            }
+            else if ((controllerName == "Hod" && methodName == "UpdateProfessorHodDetails")
+                || (controllerName == "Hod" && methodName == "UpdateHodProfilePicture")
+                || (controllerName == "Hod" && methodName == "UpdateHodPersonalInfo")
+                || (controllerName == "Hod" && methodName == "UpdateHodAddressInfo"))
+            {
+                return GetDataModel<ProfessorHodDto>(dataObj);
             }
             else
             {
@@ -336,7 +352,7 @@ namespace StudentManagementAPI.Services.MainServices
             }
         }
 
-        public async Task<IList<T>> GetAllRecordsWithoutPagination<T>(string procedureName) 
+        public async Task<IList<T>> GetAllRecordsWithoutPagination<T>(string procedureName)
         {
             IList<T> allrecords = await DbClient.ExecuteProcedure<T>(procedureName, null);
             return allrecords;
@@ -413,9 +429,198 @@ namespace StudentManagementAPI.Services.MainServices
             try
             {
                 Collection<DbParameters> parameters = new();
-                parameters.Add(new DbParameters { Name = "@userName", Value = userName, DBType = DbType.String});
+                parameters.Add(new DbParameters { Name = "@userName", Value = userName, DBType = DbType.String });
                 Student student = await DbClient.ExecuteOneRecordProcedure<Student>("[dbo].[Check_Username_exist]", parameters);
                 return student;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<Student>> GetExportStudentList(string searchQuery)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@Search_Query", Value = searchQuery, DBType = DbType.String });
+                IList<Student> students = await DbClient.ExecuteProcedure<Student>("[dbo].[Get_All_Students_ForExport]", parameters);
+                return students;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<LocationDto> GetAllCountriesStatesCitites()
+        {
+            try
+            {
+                IList<Country> countries = await DbClient.ExecuteProcedure<Country>("[dbo].[Get_All_Country]", null);
+                IList<State> states = await DbClient.ExecuteProcedure<State>("[dbo].[Get_All_State]", null);
+                IList<City> cities = await DbClient.ExecuteProcedure<City>("[dbo].[Get_All_City]", null);
+                LocationDto locationDto = new()
+                {
+                    Cities = cities,
+                    Countries = countries,
+                    States = states,
+                };
+                return locationDto;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpdateProfessorHodDetails(ProfessorHodDto professorHodDto)
+        {
+
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("FirstName");
+                table.Columns.Add("LastName");
+                table.Columns.Add("UserName");
+                table.Columns.Add("Email");
+                table.Columns.Add("MobileNumber");
+                table.Columns.Add("BirthDate");
+                table.Columns.Add("CountryId");
+                table.Columns.Add("StateId");
+                table.Columns.Add("CityId");
+                table.Columns.Add("PostalCode");
+                table.Columns.Add("ImageName");
+
+                var row = table.NewRow();
+                row["FirstName"] = professorHodDto.FirstName;
+                row["LastName"] = professorHodDto.LastName;
+                row["UserName"] = professorHodDto.UserName;
+                row["Email"] = professorHodDto.Email;
+                row["MobileNumber"] = professorHodDto.MobileNumber;
+                row["BirthDate"] = professorHodDto.BirthDate.ToString("MM-dd-yyyy HH:mm:ss");
+                row["CountryId"] = professorHodDto.CountryId;
+                row["StateId"] = professorHodDto.StateId;
+                row["CityId"] = professorHodDto.CityId;
+                row["PostalCode"] = professorHodDto.PostalCode;
+                row["ImageName"] = professorHodDto.ImageName;
+
+
+                table.Rows.Add(row);
+
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@professorHod", Value = table, DBType = DbType.Object, TypeName = "ProfessorHod_Table" });
+                if (professorHodDto.Id > 0)
+                {
+                    parameters.Add(new DbParameters { Name = "@Id", Value = professorHodDto.Id, DBType = DbType.Int32 });
+                    await DbClient.ExecuteProcedure("[dbo].[Update_ProfessorHod_Details]", parameters, ExecuteType.ExecuteNonQuery);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpdateHodProfilePicture(ProfessorHodDto professorHodDto)
+        {
+
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("FirstName");
+                table.Columns.Add("LastName");
+                table.Columns.Add("ImageName");
+
+                var row = table.NewRow();
+                row["FirstName"] = professorHodDto.FirstName;
+                row["LastName"] = professorHodDto.LastName;
+                row["ImageName"] = professorHodDto.ImageName;
+
+
+                table.Rows.Add(row);
+
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@professorHod", Value = table, DBType = DbType.Object, TypeName = "ProfessorHod_Profile_Picture_Table" });
+                if (professorHodDto.Id > 0)
+                {
+                    parameters.Add(new DbParameters { Name = "@Id", Value = professorHodDto.Id, DBType = DbType.Int32 });
+                    await DbClient.ExecuteProcedure("[dbo].[Update_Hod_ProfilePicture_Details]", parameters, ExecuteType.ExecuteNonQuery);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpdateHodPersonalInfo(ProfessorHodDto professorHodDto)
+        {
+
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("FirstName");
+                table.Columns.Add("LastName");
+                table.Columns.Add("UserName");
+                table.Columns.Add("BirthDate");
+                table.Columns.Add("Email");
+                table.Columns.Add("MobileNumber");
+
+
+                var row = table.NewRow();
+                row["FirstName"] = professorHodDto.FirstName;
+                row["LastName"] = professorHodDto.LastName;
+                row["UserName"] = professorHodDto.UserName;
+                row["BirthDate"] = professorHodDto.BirthDate;
+                row["Email"] = professorHodDto.Email;
+                row["MobileNumber"] = professorHodDto.MobileNumber;
+
+
+                table.Rows.Add(row);
+
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@professorHod", Value = table, DBType = DbType.Object, TypeName = "ProfessorHod_PersonalInfo_Table" });
+                if (professorHodDto.Id > 0)
+                {
+                    parameters.Add(new DbParameters { Name = "@Id", Value = professorHodDto.Id, DBType = DbType.Int32 });
+                    await DbClient.ExecuteProcedure("[dbo].[Update_Hod_PersonalInfo_Details]", parameters, ExecuteType.ExecuteNonQuery);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpdateHodAddressInfo(ProfessorHodDto professorHodDto)
+        {
+
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("CountryId");
+                table.Columns.Add("StateId");
+                table.Columns.Add("CityId");
+                table.Columns.Add("PostalCode");
+
+
+                var row = table.NewRow();
+                row["CountryId"] = professorHodDto.CountryId;
+                row["StateId"] = professorHodDto.StateId;
+                row["CityId"] = professorHodDto.CityId;
+                row["PostalCode"] = professorHodDto.PostalCode;
+
+                table.Rows.Add(row);
+
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@professorHod", Value = table, DBType = DbType.Object, TypeName = "ProfessorHod_AddressInfo_Table" });
+                if (professorHodDto.Id > 0)
+                {
+                    parameters.Add(new DbParameters { Name = "@Id", Value = professorHodDto.Id, DBType = DbType.Int32 });
+                    await DbClient.ExecuteProcedure("[dbo].[Update_Hod_AddressInfo_Details]", parameters, ExecuteType.ExecuteNonQuery);
+                }
             }
             catch (Exception ex)
             {

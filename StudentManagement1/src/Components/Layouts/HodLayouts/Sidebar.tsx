@@ -17,6 +17,7 @@ import SchoolIcon from "@mui/icons-material/School";
 import Diversity3Icon from "@mui/icons-material/Diversity3";
 import LogoutIcon from "@mui/icons-material/Logout";
 
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 const drawerWidth = 240;
 interface Props {
   /**
@@ -111,6 +112,20 @@ const Sidebar: React.FC = (props: Props) => {
               <ListItemText primary="Professors" />
             </ListItemButton>
           </ListItem>
+          <ListItem
+            className={
+              location.pathname === "/admin/myProfile"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/admin/myProfile")}
+          >
+            <ListItemButton className="list-items-btn">
+              <AccountCircleIcon />
+              <ListItemText primary="MyProfile" />
+            </ListItemButton>
+          </ListItem>
         </List>
 
         {/* Second list at the bottom */}
@@ -160,7 +175,7 @@ const Sidebar: React.FC = (props: Props) => {
             keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
-            display: { xs: "block", sm: "block", md:"none" },
+            display: { xs: "block", sm: "block", md: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
@@ -172,7 +187,7 @@ const Sidebar: React.FC = (props: Props) => {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: "none", sm: "none" , md: "block"},
+            display: { xs: "none", sm: "none", md: "block" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,

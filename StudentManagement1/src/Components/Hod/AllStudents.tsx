@@ -12,14 +12,21 @@ import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import {
   DeleteStudent,
+  ExcelExportReport,
   getAllStudentsData,
   GetStudentDetailsById,
+  PDFExportReport,
 } from "./AllStudent's";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import LoadingGif from "../../assets/Images/Animation.gif";
-import { AddEditStudentModal, DeleteModal, ViewStudentProfileModal } from "../AllModals/Modals";
+import {
+  AddEditStudentModal,
+  DeleteModal,
+  ExportReportModal,
+  ViewStudentProfileModal,
+} from "../AllModals/Modals";
 
 interface StudentDataProps {
   studentId: number;
@@ -32,8 +39,8 @@ interface StudentDataProps {
   email: string;
   status: boolean;
   gender: number | null;
-  imageName:string;
-  imageUrl:string;
+  imageName: string;
+  imageUrl: string;
 }
 
 interface PaginationProps {
@@ -59,11 +66,13 @@ const AllStudents: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
   const [isOpenAddEditModelOpen, setIsOpenAddEditModelOpen] =
     useState<boolean>(false);
+  const [isOpenExportModal, setIsOpenExportModal] = useState<boolean>(false);
   const [editStudentId, setEditStudentId] = useState<number>(0);
 
   const [formData, setFormData] = useState<StudentDataProps | null>();
-  const [viewStudentData, setViewStudentData] = useState<StudentDataProps | null>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [viewStudentData, setViewStudentData] =
+    useState<StudentDataProps | null>();
+  const [loading, setLoading] = useState<boolean>(true);
   //  This Method is use for close delete menu
   const closeModal = () => {
     setIsModalOpen(false);
@@ -74,6 +83,7 @@ const AllStudents: React.FC = () => {
     setIsModalOpen(true);
     setDeleteStudentId(id);
   };
+
   // This method is use for delete notice
   const handleDelete = (id: number) => {
     DeleteStudent(id);
@@ -82,6 +92,7 @@ const AllStudents: React.FC = () => {
 
   // This Method is use for Open AddStudent Model
   const openAddStudentModel = () => {
+    setFormData(null);
     setIsOpenAddEditModelOpen(true);
   };
 
@@ -109,9 +120,8 @@ const AllStudents: React.FC = () => {
     setEditStudentId(0);
   };
 
-
-   // This Method is use for Open View Profile Model
-   const openViewProfileModel = async (studentId : number) => {
+  // This Method is use for Open View Profile Model
+  const openViewProfileModel = async (studentId: number) => {
     if (studentId != 0) {
       try {
         const response = await GetStudentDetailsById(studentId);
@@ -124,7 +134,6 @@ const AllStudents: React.FC = () => {
       }
     }
     setIsProfileModalOpen(true);
-
   };
 
   //  This Method is use for close delete menu
@@ -132,7 +141,15 @@ const AllStudents: React.FC = () => {
     setIsProfileModalOpen(false);
   };
 
+  //  This Method is use for close Export Modal
+  const closeExportModal = () => {
+    setIsOpenExportModal(false);
+  };
 
+  //  This Method is use for Open Export Modal
+  const openExportModal = () => {
+    setIsOpenExportModal(true);
+  };
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -153,6 +170,30 @@ const AllStudents: React.FC = () => {
     setPage(0);
   };
 
+  const handleExcelExport = async () => {
+    setLoading(true);
+    try {
+      await ExcelExportReport(searchQuery);
+    } catch (error) {
+      console.error("Error exporting report:", error);
+    } finally {
+      setLoading(false);
+      setIsOpenExportModal(false);
+    }
+  };
+
+  const handlePDFExport = async () => {
+    setLoading(true);
+    try {
+      await PDFExportReport(searchQuery);
+    } catch (error) {
+      console.error("Error exporting report:", error);
+    } finally {
+      setLoading(false);
+      setIsOpenExportModal(false);
+    }
+  };
+
   useEffect(() => {
     const getStudentsData = async () => {
       const pagination: PaginationProps = {
@@ -161,15 +202,19 @@ const AllStudents: React.FC = () => {
         StartIndex: page * rowsPerPage,
       };
 
-      const result = await getAllStudentsData(pagination);
-      if (result != null) {
-        setStudentData(result);
+      try {
+        const result = await getAllStudentsData(pagination);
+        if (result != null) {
+          setStudentData(result);
+        }
+      } catch (error) {
+        console.error("Error fetching students data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    setLoading(true);
     getStudentsData();
-    setLoading(false);
   }, [rowsPerPage, page, searchQuery]);
 
   return (
@@ -192,6 +237,7 @@ const AllStudents: React.FC = () => {
       <h1>All Students</h1>
       <Box sx={{ marginTop: 1 }}>
         <Box
+        className="allstudents-search-main-box"
           sx={{
             display: "flex",
             justifyContent: "space-between",
@@ -230,6 +276,7 @@ const AllStudents: React.FC = () => {
               Submit Attendance
             </Button>
             <Button
+              onClick={openExportModal}
               sx={{
                 backgroundColor: "#dedede",
                 fontWeight: "600",
@@ -303,7 +350,7 @@ const AllStudents: React.FC = () => {
                         color: "grey",
                       }}
                     >
-                      <RemoveRedEyeIcon 
+                      <RemoveRedEyeIcon
                         onClick={() => openViewProfileModel(row.studentId)}
                       />
                       <DeleteOutlineIcon
@@ -326,7 +373,7 @@ const AllStudents: React.FC = () => {
             <tfoot>
               <tr>
                 <CustomTablePagination
-                  rowsPerPageOptions={[2, 10, 25, { label: "All", value: -1 }]}
+                  rowsPerPageOptions={[2, 10, 25, { label: "All", value: studentData?.totalItems ?? 0 }]}
                   // colSpan={3}
                   count={studentData?.totalItems ?? 0}
                   rowsPerPage={rowsPerPage}
@@ -368,12 +415,18 @@ const AllStudents: React.FC = () => {
         initialData={formData}
       />
 
-      <ViewStudentProfileModal 
-      isOpen={isProfileModalOpen}
-      onClose={closeViewProfileModel}
-      initialData={viewStudentData}
+      <ViewStudentProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={closeViewProfileModel}
+        initialData={viewStudentData}
       />
 
+      <ExportReportModal
+        isOpen={isOpenExportModal}
+        onClose={closeExportModal}
+        onExcelHandle={handleExcelExport}
+        onPdfHandle={handlePDFExport}
+      />
     </>
   );
 };

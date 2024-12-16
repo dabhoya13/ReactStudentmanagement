@@ -1,0 +1,85 @@
+{
+  "Files": [
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Images\\school_logo.png",
+      "PackagePath": "staticwebassets\\Images\\school_logo.png"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\Animation.gif",
+      "PackagePath": "staticwebassets\\Uploads\\HodProfiles\\Animation.gif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\profile-image.jfif",
+      "PackagePath": "staticwebassets\\Uploads\\HodProfiles\\profile-image.jfif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\Animation.gif",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\Animation.gif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\Annual-Day-pic.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\Annual-Day-pic.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\annual-Day.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\annual-Day.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\download (4).jfif",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\download (4).jfif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\mid-term-schedule.jfif",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\mid-term-schedule.jfif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\painting_competition.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\painting_competition.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\NoticeImages\\profile-image.jfif",
+      "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\profile-image.jfif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\PdfTemplate\\PdfFooter.html",
+      "PackagePath": "staticwebassets\\Uploads\\PdfTemplate\\PdfFooter.html"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\PdfTemplate\\PdfHeader.html",
+      "PackagePath": "staticwebassets\\Uploads\\PdfTemplate\\PdfHeader.html"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\PdfTemplate\\PdfTemplate.html",
+      "PackagePath": "staticwebassets\\Uploads\\PdfTemplate\\PdfTemplate.html"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentProfiles\\Animation.gif",
+      "PackagePath": "staticwebassets\\Uploads\\StudentProfiles\\Animation.gif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentProfiles\\default.png",
+      "PackagePath": "staticwebassets\\Uploads\\StudentProfiles\\default.png"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentProfiles\\profile-image.jfif",
+      "PackagePath": "staticwebassets\\Uploads\\StudentProfiles\\profile-image.jfif"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.StudentManagementAPI.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.build.StudentManagementAPI.props",
+      "PackagePath": "build\\StudentManagementAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.buildMultiTargeting.StudentManagementAPI.props",
+      "PackagePath": "buildMultiTargeting\\StudentManagementAPI.props"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.buildTransitive.StudentManagementAPI.props",
+      "PackagePath": "buildTransitive\\StudentManagementAPI.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

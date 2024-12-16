@@ -5,6 +5,7 @@ using StudentManagementAPI.Models;
 using StudentManagementAPI.Services.MainServices;
 using StudentManagementAPI.Services;
 using System.Net;
+using AutoMapper;
 
 namespace StudentManagementAPI.Controllers
 {
@@ -17,7 +18,7 @@ namespace StudentManagementAPI.Controllers
         private readonly IConfiguration _configuration;
 
 
-        public CourseController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices)
+        public CourseController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices,IMapper mapper)
         {
             this._response = new();
             _studentServices = studentServices;
