@@ -406,5 +406,29 @@ namespace StudentManagementAPI.Controllers
             }
             return _response;
         }
+
+
+        [HttpGet("GetAllStudentsWithAttendance")]
+        public async Task<ActionResult<APIResponse>> GetAllStudentsWithAttendance()
+        {
+            try
+            {
+                IList<Student> students = await _studentServices.GetAllStudentsWithAttendance();
+                RoleBaseResponse<IList<Student>> roleBaseResponse = new()
+                {
+                    data = students
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
     }
 }

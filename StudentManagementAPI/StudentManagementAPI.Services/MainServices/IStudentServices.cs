@@ -54,5 +54,21 @@ namespace StudentManagementAPI.Services.MainServices
 
         Task UpdateHodAddressInfo(ProfessorHodDto professorHodDto);
 
+        Task<IList<AttendanceDto>> GetAttendanceFromMonthYear(int month, int year,int studentId);
+
+        Task AddTodayStudentAttendance(AttendanceDto attendanceDto);
+
+        Task<IList<Student>> GetAllStudentsWithAttendance();
+
+        Task HodSubmitAttendance(AttendanceDto attendanceDto);
+
+        Task<IList<StudentsLeaveDto>> GetStudentLeaveById(int StudentId, int month, int year);
+
+        Task<StudentAttendanceCountDto> GetStudentAttendanceCountById(int studentId, int month, int year);
+
+        Task<IList<AttendanceDto>> GetLast7DaysAttendance(int StudentId, DateTime startDate, DateTime endDate);
+
+        Task<IList<StudentExam>> GetStudentExams(int StudentId, DateTime? ExamDate);
+
     }
 }

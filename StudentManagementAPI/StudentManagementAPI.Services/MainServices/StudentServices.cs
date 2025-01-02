@@ -149,6 +149,23 @@ namespace StudentManagementAPI.Services.MainServices
             {
                 return GetDataModel<ProfessorHodDto>(dataObj);
             }
+            else if ((controllerName == "Student" && methodName == "GetAttendanceFromMonthYear")
+                || (controllerName == "Student" && methodName == "AddStudentAttendance")
+                || (controllerName == "Student" && methodName == "SubmitAttendanceByHod"))
+            {
+                return GetDataModel<AttendanceDto>(dataObj);
+            }
+            else if ((controllerName == "Student" && methodName == "GetStudentLeaveStatus")
+                || (controllerName == "Student" && methodName == "GetStudentAttendanceCount"))
+            {
+                return GetDataModel<StudentMonthYearDto>(dataObj);
+            }else if(controllerName == "Student" && methodName == "GetStudentLast7daysAttendances")
+            {
+                return GetDataModel<StudentLast7DaysViewModel>(dataObj);
+            }else if(controllerName == "Student" && methodName == "GetStudentExamsFromDate")
+            {
+                return GetDataModel<StudentExam>(dataObj);
+            }
             else
             {
                 return null;
@@ -627,6 +644,160 @@ namespace StudentManagementAPI.Services.MainServices
                 throw;
             }
         }
+
+        public async Task<IList<AttendanceDto>> GetAttendanceFromMonthYear(int month, int year, int studentId)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@month", Value = month, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@year", Value = year, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@studentId", Value = studentId, DBType = DbType.Int32 });
+
+                IList<AttendanceDto> attendanceDtos = await DbClient.ExecuteProcedure<AttendanceDto>("[dbo].[Get_Attendance_From_MonthYear]", parameters);
+                return attendanceDtos;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task AddTodayStudentAttendance(AttendanceDto attendanceDto)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@studentId", Value = attendanceDto.StudentId, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@date", Value = attendanceDto.Date, DBType = DbType.DateTime });
+                parameters.Add(new DbParameters { Name = "@status", Value = attendanceDto.Status, DBType = DbType.Boolean });
+
+                await DbClient.ExecuteProcedure("[dbo].[Add_Attendance]", parameters, ExecuteType.ExecuteNonQuery);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<Student>> GetAllStudentsWithAttendance()
+        {
+            try
+            {
+                IList<Student> students = await DbClient.ExecuteProcedure<Student>("[dbo].[Get_AllStudent_With_Attendance]", null);
+                return students;
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task HodSubmitAttendance(AttendanceDto attendanceDto)
+        {
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("StudentId");
+                table.Columns.Add("Status");
+
+                if (attendanceDto.AttedancesWithStudentId.Count > 0)
+                {
+                    foreach (var attednaceWithStudentId in attendanceDto.AttedancesWithStudentId)
+                    {
+                        var row = table.NewRow();
+                        row["StudentId"] = attednaceWithStudentId.StudentId;
+                        row["Status"] = attednaceWithStudentId.Status;
+                        table.Rows.Add(row);
+                    }
+
+                    Collection<DbParameters> parameters = new();
+                    parameters.Add(new DbParameters { Name = "@AttendanceList", Value = table, DBType = DbType.Object, TypeName = "dbo.StudentAttendanceType" });
+                    await DbClient.ExecuteProcedure("[dbo].[Submit_Attendance_By_Hod]", parameters, ExecuteType.ExecuteNonQuery);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<StudentsLeaveDto>> GetStudentLeaveById(int StudentId, int month, int year)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@studentId", Value = StudentId, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@month", Value = month, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@year", Value = year, DBType = DbType.Int32 });
+
+                IList<StudentsLeaveDto> studentsLeaves = await DbClient.ExecuteProcedure<StudentsLeaveDto>("[dbo].[Get_LeaveStatus_ByStudentId]", parameters);
+                return studentsLeaves;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<StudentAttendanceCountDto> GetStudentAttendanceCountById(int studentId, int month, int year)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@studentId", Value = studentId, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@month", Value = month, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@year", Value = year, DBType = DbType.Int32 });
+
+                StudentAttendanceCountDto studentAttendanceCount = await DbClient.ExecuteOneRecordProcedure<StudentAttendanceCountDto>("[dbo].[Get_AttendanceCount_ByStudentId]", parameters);
+                return studentAttendanceCount;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<AttendanceDto>> GetLast7DaysAttendance(int StudentId, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@studentId", Value = StudentId, DBType = DbType.Int32 });
+                parameters.Add(new DbParameters { Name = "@startDate", Value = startDate, DBType = DbType.DateTime });
+                parameters.Add(new DbParameters { Name = "@endDate", Value = endDate, DBType = DbType.DateTime });
+
+                IList<AttendanceDto> attendanceDto= await DbClient.ExecuteProcedure<AttendanceDto>("[dbo].[Get_Last7DaysAttendance]", parameters);
+                return attendanceDto;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<StudentExam>> GetStudentExams(int StudentId, DateTime? ExamDate)
+        {
+            try
+            {
+                Collection<DbParameters> parameters = new()
+                {
+                    new DbParameters { Name = "@studentId", Value = StudentId, DBType = DbType.Int32 },
+                    new DbParameters { Name = "@date", Value = ExamDate, DBType = DbType.DateTime }
+                };
+                IList<StudentExam> studentExams = await DbClient.ExecuteProcedure<StudentExam>("[dbo].[Get_Exam_For_Student]", parameters);
+
+                return studentExams;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
 
     }
 }

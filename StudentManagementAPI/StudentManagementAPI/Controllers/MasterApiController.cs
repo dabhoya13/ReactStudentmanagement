@@ -114,7 +114,6 @@ namespace StudentManagementAPI.Controllers
                             _response.IsSuccess = false;
                             _response.StatusCode = HttpStatusCode.NotFound;
                             return NotFound(_response);
-
                         }
                     }
                 }

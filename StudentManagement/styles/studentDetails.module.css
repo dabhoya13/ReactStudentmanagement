@@ -1,0 +1,16 @@
+.card_header {
+  border-color: #e9edf4;
+  position: relative;
+  background: transparent;
+  padding: 1rem 1.25rem 1rem;
+}
+
+.card_body{
+    padding: 1.25rem;
+}
+
+.text_truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

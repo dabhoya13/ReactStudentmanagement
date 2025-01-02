@@ -1,0 +1,839 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --main-color: #4c8cf8;
+  --secondary-color: #1fe5d1;
+}
+
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0; /* If you want to hide both scrollbars */
+}
+
+/* ----------------------------------------------------------------------------
+
+LOGIN SCREEN CSSS
+
+----------------------------------------------------------------------------- */
+body {
+  background-color: #f1f0ff;
+  font-family: "Roboto", sans-serif;
+}
+
+.welcome-h3 {
+  margin: 0;
+}
+
+.login-textfield {
+  width: 100% !important;
+}
+
+.login-form {
+  width: 100%;
+}
+
+/* ----------------------------------------------------------------------------
+
+Header Sidebar CSS
+
+----------------------------------------------------------------------------- */
+
+.sidebar-main-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo-div {
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.list-items-btn {
+  gap: 10px;
+}
+
+.list-items {
+  padding-left: 25px;
+}
+
+.list-items.selected {
+  background-color: var(--main-color);
+  color: white;
+}
+
+.selected {
+  background-color: #1976d2;
+
+  color: white;
+}
+
+.menu-icon {
+  position: absolute !important;
+  padding-left: 25px !important;
+  padding-top: 15px !important;
+}
+
+.bg-dark {
+  background-color: darkblue;
+}
+
+.header-box {
+  box-shadow: none !important;
+  background-color: white !important;
+  color: black !important;
+  gap: 15px;
+}
+
+.header-toolbar,
+.header-icon-box {
+  gap: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon-div {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: rgb(209, 209, 209);
+}
+
+.profile-icon-div-btn {
+  width: 100% !important;
+  height: 100% !important;
+}
+.profile-icon-div {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+
+.profile-picture {
+  width: 50px !important;
+  height: 50px !important;
+}
+
+/* ----------------------------------------------------------------------------
+
+ADMIN DASHBOARD CSS START
+
+----------------------------------------------------------------------------- */
+
+.adminDashboard-cards {
+  background-color: #eff6fe !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.adminDashboard-cards:hover,
+.studentDashboard-cards:hover {
+  background-color: var(--main-color) !important;
+  transform: translateY(-10px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card-content {
+  background-color: transparent;
+  border: none;
+  display: flex;
+  justify-content: start;
+  padding: 24px;
+  gap: 16px;
+}
+
+.card-header {
+  border-color: #e9edf4;
+  background-color: white !important;
+  position: relative;
+  background: transparent;
+  padding: 1rem 1.25rem 1rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-content-main-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.card-content-icon-div-background {
+  background-color: white;
+  color: #3d5ee1;
+}
+.card-content-icon-div {
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.total-text {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.total-text-count {
+  color: grey;
+  font-size: 15px;
+}
+.notice-board-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  background-color: var(--main-color);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  width: 30px;
+  font-size: 25px;
+  height: 30px;
+}
+
+.notice-board-imgs {
+  width: 50px;
+  height: 50px;
+}
+
+.notice-board-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  background-color: var(--main-color);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  font-size: 15px;
+  height: 30px;
+}
+
+.event-calender-div {
+  width: 25%;
+  padding: 5px;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(33, 33, 33, 0.2);
+}
+
+.pie-chart-count {
+  position: absolute;
+  margin-top: 170px;
+}
+
+.submit-attendance-dialog-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid black;
+}
+
+.submit-attendance-image-box {
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+}
+
+.submit-attendance-model-select-true {
+  color: green;
+  border: none;
+}
+
+.submit-attendance-model-select-false {
+  color: red;
+  border: none;
+}
+@media (max-width: 1581px) {
+  .event-calender-div {
+    width: 30% !important;
+  }
+}
+
+@media (max-width: 1389px) {
+  .event-calender-div {
+    width: 35% !important;
+  }
+}
+
+@media (max-width: 1199px) {
+  .event-calender-div {
+    width: 50% !important;
+  }
+}
+
+@media (max-width: 1005px) {
+  .event-calender-div {
+    width: 55% !important;
+  }
+}
+
+@media (max-width: 899px) {
+  .event-calender-div {
+    width: 100% !important;
+  }
+}
+
+.Dashboard-fileUpload-box #myinputfile::-webkit-file-upload-button {
+  -webkit-appearance: none;
+  float: right;
+  position: absolute;
+  margin: -10px 0 0 0;
+  right: 7%;
+  padding-top: 12px;
+  border: 1px solid #aaaaaa;
+  border-radius: 4px;
+  opacity: 0;
+  z-index: 9999;
+}
+
+.Dashboard-fileUpload-box input[type="file"] {
+  -webkit-appearance: none;
+  text-align: left;
+  padding-top: 5px;
+  color: gray;
+  width: 100% !important;
+  padding-left: 20px;
+  z-index: 9699;
+}
+
+.upload-btn {
+  border: 1px solid green;
+  color: white;
+  display: flex !important;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  background-color: green;
+  padding: 8px;
+  border-radius: 0 10px 10px 0;
+  font-size: 18px;
+  position: absolute;
+  right: 7%;
+  margin-top: 33px;
+  width: 102px !important;
+}
+
+.loading-spinner {
+  position: absolute;
+  top: 50%;
+  width: 100%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 20px;
+  color: #007bff;
+  background-color: rgba(0, 0, 0, 0.5);
+  height: 100vh;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pie-chart-container {
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(33, 33, 33, 0.2);
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.attendance-half-dropdown {
+  height: 55px;
+  margin-top: 8px;
+}
+
+.dashboard-Attendance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (max-width: 610px) {
+  .dashboard-Attendance-header {
+    flex-direction: column;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+
+ALL Student Page CSS START
+
+----------------------------------------------------------------------------- */
+
+.student-table {
+  width: 100%;
+}
+
+.student-table thead {
+  padding: 15px !important;
+}
+.student-table thead tr {
+  background-color: #595959;
+  color: white;
+}
+
+.student-table thead tr th {
+  text-align: center;
+  vertical-align: middle;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.student-table tbody tr td {
+  padding: 15px;
+  text-align: center;
+  vertical-align: middle;
+  word-break: normal;
+}
+.student-table tbody tr:nth-child(odd) {
+  background-color: white;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+
+.student-table tbody tr:nth-child(even) {
+  background-color: transparent;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+}
+.absent-td {
+  color: red;
+}
+
+.present-td {
+  color: green;
+}
+
+@media (max-width: 1077px) {
+  .allstudents-search-main-box {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+.myprofile-picture {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ----------------------------------------------------------------------------
+
+Student Dashboard Page CSS START
+
+----------------------------------------------------------------------------- */
+
+.event-calender-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-left: 5px;
+}
+
+.event-calender-inner-div {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-header-div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: sticky;
+}
+
+.board-main-content-div {
+  overflow-y: auto;
+  margin-top: 10px;
+  max-height: calc(400px - 48px);
+}
+
+.exam-content-inner-div-1 {
+  padding: 10px;
+  border-radius: 15px;
+  border: 0.5px solid rgba(169, 169, 169, 0.5);
+  /* background-color: pink; */
+  margin-bottom: 10px;
+  box-shadow: 0 0 11px rgba(33, 33, 33, 0.2);
+}
+
+.exam-inner-content-header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.days-more-left {
+  color: red;
+  background-color: #fde9ec;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  border-radius: 15px;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.exam-content-inner-div-2 {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.student-event-calender-div {
+  padding: 5px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(33, 33, 33, 0.2);
+}
+
+.student-attedance-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.student-attedance-chart-header-inner-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.absent-present-div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  border: 0.5px solid rgba(169, 169, 169, 0.5);
+}
+
+.slick-track {
+  display: flex !important; /* Ensure the slides are displayed in a row */
+  gap: 20px !important; /* Add gap between the slides */
+}
+
+.leave_status_calendar_div .react-datepicker__input-container input {
+  width: 70px;
+}
+
+.student-attedance-chart-header-inner-box
+  .react-datepicker__input-container
+  input {
+  width: 70px;
+  border: none;
+}
+
+.student-attedance-chart-header-inner-box
+  .react-datepicker__input-container
+  input {
+  width: 70px;
+  border: none;
+}
+
+@media (max-width: 1536px) {
+  .student-event-calender-div {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1400px) {
+  .student-event-calender-div {
+    margin-top: 24px !important;
+  }
+  .fees-reminder-main-div {
+    margin-top: 24px !important;
+  }
+  .student-event-calender-div {
+    margin: 12px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .pie-chart-main-div {
+    margin-top: 24px !important;
+  }
+
+  .exam-result-main-div {
+    margin-top: 24px !important;
+  }
+}
+
+/* ----------------------------------------------------------------------------
+
+Student Details Page CSS START
+
+----------------------------------------------------------------------------- */
+
+.nav-tabs.nav-tabs-bottom li a.active,
+.nav-tabs.nav-tabs-bottom li a:hover {
+  border-bottom-color: #3d5ee1;
+  background: transparent;
+  border-radius: 0;
+  color: #3d5ee1;
+}
+
+.nav-tabs.nav-tabs-bottom li a {
+  border-width: 0 0 2px 0;
+}
+
+.nav-tabs .nav-link {
+  margin-bottom: -1px;
+  background: 0 0;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  color: black;
+}
+
+dl dt {
+  font-weight: 500 !important;
+}
+
+.badge.badge-soft-success {
+  background: rgba(26, 190, 23, 0.1);
+  color: #1abe17;
+}
+.badge-soft-pending {
+  background: #e6f9ff;
+  color: #05c3fb;
+}
+
+.badge {
+  padding: 0.25rem 0.45rem;
+  text-transform: capitalize;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+}
+
+.text-dark {
+  color: #202c4b !important;
+  font-weight: 500 !important;
+}
+.avatar {
+  position: relative;
+  height: 2.625rem;
+  width: 2.625rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: #fff;
+  font-weight: 500;
+}
+.avatar.avatar-md {
+  width: 2rem;
+  height: 2rem;
+  line-height: 2rem;
+  font-size: 0.8rem;
+}
+
+.text-default {
+  color: #6a7287 !important;
+}
+
+.rounded {
+  border-radius: 4px !important;
+}
+
+.bg-light-300 {
+  background: #f8fafc;
+}
+
+.btn-icon.btn-sm {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.nav-tabs.nav-tabs-solid.nav-tabs-rounded-fill li a.active {
+  background-color: #3d5ee1;
+  border-color: #3d5ee1;
+  color: #fff;
+  border-radius: 50px;
+}
+
+.nav-tabs.nav-tabs-solid.nav-tabs-rounded-fill li a {
+  color: black;
+  font-weight: 500;
+  border-color: #e9edf4;
+}
+
+h5,
+.h5 {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+h4,
+.h4 {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+.btn.btn-primary {
+  background-color: #506ee4 !important;
+  border: 1px solid #506ee4 !important;
+  color: #fff !important;
+}
+.btn {
+  border-radius: 5px !important;
+  padding: 0.5rem 0.85rem !important;
+  font-size: 14px !important;
+  transition: all 0.5s !important;
+  font-weight: 500 !important;
+}
+
+.leave-table thead tr,
+.leave-table thead tr th {
+  background-color: #e9edf4 !important;
+}
+
+.leave-table thead tr th {
+  color: #202c4b;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 20px;
+}
+
+.leave-table > tbody > tr td {
+  color: #515b73;
+  border-bottom: 1px solid #e9edf4;
+  padding: 12px 20px;
+}
+
+.card {
+  margin-bottom: 1.5rem;
+  background-color: #fff;
+  transition: all 0.5s ease-in-out;
+  position: relative;
+  border-radius: 5px;
+  border: 1px solid #e9edf4;
+  box-shadow: 0px 4.4px 12px -1px rgba(222, 222, 222, 0.3607843137);
+  color: inherit;
+}
+
+.attendance_select_Attendance {
+  height: 40px;
+  margin-bottom: 12px;
+  margin-top: 12px;
+  padding: 5px;
+  border: 1px solid #e9edf4 !important;
+  color: #515b73 !important;
+  width: auto;
+}
+
+.card .card-body {
+  padding: 1.25rem;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+  color: var(--bs-card-color);
+}
+
+.avatar.avatar-lg {
+  width: 2.813rem;
+  height: 2.813rem;
+  line-height: 2.813rem;
+  font-size: 1rem;
+}
+
+.bg-primary-transparent {
+  background-color: #f2f5ff !important;
+  color: #3d5ee1 !important;
+}
+.text-primary {
+  color: #3d5ee1 !important;
+  opacity: 1;
+}
+
+.text-danger {
+  color: #e82646 !important;
+  opacity: 1;
+}
+
+.bg-danger-transparent {
+  background-color: #fde9ed !important;
+  color: #e82646 !important;
+}
+
+.card .card-header {
+  border-color: #e9edf4;
+  position: relative;
+  background: transparent;
+  padding: 1rem 1.25rem 1rem;
+}
+
+.shadow-md {
+  box-shadow: 0px 4px 9px -1px rgba(19, 16, 34, 0.03),
+    0px 4.4px 20px -1px rgba(19, 16, 34, 0.05) !important;
+}
+
+.btn.btn-light {
+  background-color: #e9edf4 !important;
+  border: 1px solid #e9edf4 !important;
+  color: #515b73 !important;
+}
+
+.attendance_export_menu {
+  position: absolute;
+  inset: 0px 0px auto auto;
+  margin: 0px;
+  transform: translate3d(0px, 41px, 0px);
+}
+
+.dropdown .dropdown-menu {
+  font-family: "Roboto", sans-serif;
+}
+
+.dropdown-menu.show {
+  display: block;
+}
+.dropdown-menu {
+  border-color: #e9edf4;
+  box-shadow: 0px 4px 13px -2px rgba(19, 16, 34, 0.06);
+  font-size: 0.875rem;
+  color: #202c4b;
+  background-color: #fff;
+  padding: 0;
+  z-index: 10;
+}
+
+.avatar.avatar-sm {
+  width: 1.5rem;
+  height: 1.5rem;
+  line-height: 1.5rem;
+  font-size: 0.65rem;
+}
+
+.bg-successs {
+  background-color: #1ABE17 !important;
+  border: 1px solid #1ABE17 !important;
+  color: #FFF;
+}

@@ -1,0 +1,266 @@
+.profile_main_div {
+  gap: 24px;
+  background-color: #202c4b;
+  padding: 24px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.studentid_typography {
+  background-color: white;
+  color: #3d5ee1;
+  padding-left: 4px;
+  padding-right: 4px;
+  border-radius: 5px;
+  font-weight: bold;
+  display: inline-block;
+  margin-bottom: 5px;
+}
+
+.student_name_typography {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.edit_btn_main_box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.edit_profile_btn {
+  background-color: #506ee4;
+  color: white;
+  padding: 8px;
+  width: auto;
+  font-weight: bold;
+  border-radius: 5px;
+  text-transform: none;
+}
+
+.attendance_chart_present_absent_div {
+  margin-top: 40px;
+  margin-bottom: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.exam_details_main_div {
+  max-height: 300px;
+  margin-right: 10px;
+  margin-left: 10px;
+  margin-bottom: 20px;
+  overflow-y: auto;
+}
+
+.leave_status_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+}
+
+.leave_status_heading {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.leave_status_dropdown {
+  border: none;
+}
+
+.faculties_main_div {
+  background-color: white;
+  margin-top: 24px;
+}
+
+.faculties_header_div {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slider {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.slick-track {
+  display: flex !important; /* Ensure the slides are displayed in a row */
+  gap: 20px !important; /* Add gap between the slides */
+}
+
+.slider_box {
+  border: 1px solid rgba(110, 102, 102, 0.2);
+  padding: 16px;
+  width: 250px; /* Width of each box */
+  box-sizing: border-box; /* Ensure padding is included in width */
+}
+
+.btn_container {
+  display: flex;
+  gap: 1rem; /* This will add spacing between buttons */
+  flex-wrap: wrap;
+}
+
+.btn_container .btn {
+  flex: 1 1 45%; /* flex-grow, flex-shrink, flex-basis */
+  min-width: 120px; /* Ensure the button doesn't shrink too small */
+  box-sizing: border-box; /* Avoid padding breaking layout */
+}
+
+.profile_dotted_line {
+  margin-top: 24px;
+  color: white;
+  width: 100%;
+  border-bottom: 2px dotted white;
+}
+
+.pass_typography {
+  color: white;
+  border-radius: 5px;
+  padding-left: 4px; /* 0.5 * 8px = 4px */
+  padding-right: 4px; /* 0.5 * 8px = 4px */
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header_bottomline_typography {
+  margin-top: 8px; /* 1 * 8px = 8px */
+  color: white;
+  width: 100%;
+  border-bottom: 1px solid rgba(110, 102, 102, 0.2);
+}
+
+.leave_inner_box {
+  background-color: #f8fafc;
+  padding: 16px; /* 2 * 8px = 16px */
+  display: flex;
+  justify-content: space-between;
+}
+
+.leave_inner_content_icon {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.leave_Status {
+  color: white;
+  padding: 4px; /* 0.5 * 8px = 4px */
+  text-align: center;
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 13px;
+}
+
+.attendance_last7days_main_div {
+  width: 100%;
+  margin-top: 16px; /* 2 * 8px = 16px */
+  border-radius: 5px;
+  background-color: #ecf0f6;
+  padding: 16px;
+}
+
+.attendance_last7days_weeks {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+}
+
+.faculties_crousel_btns {
+  display: flex;
+  height: 24px;
+  width: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* This ensures the button is fully rounded */
+  background-color: white;
+  border: 0.5px solid rgba(169, 169, 169, 0.5);
+  color: black;
+}
+
+.slider_main_div {
+  padding: 16px; /* 2 * 8px = 16px */
+  display: flex;
+  gap: 16px; /* 2 * 8px = 16px */
+  width: 100%;
+}
+
+.notice_board_main_box {
+  background-color: transparent;
+  padding: 16px; /* 2 * 8px = 16px */
+  display: flex;
+  justify-content: space-between;
+}
+
+.notice_board_inner_box {
+  display: flex;
+  gap: 8px; /* 1 * 8px = 8px */
+  align-items: center;
+  justify-content: center;
+}
+
+.notice_board_icon_box {
+  background-color: #fde9ed;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  border-radius: 50%; /* Ensures the element is a circle */
+  align-items: center;
+}
+
+.Exam_result_marks_main_box {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.Exam_result_marks_inner_box {
+  border-radius: 5px;
+  padding: 5px 12px;
+  line-height: 1.5;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.fees_reminder_main_box {
+  background-color: transparent;
+  padding: 16px; /* 2 * 8px = 16px */
+  display: flex;
+  justify-content: space-between;
+}
+
+
+.fees_reminder_icon_box {
+  background-color: #fde9ed;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  border-radius: 50%; /* Ensures the element is a circle */
+  align-items: center;
+}
+
+.calendar{
+  width: 100% !important;
+  margin-right: 10px;
+  margin-left: 10px;
+  border: none !important;
+}

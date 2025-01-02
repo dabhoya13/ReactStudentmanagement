@@ -52,6 +52,7 @@ namespace StudentManagementAPI.Models
         public string ImageName { get; set; }
 
         public string ImageUrl { get; set; }
+
     }
 
     public class GenderWiseCountDto

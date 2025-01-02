@@ -23,7 +23,7 @@ namespace StudentManagementAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
-        public StudentController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices,IMapper mapper)
+        public StudentController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices, IMapper mapper)
         {
             this._response = new();
             _studentServices = studentServices;
@@ -354,7 +354,7 @@ namespace StudentManagementAPI.Controllers
                 converter.Header.Height = 230;
                 converter.Footer.Height = 100;
 
-                string headerHtmlPath = Path.Combine("wwwroot","Uploads", "PdfTemplate", "PdfHeader.html");
+                string headerHtmlPath = Path.Combine("wwwroot", "Uploads", "PdfTemplate", "PdfHeader.html");
                 string headerHtmlContent = System.IO.File.ReadAllText(headerHtmlPath);
                 string hodEmail = exportPdfViewModel.Email == "null" ? "dabhoyakishan12@gmail.com" : exportPdfViewModel.Email;
                 string hodUsername = exportPdfViewModel.UserName ?? "";
@@ -405,6 +405,175 @@ namespace StudentManagementAPI.Controllers
                 _response.StatusCode = HttpStatusCode.OK;
                 _response.IsSuccess = true;
 
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+
+        [HttpGet("GetAttendanceFromMonthYear")]
+        public async Task<ActionResult<APIResponse>> GetAttendanceFromMonthYear(AttendanceDto attendanceDto)
+        {
+            try
+            {
+                IList<AttendanceDto> attendanceDtos = await _studentServices.GetAttendanceFromMonthYear(attendanceDto.Month, attendanceDto.Year, attendanceDto.StudentId);
+                RoleBaseResponse<IList<AttendanceDto>> roleBaseResponse = new()
+                {
+                    data = attendanceDtos,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpPost("AddStudentAttendance")]
+        public async Task<ActionResult<APIResponse>> AddStudentAttendance(AttendanceDto attendanceDto)
+        {
+            try
+            {
+                await _studentServices.AddTodayStudentAttendance(attendanceDto);
+                RoleBaseResponse<bool> roleBaseResponse = new()
+                {
+                    data = true,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpPost("SubmitAttendanceByHod")]
+        public async Task<ActionResult<APIResponse>> SubmitAttendanceByHod(AttendanceDto attendanceDto)
+        {
+            try
+            {
+                await _studentServices.HodSubmitAttendance(attendanceDto);
+                RoleBaseResponse<bool> roleBaseResponse = new()
+                {
+                    data = true,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetStudentLeaveStatus")]
+        public async Task<ActionResult<APIResponse>> GetStudentLeaveStatus(StudentMonthYearDto studentMonthYear)
+        {
+            try
+            {
+                IList<StudentsLeaveDto> newStudentLeaves = await _studentServices.GetStudentLeaveById(studentMonthYear.StudentId, studentMonthYear.Month, studentMonthYear.Year);
+                RoleBaseResponse<IList<StudentsLeaveDto>> roleBaseResponse = new()
+                {
+                    data = newStudentLeaves,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+
+        [HttpGet("GetStudentAttendanceCount")]
+        public async Task<ActionResult<APIResponse>> GetStudentAttendanceCount(StudentMonthYearDto studentMonthYear)
+        {
+            try
+            {
+                StudentAttendanceCountDto studentAttendanceCount = await _studentServices.GetStudentAttendanceCountById(studentMonthYear.StudentId, studentMonthYear.Month, studentMonthYear.Year);
+                studentAttendanceCount.TotalAbsentPresent = studentAttendanceCount.TotalPresent + studentAttendanceCount.TotalAbsent;
+                RoleBaseResponse<StudentAttendanceCountDto> roleBaseResponse = new()
+                {
+                    data = studentAttendanceCount,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetStudentLast7daysAttendances")]
+        public async Task<ActionResult<APIResponse>> GetStudentLast7daysAttendances(StudentLast7DaysViewModel studentLast7DaysViewModel)
+        {
+            try
+            {
+                IList<AttendanceDto> attendances = await _studentServices.GetLast7DaysAttendance(studentLast7DaysViewModel.StudentId, studentLast7DaysViewModel.StartDate, studentLast7DaysViewModel.EndDate);
+                RoleBaseResponse<IList<AttendanceDto>> roleBaseResponse = new()
+                {
+                    data = attendances,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+
+        [HttpGet("GetStudentExamsFromDate")]
+        public async Task<ActionResult<APIResponse>> GetStudentExamsFromDate(StudentExam studentExam)
+        {
+            try
+            {
+                if (studentExam.ExamDate != null)
+                {
+                    studentExam.ExamDate = studentExam.ExamDate?.Date.AddDays(1);
+                }
+                IList<StudentExam> studentExams = await _studentServices.GetStudentExams(studentExam.StudentId, studentExam.ExamDate);
+                RoleBaseResponse<IList<StudentExam>> roleBaseResponse = new()
+                {
+                    data = studentExams,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
             }
             catch (Exception ex)
             {
