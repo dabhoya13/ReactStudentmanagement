@@ -39,14 +39,14 @@ const StudentDetailsLayout = ({ children }: Props) => {
     },
     {
       name: "Fees",
-      path: "/student/fees",
+      path: "/student/studentFees",
       icon: (
         <PriceChangeOutlinedIcon className="me-2" sx={{ fontSize: "18px" }} />
       ),
     },
     {
       name: "Exam & Results",
-      path: "/student/examResults",
+      path: "/student/examAndResult",
       icon: (
         <EventAvailableOutlinedIcon
           className="me-2"

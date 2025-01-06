@@ -317,11 +317,71 @@ const LeaveAttendanceDetails: React.FC = () => {
                   </div>
                   <div className="d-flex align-items-center bg-white border rounded p-2 me-3 mb-3">
                     <span className="avatar avatar-sm bg-info rounded me-2 flex-shrink-0 ">
-                      <CalendarMonthOutlined sx={{fontSize:"0.85rem" ,fontWeight:"bolder"}}/>
+                      <CalendarMonthOutlined
+                        sx={{ fontSize: "0.85rem", fontWeight: "bolder" }}
+                      />
                     </span>
                     <p className="text-dark mb-0">Holiday</p>
                   </div>
                 </div>
+              </div>
+              <div className="table-responsive">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Date | Month</th>
+                      {[
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ].map((month, index) => (
+                        <th key={index}>{month}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <CustomTablePagination
+                        rowsPerPageOptions={[10]}
+                        // colSpan={3}
+                        count={10}
+                        rowsPerPage={10}
+                        page={page}
+                        slotProps={{
+                          select: {
+                            "aria-label": "rows per page",
+                          },
+                          actions: {
+                            showFirstButton: true,
+                            showLastButton: true,
+                            slots: {
+                              firstPageIcon: FirstPageRoundedIcon,
+                              lastPageIcon: LastPageRoundedIcon,
+                              nextPageIcon: ChevronRightRoundedIcon,
+                              backPageIcon: ChevronLeftRoundedIcon,
+                            },
+                          },
+                        }}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                      />
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
             </div>
           </div>

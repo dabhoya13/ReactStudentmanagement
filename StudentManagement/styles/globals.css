@@ -649,6 +649,19 @@ dl dt {
   font-size: 0.8rem;
 }
 
+.avatar.avatar-xl {
+  width: 4rem;
+  height: 4rem;
+  line-height: 4rem;
+  font-size: 1.25rem;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 4px;
+}
+
 .text-default {
   color: #6a7287 !important;
 }
@@ -709,18 +722,22 @@ h4,
 }
 
 .leave-table thead tr,
-.leave-table thead tr th {
+.leave-table thead tr th,
+.student-fees-table thead tr,
+.student-fees-table thead tr th {
   background-color: #e9edf4 !important;
 }
 
-.leave-table thead tr th {
+.leave-table thead tr th,
+.student-fees-table thead tr th {
   color: #202c4b;
   font-size: 14px;
   font-weight: 500;
   padding: 12px 20px;
 }
 
-.leave-table > tbody > tr td {
+.leave-table > tbody > tr td,
+.student-fees-table > tbody > tr td {
   color: #515b73;
   border-bottom: 1px solid #e9edf4;
   padding: 12px 20px;
@@ -833,7 +850,64 @@ h4,
 }
 
 .bg-successs {
-  background-color: #1ABE17 !important;
-  border: 1px solid #1ABE17 !important;
-  color: #FFF;
+  background-color: #1abe17 !important;
+  border: 1px solid #1abe17 !important;
+  color: #fff;
+}
+
+.text-successs {
+  color: #1abe17 !important;
+}
+
+.accordion-button:not(.collapsed) {
+  color: #6a7287 !important;
+  background-color: #f7f8f9 !important;
+  box-shadow: none !important;
+}
+
+.accordion-item {
+  border: 1px solid rgb(216, 216, 216) !important;
+}
+.accordion-button {
+  background-color: #fff;
+  color: #6a7287;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.table .thead-light th {
+  background-color: #f2f4f8;
+  color: #202c4b;
+}
+
+.table thead tr th {
+  font-weight: 500;
+  border-color: #e9edf4;
+  font-size: 14px;
+}
+.table th,
+.table td {
+  padding: 12px 20px;
+  vertical-align: middle;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.bg-darks {
+  background-color: #202c4b !important;
+  border: 1px solid #202c4b !important;
+  color: #fff;
+}
+
+.table th,
+.table td {
+  padding: 12px 20px !important;
+  vertical-align: middle !important;
+  font-size: 14px !important;
+  white-space: nowrap !important;
+}
+
+p:last-child {
+  margin-bottom: 0;
 }
