@@ -1,0 +1,79 @@
+//   const card = (
+//     <React.Fragment>
+//       <CardContent className="dashboard-card-content">
+//         <Box className="card-content-main-box">
+//           <Box
+//             className="card-content-icon-div"
+//             sx={{
+//               backgroundColor: "#3d5ee1",
+//             }}
+//           >
+//             <AssuredWorkloadIcon sx={{ color: "white" }} />
+//           </Box>
+//         </Box>
+//         <Box sx={{ display: "flex", alignItems: "center" }}>
+//           <Typography className="total-text">Pay Fees</Typography>
+//         </Box>
+//       </CardContent>
+//     </React.Fragment>
+//   );
+
+//   const card2 = (
+//     <React.Fragment>
+//       <CardContent className="dashboard-card-content">
+//         <Box className="card-content-main-box">
+//           <Box
+//             className="card-content-icon-div"
+//             sx={{
+//               backgroundColor: "#3fc83d",
+//             }}
+//           >
+//             <LibraryBooksIcon sx={{ color: "white" }} />
+//           </Box>
+//         </Box>
+//         <Box sx={{ display: "flex", alignItems: "center" }}>
+//           <Typography className="total-text">Exam Result</Typography>
+//         </Box>
+//       </CardContent>
+//     </React.Fragment>
+//   );
+
+//   const card3 = (
+//     <React.Fragment>
+//       <CardContent className="dashboard-card-content">
+//         <Box className="card-content-main-box">
+//           <Box
+//             className="card-content-icon-div"
+//             sx={{
+//               backgroundColor: "#eab300",
+//             }}
+//           >
+//             <CalendarMonthIcon sx={{ color: "white" }} />
+//           </Box>
+//         </Box>
+//         <Box sx={{ display: "flex", alignItems: "center" }}>
+//           <Typography className="total-text">Calendar</Typography>
+//         </Box>
+//       </CardContent>
+//     </React.Fragment>
+//   );
+
+//   const card4 = (
+//     <React.Fragment>
+//       <CardContent className="dashboard-card-content">
+//         <Box className="card-content-main-box">
+//           <Box
+//             className="card-content-icon-div"
+//             sx={{
+//               backgroundColor: "#202c4b",
+//             }}
+//           >
+//             <EditCalendarIcon sx={{ color: "white" }} />
+//           </Box>
+//         </Box>
+//         <Box sx={{ display: "flex", alignItems: "center" }}>
+//           <Typography className="total-text">Attendance</Typography>
+//         </Box>
+//       </CardContent>
+//     </React.Fragment>
+//   );

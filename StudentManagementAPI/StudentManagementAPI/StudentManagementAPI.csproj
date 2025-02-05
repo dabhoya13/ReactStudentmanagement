@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\Uploads\FacultyImages\default.png" />
+    <Content Remove="wwwroot\Uploads\HodProfiles\default.png" />
+    <Content Remove="wwwroot\Uploads\NoticeImages\default.png" />
+    <Content Remove="wwwroot\Uploads\ParentProfiles\default.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="EPPlus" Version="7.5.1" />
     <PackageReference Include="EPPlus.System.Drawing" Version="7.5.0" />
@@ -21,12 +28,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\Uploads\FacultyImages\default.png" />
+    <None Include="wwwroot\Uploads\HodProfiles\default.png" />
     <None Include="wwwroot\Uploads\NoticeImages\Annual-Day-pic.jpg" />
     <None Include="wwwroot\Uploads\NoticeImages\annual-Day.jpg" />
+    <None Include="wwwroot\Uploads\NoticeImages\default.png" />
     <None Include="wwwroot\Uploads\NoticeImages\download %284%29.jfif" />
     <None Include="wwwroot\Uploads\NoticeImages\mid-term-schedule.jfif" />
     <None Include="wwwroot\Uploads\NoticeImages\painting_competition.jpg" />
     <None Include="wwwroot\Uploads\NoticeImages\profile-image.jfif" />
+    <None Include="wwwroot\Uploads\ParentProfiles\default.png" />
     <None Include="wwwroot\Uploads\PdfTemplate\PdfFooter.html" />
     <None Include="wwwroot\Uploads\PdfTemplate\PdfHeader.html" />
     <None Include="wwwroot\Uploads\PdfTemplate\PdfTemplate.html" />
@@ -36,7 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Uploads\HodProfiles\" />
+    <Folder Include="wwwroot\Uploads\StudentDocuments\" />
   </ItemGroup>
 
 </Project>

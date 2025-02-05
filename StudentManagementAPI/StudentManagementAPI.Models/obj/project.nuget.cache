@@ -1,13 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "Z/82g6dLjB4lw2ShEhE4ZKDJHMIkKq8v6Z5+8IwaSST5Zen4eATGklJbEeL3s8gAmnGGP7QKFXtBf8g21NFb2A==",
+  "dgSpecHash": "hAiy+tMouG4=",
   "success": true,
   "projectFilePath": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI.Models\\StudentManagementAPI.Models.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.aspnetcore.http.features\\2.2.0\\microsoft.aspnetcore.http.features.2.2.0.nupkg.sha512",
     "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.extensions.primitives\\2.2.0\\microsoft.extensions.primitives.2.2.0.nupkg.sha512",
     "C:\\Users\\pctr54\\.nuget\\packages\\system.memory\\4.5.1\\system.memory.4.5.1.nupkg.sha512",
-    "C:\\Users\\pctr54\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.1\\system.runtime.compilerservices.unsafe.4.5.1.nupkg.sha512"
+    "C:\\Users\\pctr54\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\4.5.1\\system.runtime.compilerservices.unsafe.4.5.1.nupkg.sha512",
+    "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.20\\microsoft.windowsdesktop.app.ref.7.0.20.nupkg.sha512",
+    "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.20\\microsoft.netcore.app.ref.7.0.20.nupkg.sha512",
+    "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.20\\microsoft.aspnetcore.app.ref.7.0.20.nupkg.sha512"
   ],
   "logs": []
 }

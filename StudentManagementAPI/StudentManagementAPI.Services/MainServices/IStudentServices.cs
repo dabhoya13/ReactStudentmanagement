@@ -70,5 +70,36 @@ namespace StudentManagementAPI.Services.MainServices
 
         Task<IList<StudentExam>> GetStudentExams(int StudentId, DateTime? ExamDate);
 
+        Task<IList<Faculty>> GetFacultyForDashboard();
+
+        Task<IList<ClassesDto>> GetAllClasses();
+
+        Task UpsertStudentExam(StudentExam studentExam);
+
+        Task<IList<StudentTodo>> GetTodolistFromDate(DateTime? date);
+
+        Task AddStudentTodo(StudentTodo studentTodo);
+
+        Task<IList<StudentResults>> GetStudentResultsById(StudentResults studentResults);
+
+        Task ChangeTodoStatus(StudentTodo studentTodo);
+
+        Task DeleteTodo(StudentTodo studentTodo);
+
+        Task<IList<NoticeDto>> GetAllNoticeWithPagination(int page);
+
+        Task<IList<Parents>> GetParentsByStudentId(int studentId);
+
+        Task<IList<StudentDocuments>> GetStudentDocuments(int studentId);
+
+        Task<IList<StudentsLeaveDto>> GetAllStudentLeavesWithPagination(PaginationDto paginationDto);
+
+        Task AddStudentLeave(StudentsLeaveDto studentsLeaveDto);
+
+        Task<StudentsLeaveDto> GetTotalLeaves();
+
+        Task<IList<StudentResults>> GetWholeYearResult(StudentResults studentResults);
+
+        Task<IList<ExamType>> GetAllExamTypes();
     }
 }

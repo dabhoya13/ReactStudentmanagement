@@ -10,8 +10,9 @@ D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Servic
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\bin\Debug\net7.0\StudentManagementAPI.Models.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\bin\Debug\net7.0\StudentManagementAPI.DataContext.pdb
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\bin\Debug\net7.0\StudentManagementAPI.Models.pdb
-D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\StudentManagementAPI.Services.csproj.CopyComplete
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\StudentManagementAPI.Services.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\refint\StudentManagementAPI.Services.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\StudentManagementAPI.Services.pdb
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\ref\StudentManagementAPI.Services.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\StudentManagementAPI.Services.sourcelink.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Services\obj\Debug\net7.0\StudentM.6F6D09D0.Up2Date

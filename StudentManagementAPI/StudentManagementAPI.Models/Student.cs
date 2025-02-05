@@ -53,6 +53,77 @@ namespace StudentManagementAPI.Models
 
         public string ImageUrl { get; set; }
 
+        public int ClassId { get; set; }
+
+        public string ClassName { get; set; }
+
+        public int ClassRank { get; set; }
+
+        public int RollNo { get; set; }
+
+        public string BloodGroup { get; set; }
+
+        public string Reigion { get; set; }
+
+        public string Caste { get; set; }
+
+        public string Category { get; set; }
+
+        public string MotherTongue { get; set; }
+
+        public string MobileNumber { get; set; }
+
+        public string CurrentAddress { get; set; }
+
+        public string PermanentAddress { get; set; }
+
+        public string PreviousSchoolName { get; set; }
+
+        public string PreviousSchoolAddress { get; set; }
+
+        public string OtherInfo { get; set; }
+
+        public string AcademicYear { get; set; }
+        public DateTime AdmissionDate { get; set; }
+
+
+        public IList<Parents> Parents { get; set; }
+
+        public IList<StudentDocuments> Documents { get; set; }
+        public IList<StudentDocuments> DeletedDocuments { get; set; }
+
+    }
+
+    public class Parents
+    {
+        public int ParentId { get; set; }
+
+        [StringLength(50)]
+        public string ParentName { get; set; }
+
+        public int Relation { get; set; }
+
+        public string ParentNumber { get; set; }
+
+        [RegularExpression("^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", ErrorMessage = "Enter Correct Email")]
+        public string ParentEmail { get; set; }
+
+        public string? ParentImage { get; set; } = null;
+
+        public string ParentImageUrl { get; set; }
+
+        public string Occupation { get; set; }
+    }
+
+    public class StudentDocuments
+    {
+        public int StudentDocumentId { get; set; }
+
+        public string StudentDocumentName { get; set; }
+
+        public int StudentId { get; set; }
+
+        public string StudentDocumentUrl { get; set; }
     }
 
     public class GenderWiseCountDto
@@ -64,9 +135,9 @@ namespace StudentManagementAPI.Models
 
     public class StudentProfessorCount
     {
-        public int StudentCount { get; set;}
+        public int StudentCount { get; set; }
 
-        public int ProfessorCount { get; set; } 
+        public int ProfessorCount { get; set; }
     }
 
     public class ExportStudent

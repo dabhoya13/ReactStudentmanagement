@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Head from "next/head";
+import { StudentProvider } from "@/utils/auth/Context/StudentProvider";
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -29,12 +30,21 @@ export default function App({ Component, pageProps }: AppProps) {
   const Layout =
     layoutsMap[router.pathname.split("/")[1]] ||
     (({ children }: { children: React.ReactNode }) => <>{children}</>);
+  const isStudentLayout = router.pathname.startsWith("/student"); // Adjust based on your needs
 
   return (
     <>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
+      {isStudentLayout ? (
+        <StudentProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </StudentProvider>
+      ) : (
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      )}
     </>
   );
 }

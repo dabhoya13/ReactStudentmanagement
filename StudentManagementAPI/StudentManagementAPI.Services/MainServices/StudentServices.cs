@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Azure;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using StudentManagementAPI.DataContext;
 using StudentManagementAPI.Models;
@@ -119,13 +120,17 @@ namespace StudentManagementAPI.Services.MainServices
                 return GetDataModel<AttendanceMonthYearDto>(dataObj);
             }
             else if ((controllerName == "Hod" && methodName == "GetAllStudents") ||
-                     (controllerName == "Student" && methodName == "ExportExcelReport"))
+                     (controllerName == "Student" && methodName == "ExportExcelReport") ||
+                     (controllerName == "Student" && methodName == "GetAllStudentsLeave"))
             {
                 return GetDataModel<PaginationDto>(dataObj);
             }
             else if ((controllerName == "Student" && methodName == "DeleteStudentById")
                     || (controllerName == "Student" && methodName == "GetStudentDetailsById")
-                    || (controllerName == "Hod" && methodName == "GetHodDetailsById"))
+                    || (controllerName == "Hod" && methodName == "GetHodDetailsById")
+                    || (controllerName == "Student" && methodName == "GetStudentExamByExamId")
+                    || (controllerName == "Student" && methodName == "GetAllNoticesWithPagination")
+                    || (controllerName == "Student" && methodName == "GetStudentUsedLeaveCounts"))
             {
                 return Convert.ToInt32(dataObj);
             }
@@ -159,12 +164,32 @@ namespace StudentManagementAPI.Services.MainServices
                 || (controllerName == "Student" && methodName == "GetStudentAttendanceCount"))
             {
                 return GetDataModel<StudentMonthYearDto>(dataObj);
-            }else if(controllerName == "Student" && methodName == "GetStudentLast7daysAttendances")
+            }
+            else if (controllerName == "Student" && methodName == "GetStudentLast7daysAttendances")
             {
                 return GetDataModel<StudentLast7DaysViewModel>(dataObj);
-            }else if(controllerName == "Student" && methodName == "GetStudentExamsFromDate")
+            }
+            else if ((controllerName == "Student" && methodName == "GetStudentExamsFromDate")
+                || (controllerName == "Student" && methodName == "UpsertStudentExam"))
             {
                 return GetDataModel<StudentExam>(dataObj);
+            }
+            else if ((controllerName == "Student" && methodName == "GetAllStudentTodoListByDate")
+                || (controllerName == "Student" && methodName == "AddStudentTodo")
+                || (controllerName == "Student" && methodName == "ChangeTodoStatus")
+                || (controllerName == "Student" && methodName == "DeleteTodo"))
+
+            {
+                return GetDataModel<StudentTodo>(dataObj);
+            }
+            else if ((controllerName == "Student" && methodName == "GetStudentResultById") ||
+                    (controllerName == "Student" && methodName == "GetWholeYearStudentResult"))
+            {
+                return GetDataModel<StudentResults>(dataObj);
+            }
+            else if (controllerName == "Student" && methodName == "AddStudentLeave")
+            {
+                return GetDataModel<StudentsLeaveDto>(dataObj);
             }
             else
             {
@@ -392,7 +417,7 @@ namespace StudentManagementAPI.Services.MainServices
         public async Task<T> GetOneRecordFromId<T>(string Procedure, int Id)
         {
             Collection<DbParameters> parameters = new();
-            parameters.Add(new DbParameters { Name = "@Id", Value = Id, DBType = DbType.Int64 });
+            parameters.Add(new DbParameters { Name = "@Id", Value = Id, DBType = DbType.Int32 });
             T newobj = await DbClient.ExecuteOneRecordProcedure<T>(Procedure, parameters);
             return newobj;
 
@@ -403,32 +428,107 @@ namespace StudentManagementAPI.Services.MainServices
             try
             {
                 var table = new DataTable();
+                table.Columns.Add("AcademicYear");
+                table.Columns.Add("AdmissionDate");
                 table.Columns.Add("FirstName");
                 table.Columns.Add("LastName");
-                table.Columns.Add("UserName");
-                table.Columns.Add("Email");
-                table.Columns.Add("CourseId");
-                table.Columns.Add("Password");
-                table.Columns.Add("BirthDate");
+                table.Columns.Add("Course");
+                table.Columns.Add("Class");
+                table.Columns.Add("RollNo");
                 table.Columns.Add("Gender");
+                table.Columns.Add("BirthDate");
+                table.Columns.Add("BloodGroup");
+                table.Columns.Add("Religion");
+                table.Columns.Add("Category");
+                table.Columns.Add("Caste");
+                table.Columns.Add("MobileNumber");
+                table.Columns.Add("Email");
+                table.Columns.Add("MotherTongue");
+                table.Columns.Add("CurrentAddress");
+                table.Columns.Add("ParmanentAddres");
+                table.Columns.Add("PreviousSchoolNam");
+                table.Columns.Add("PreviousSchoolAd");
+                table.Columns.Add("UserName");
+                table.Columns.Add("Password");
+                table.Columns.Add("OtherInfo");
                 table.Columns.Add("ImageName");
 
 
                 var row = table.NewRow();
+                row["AcademicYear"] = student.AcademicYear;
+                row["AdmissionDate"] = student.AdmissionDate.ToString("MM-dd-yyyy HH:mm:ss");
                 row["FirstName"] = student.FirstName;
                 row["LastName"] = student.LastName;
-                row["UserName"] = student.UserName;
-                row["Email"] = student.Email;
-                row["CourseId"] = student.CourseId;
-                row["Password"] = "Kp@123123";
-                row["BirthDate"] = student.BirthDate.ToString("MM-dd-yyyy HH:mm:ss");
+                row["Course"] = student.CourseId;
+                row["Class"] = student.ClassId;
+                row["RollNo"] = student.RollNo;
                 row["Gender"] = student.Gender;
+                row["BirthDate"] = student.BirthDate.ToString("MM-dd-yyyy HH:mm:ss");
+                row["BloodGroup"] = student.BloodGroup;
+                row["Religion"] = student.Reigion;
+                row["Category"] = student.Category;
+                row["Caste"] = student.Caste;
+                row["MobileNumber"] = student.MobileNumber;
+                row["Email"] = student.Email;
+                row["MotherTongue"] = student.MotherTongue;
+                row["CurrentAddress"] = student.CurrentAddress;
+                row["ParmanentAddres"] = student.PermanentAddress;
+                row["PreviousSchoolNam"] = student.PreviousSchoolName;
+                row["PreviousSchoolAd"] = student.PreviousSchoolAddress;
+                row["UserName"] = student.UserName;
+                row["Password"] = student.Password;
+                row["OtherInfo"] = student.OtherInfo;
                 row["ImageName"] = student.ImageName;
 
                 table.Rows.Add(row);
 
+                var table2 = new DataTable();
+                table2.Columns.Add("ParentName");
+                table2.Columns.Add("Relation");
+                table2.Columns.Add("ParentNumber");
+                table2.Columns.Add("ParentEmail");
+                table2.Columns.Add("ParentImage");
+                table2.Columns.Add("Occupation");
+
+                foreach (var parent in student.Parents)
+                {
+                    var row2 = table2.NewRow();
+                    row2["ParentName"] = parent.ParentName;
+                    row2["Relation"] = parent.Relation;
+                    row2["ParentNumber"] = parent.ParentNumber;
+                    row2["ParentEmail"] = parent.ParentEmail;
+                    row2["ParentImage"] = parent.ParentImage ?? null;
+                    row2["Occupation"] = parent.Occupation;
+                    table2.Rows.Add(row2);
+                }
+
+                var table3 = new DataTable();
+                table3.Columns.Add("StudentDocumentName");
+                table3.Columns.Add("StudentId");
+
+                foreach (var document in student.Documents)
+                {
+                    var row3 = table3.NewRow();
+                    row3["StudentDocumentName"] = document.StudentDocumentName;
+                    row3["StudentId"] = student.StudentId;
+                    table3.Rows.Add(row3);
+                }
+
+                var table4 = new DataTable();
+                table4.Columns.Add("StudentDocumentId");
+                foreach (var document in student.DeletedDocuments)
+                {
+                    var row4 = table4.NewRow();
+                    row4["StudentDocumentId"] = document.StudentDocumentId;
+                    table4.Rows.Add(row4);
+                }
+
                 Collection<DbParameters> parameters = new();
                 parameters.Add(new DbParameters { Name = "@student_table", Value = table, DBType = DbType.Object, TypeName = "Student_Table" });
+                parameters.Add(new DbParameters { Name = "@parent_table", Value = table2, DBType = DbType.Object, TypeName = "Parent_Table" });
+                parameters.Add(new DbParameters { Name = "@document_table", Value = table3, DBType = DbType.Object, TypeName = "Document_Table" });
+                parameters.Add(new DbParameters { Name = "@deleted_document_table", Value = table4, DBType = DbType.Object, TypeName = "Deleted_Document_Table" });
+
                 if (student.StudentId > 0)
                 {
                     parameters.Add(new DbParameters { Name = "@studentId", Value = student.StudentId, DBType = DbType.Int32 });
@@ -769,7 +869,7 @@ namespace StudentManagementAPI.Services.MainServices
                 parameters.Add(new DbParameters { Name = "@startDate", Value = startDate, DBType = DbType.DateTime });
                 parameters.Add(new DbParameters { Name = "@endDate", Value = endDate, DBType = DbType.DateTime });
 
-                IList<AttendanceDto> attendanceDto= await DbClient.ExecuteProcedure<AttendanceDto>("[dbo].[Get_Last7DaysAttendance]", parameters);
+                IList<AttendanceDto> attendanceDto = await DbClient.ExecuteProcedure<AttendanceDto>("[dbo].[Get_Last7DaysAttendance]", parameters);
                 return attendanceDto;
             }
             catch (Exception ex)
@@ -797,7 +897,220 @@ namespace StudentManagementAPI.Services.MainServices
             }
         }
 
+        public async Task<IList<Faculty>> GetFacultyForDashboard()
+        {
+            try
+            {
+                IList<Faculty> faculties = await DbClient.ExecuteProcedure<Faculty>("[dbo].[get_feculties_for_studentDashboard]", null);
+
+                return faculties;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<ClassesDto>> GetAllClasses()
+        {
+
+            try
+            {
+                IList<ClassesDto> classes = await DbClient.ExecuteProcedure<ClassesDto>("[dbo].[Get_All_Classes]", null);
+
+                return classes;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task UpsertStudentExam(StudentExam studentExam)
+        {
+            try
+            {
+                var table = new DataTable();
+                table.Columns.Add("SubjectId");
+                table.Columns.Add("StartTime");
+                table.Columns.Add("EndTime");
+                table.Columns.Add("ExamDate");
+                table.Columns.Add("RoomNo");
+                table.Columns.Add("ExamType");
+                table.Columns.Add("ClassId");
 
 
+                var row = table.NewRow();
+                row["SubjectId"] = studentExam.SubjectId;
+                row["StartTime"] = studentExam.StartTime;
+                row["EndTime"] = studentExam.EndTime;
+                row["ExamDate"] = studentExam.ExamDate?.ToString("MM-dd-yyyy HH:mm:ss");
+                row["RoomNo"] = studentExam.RoomNo;
+                row["ExamType"] = studentExam.ExamType;
+                row["ClassId"] = studentExam.ClassId;
+
+                table.Rows.Add(row);
+
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@exam_table", Value = table, DBType = DbType.Object, TypeName = "Student_Exam" });
+                if (studentExam.ExamId > 0)
+                {
+                    parameters.Add(new DbParameters { Name = "@examId", Value = studentExam.ExamId, DBType = DbType.Int32 });
+                }
+                await DbClient.ExecuteProcedure("[dbo].[Add_Edit_Student_exam]", parameters, ExecuteType.ExecuteNonQuery);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<IList<StudentTodo>> GetTodolistFromDate(DateTime? date)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@date", Value = date, DBType = DbType.Date });
+            IList<StudentTodo> studentTodos = await DbClient.ExecuteProcedure<StudentTodo>("[dbo].[get_all_studentTodo]", parameters);
+            return studentTodos;
+        }
+
+        public async Task AddStudentTodo(StudentTodo studentTodo)
+        {
+            if (studentTodo.TodoDate != null)
+            {
+                studentTodo.TodoDate = studentTodo.TodoDate?.Date.AddDays(1);
+                Collection<DbParameters> parameters = new();
+                parameters.Add(new DbParameters { Name = "@name", Value = studentTodo.TodoName, DBType = DbType.String });
+                parameters.Add(new DbParameters { Name = "@time", Value = studentTodo.Time, DBType = DbType.Time });
+                parameters.Add(new DbParameters { Name = "@date", Value = studentTodo.TodoDate, DBType = DbType.Date });
+                await DbClient.ExecuteProcedure("[dbo].[add_StudentTodo]", parameters, ExecuteType.ExecuteNonQuery);
+            }
+        }
+
+        public async Task<IList<StudentResults>> GetStudentResultsById(StudentResults studentResults)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@studentId", Value = studentResults.StudentId, DBType = DbType.Int32 });
+            parameters.Add(new DbParameters { Name = "@examId", Value = studentResults.ExamTypeId, DBType = DbType.Int32 });
+
+            IList<StudentResults> studentResults1 = await DbClient.ExecuteProcedure<StudentResults>("[dbo].[Get_Student_Result_ById]", parameters);
+            return studentResults1;
+        }
+
+        public async Task ChangeTodoStatus(StudentTodo studentTodo)
+        {
+            string todoIdsString = string.Join(",", studentTodo.TodoIds);
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@TodoIds", Value = todoIdsString, DBType = DbType.String });
+            await DbClient.ExecuteProcedure("[dbo].[change_todo_status]", parameters, ExecuteType.ExecuteNonQuery);
+
+        }
+
+        public async Task DeleteTodo(StudentTodo studentTodo)
+        {
+            string todoIdsString = string.Join(",", studentTodo.TodoIds);
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@TodoIds", Value = todoIdsString, DBType = DbType.String });
+            await DbClient.ExecuteProcedure("[dbo].[delete_todo]", parameters, ExecuteType.ExecuteNonQuery);
+
+        }
+
+        public async Task<IList<NoticeDto>> GetAllNoticeWithPagination(int page)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@PageNumber", Value = page, DBType = DbType.Int32 });
+            IList<NoticeDto> notices = await DbClient.ExecuteProcedure<NoticeDto>("[dbo].[GetAllNoticeWithPagination]", parameters);
+            return notices;
+        }
+
+        public async Task<IList<StudentDocuments>> GetStudentDocuments(int studentId)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@studentId", Value = studentId, DBType = DbType.Int32 });
+            IList<StudentDocuments> studentDocuments = await DbClient.ExecuteProcedure<StudentDocuments>("[dbo].[get_student_documents]", parameters);
+            return studentDocuments;
+        }
+
+        public async Task<IList<Parents>> GetParentsByStudentId(int studentId)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@studentId", Value = studentId, DBType = DbType.Int32 });
+            IList<Parents> parents = await DbClient.ExecuteProcedure<Parents>("[dbo].[get_parents_with_studentId]", parameters);
+            return parents;
+        }
+
+        public async Task<IList<StudentsLeaveDto>> GetAllStudentLeavesWithPagination(PaginationDto paginationDto)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@Search_Query", Value = paginationDto.SearchQuery ?? "", DBType = DbType.String });
+            parameters.Add(new DbParameters { Name = "@Sort_Column_Name", Value = paginationDto.OrderBy ?? "", DBType = DbType.String });
+            parameters.Add(new DbParameters { Name = "@Start_index", Value = paginationDto.StartIndex, DBType = DbType.Int64 });
+            parameters.Add(new DbParameters { Name = "@Page_Size", Value = paginationDto.PageSize, DBType = DbType.Int64 });
+            parameters.Add(new DbParameters { Name = "@StudentId", Value = paginationDto.StudentId, DBType = DbType.Int64 });
+
+            //if (paginationDto.FromDate != null && paginationDto.ToDate != null)
+            //{
+            //    parameters.Add(new DbParameters { Name = "@FromDate", Value = paginationDto.FromDate, DBType = DbType.Date });
+            //    parameters.Add(new DbParameters { Name = "@ToDate", Value = paginationDto.ToDate, DBType = DbType.Date });
+
+            //}
+            //IList<Book> books = DbClient.ExecuteProcedure<Book>("[dbo].[Get_Books_List]", parameters);
+            IList<StudentsLeaveDto> data = await DbClient.ExecuteProcedure<StudentsLeaveDto>("[dbo].[get_Student_AllLeave]", parameters);
+            return data;
+        }
+
+        public async Task AddStudentLeave(StudentsLeaveDto studentsLeaveDto)
+        {
+            var table = new DataTable();
+            table.Columns.Add("LeaveTypeId");
+            table.Columns.Add("LeaveDate");
+            table.Columns.Add("StudentId");
+            table.Columns.Add("NumberOfDays");
+            table.Columns.Add("LeaveStatus");
+            table.Columns.Add("Reason");
+
+
+            var row = table.NewRow();
+            row["LeaveTypeId"] = studentsLeaveDto.LeaveTypeId;
+            row["LeaveDate"] = studentsLeaveDto.LeaveDate.AddDays(1).ToString("MM-dd-yyyy HH:mm:ss");
+            row["StudentId"] = studentsLeaveDto.StudentId;
+            row["NumberOfDays"] = studentsLeaveDto.NumberOfDays;
+            row["LeaveStatus"] = studentsLeaveDto.LeaveStatus;
+            row["Reason"] = studentsLeaveDto.Reason;
+            table.Rows.Add(row);
+            Collection<DbParameters> addParameters = new();
+            addParameters.Add(new DbParameters { Name = "@leave_Table", Value = table, DBType = DbType.Object, TypeName = "Student_Leave" });
+            await DbClient.ExecuteProcedure("[dbo].[add_student_leave]", addParameters, ExecuteType.ExecuteNonQuery);
+
+
+        }
+
+        public async Task<StudentsLeaveDto> GetTotalLeaves()
+        {
+            try
+            {
+                StudentsLeaveDto studentsLeaveDto = await DbClient.ExecuteOneRecordProcedure<StudentsLeaveDto>("[dbo].[get_total_leave_count]", null);
+                return studentsLeaveDto;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<IList<StudentResults>> GetWholeYearResult(StudentResults studentResults)
+        {
+            Collection<DbParameters> parameters = new();
+            parameters.Add(new DbParameters { Name = "@studentId", Value = studentResults.StudentId, DBType = DbType.Int32 });
+            parameters.Add(new DbParameters { Name = "@startYear", Value = studentResults.StartYear, DBType = DbType.Int32 });
+            IList<StudentResults> studentResultss = await DbClient.ExecuteProcedure<StudentResults>("[dbo].[Get_Whole_Year_Student_Result]", parameters);
+            return studentResultss;
+        }
+
+        public async Task<IList<ExamType>> GetAllExamTypes()
+        {
+            IList<ExamType> examTypes = await DbClient.ExecuteProcedure<ExamType>("[dbo].[get_All_ExamType]", null);
+            return examTypes;
+        }
     }
 }

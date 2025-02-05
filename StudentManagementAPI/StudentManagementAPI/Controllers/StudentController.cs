@@ -2,6 +2,7 @@
 using Azure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SelectPdf;
@@ -9,6 +10,7 @@ using StudentManagementAPI.Models;
 using StudentManagementAPI.Services;
 using StudentManagementAPI.Services.MainServices;
 using System.Drawing;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -22,6 +24,7 @@ namespace StudentManagementAPI.Controllers
         private readonly IStudentServices _studentServices;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly IJwtServices _jwtServices;
 
         public StudentController(IStudentServices studentServices, IConfiguration configuration, IJwtServices jwtServices, IMapper mapper)
         {
@@ -29,6 +32,7 @@ namespace StudentManagementAPI.Controllers
             _studentServices = studentServices;
             _configuration = configuration;
             _mapper = mapper;
+            _jwtServices = jwtServices;
         }
 
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -185,6 +189,10 @@ namespace StudentManagementAPI.Controllers
                 }
 
                 Student student = await _studentServices.GetOneRecordFromId<Student>("[dbo].[Get_Student_Details_ById]", studentId);
+                IList<Parents> parents = await _studentServices.GetParentsByStudentId(studentId);
+                IList<StudentDocuments> studentDocuments = await _studentServices.GetStudentDocuments(studentId);
+                student.Parents = parents;
+                student.Documents = studentDocuments;
                 RoleBaseResponse<Student> roleBaseResponse = new()
                 {
                     data = student
@@ -220,6 +228,27 @@ namespace StudentManagementAPI.Controllers
             try
             {
                 await _studentServices.UpsertStudentDetails(student);
+                if(student.DeletedDocuments != null && student.DeletedDocuments.Count > 0)
+                {
+                        var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "StudentDocuments");
+                    foreach(var document in student.DeletedDocuments)
+                    {
+                        var filePath = Path.Combine(uploadsFolderPath, document.StudentDocumentName);
+                        if(System.IO.File.Exists(filePath))
+                        {
+                            try
+                            {
+                                System.IO.File.Delete(filePath);
+                            }
+                            catch (Exception ex)
+                            {
+                                _response.IsSuccess = false;
+                                _response.ErroMessages = new List<string> { ex.Message };
+                                _response.StatusCode = HttpStatusCode.InternalServerError;
+                            }
+                        }
+                    }
+                }
                 _response.IsSuccess = true;
                 _response.result = null;
                 _response.StatusCode = HttpStatusCode.OK;
@@ -582,6 +611,558 @@ namespace StudentManagementAPI.Controllers
                 _response.StatusCode = HttpStatusCode.InternalServerError;
             }
             return _response;
+        }
+
+        [HttpGet("GetAllFacultyForStudentDashboard")]
+        public async Task<ActionResult<APIResponse>> GetAllFacultyForStudentDashboard()
+        {
+            try
+            {
+                IList<Faculty> faculties = await _studentServices.GetFacultyForDashboard();
+                RoleBaseResponse<IList<Faculty>> roleBaseResponse = new()
+                {
+                    data = faculties,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+
+        [HttpGet("GetAllClasses")]
+        public async Task<ActionResult<APIResponse>> GetAllClasses()
+        {
+            try
+            {
+                IList<ClassesDto> classes = await _studentServices.GetAllClasses();
+                RoleBaseResponse<IList<ClassesDto>> roleBaseResponse = new()
+                {
+                    data = classes,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetStudentExamByExamId")]
+        public async Task<ActionResult<APIResponse>> GetStudentExamByExamId(int examId)
+        {
+            try
+            {
+                StudentExam studentExam = await _studentServices.GetOneRecordFromId<StudentExam>("[dbo].[get_studentExam_byId]", examId);
+                RoleBaseResponse<StudentExam> roleBaseResponse = new()
+                {
+                    data = studentExam,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("GetAllSubjects")]
+        public async Task<ActionResult<APIResponse>> GetAllSubjects()
+        {
+
+            try
+            {
+                IList<SubjectDto> subjects = await _studentServices.GetAllRecordsWithoutPagination<SubjectDto>("[dbo].[get_All_Subjects]");
+                RoleBaseResponse<IList<SubjectDto>> roleBaseResponse = new()
+                {
+                    data = subjects,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+
+        }
+
+
+        [HttpPost("UpsertStudentExam")]
+        public async Task<ActionResult<APIResponse>> UpsertStudentExam(StudentExam studentExam)
+        {
+            try
+            {
+                studentExam.ExamDate = studentExam.ExamDate?.AddDays(1);
+                await _studentServices.UpsertStudentExam(studentExam);
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetAllStudentTodoListByDate")]
+        public async Task<ActionResult<APIResponse>> GetAllStudentTodoListByDate(StudentTodo studentTodo)
+        {
+
+            try
+            {
+                IList<StudentTodo> studentTodos = await _studentServices.GetTodolistFromDate(studentTodo.TodoDate);
+                RoleBaseResponse<IList<StudentTodo>> roleBaseResponse = new()
+                {
+                    data = studentTodos,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpPost("AddStudentTodo")]
+        public async Task<ActionResult<APIResponse>> AddStudentTodo(StudentTodo studentTodo)
+        {
+            try
+            {
+                await _studentServices.AddStudentTodo(studentTodo);
+                RoleBaseResponse<bool> roleBaseResponse = new()
+                {
+                    data = true,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetStudentResultById")]
+        public async Task<ActionResult<APIResponse>> GetStudentResultById(StudentResults studentResults)
+        {
+
+            try
+            {
+                IList<StudentResults> studentResults1 = await _studentServices.GetStudentResultsById(studentResults);
+                RoleBaseResponse<IList<StudentResults>> roleBaseResponse = new()
+                {
+                    data = studentResults1,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpPut("ChangeTodoStatus")]
+        public async Task<ActionResult<APIResponse>> ChangeTodoStatus(StudentTodo studentTodo)
+        {
+
+            try
+            {
+                _studentServices.ChangeTodoStatus(studentTodo);
+                RoleBaseResponse<bool> roleBaseResponse = new()
+                {
+                    data = true,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+
+        [HttpPut("DeleteTodo")]
+        public async Task<ActionResult<APIResponse>> DeleteTodo(StudentTodo studentTodo)
+        {
+
+            try
+            {
+                _studentServices.DeleteTodo(studentTodo);
+                RoleBaseResponse<bool> roleBaseResponse = new()
+                {
+                    data = true,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetAllNoticesWithPagination")]
+        public async Task<ActionResult<APIResponse>> GetAllNoticesWithPagination(int page)
+        {
+            try
+            {
+                RoleBaseResponse<IList<NoticeDto>> roleBaseResponse = new();
+                IList<NoticeDto> notices = await _studentServices.GetAllNoticeWithPagination(page);
+                if (notices != null)
+                {
+                    roleBaseResponse.data = notices;
+                }
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                return _response;
+
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+                return _response;
+            }
+        }
+
+        [HttpGet("GetStudentUsedLeaveCounts")]
+        public async Task<ActionResult<APIResponse>> GetStudentUsedLeaveCounts(int studentId)
+        {
+            try
+            {
+                RoleBaseResponse<StudentsLeaveDto> roleBaseResponse = new();
+                StudentsLeaveDto leavesCount = await _studentServices.GetOneRecordFromId<StudentsLeaveDto>("[dbo].[get_used_leave_count]", studentId);
+                StudentsLeaveDto totalLeaves = await _studentServices.GetTotalLeaves();
+                leavesCount.TotalMedicalLeave = totalLeaves.TotalMedicalLeave;
+                leavesCount.TotalCasualLeave = totalLeaves.TotalCasualLeave;
+                leavesCount.TotalMaternityLeave = totalLeaves.TotalMaternityLeave;
+                leavesCount.TotalPaternityLeave = totalLeaves.TotalPaternityLeave;
+                roleBaseResponse.data = leavesCount;
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+                return _response;
+
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+                return _response;
+            }
+        }
+
+        [HttpGet("GetAllStudentsLeave")]
+        public async Task<ActionResult<APIResponse>> GetAllStudentsLeave(PaginationDto paginationDto)
+        {
+            try
+            {
+                if (paginationDto.StartIndex < 0 || paginationDto.PageSize < 0)
+                {
+                    return _response;
+                }
+                IList<StudentsLeaveDto> studentsLeaveDtos = await _studentServices.GetAllStudentLeavesWithPagination(paginationDto);
+                int totalItems = studentsLeaveDtos.Count > 0 ? studentsLeaveDtos.FirstOrDefault(x => x.LeaveId != 0)?.TotalRecords ?? 0 : 0;
+                int TotalPages = (int)Math.Ceiling((decimal)totalItems / paginationDto.PageSize);
+                RoleBaseResponse<IList<StudentsLeaveDto>> roleBaseResponse = new()
+                {
+                    data = studentsLeaveDtos,
+                    StartIndex = paginationDto.StartIndex,
+                    PageSize = paginationDto.PageSize,
+                    TotalItems = totalItems,
+                    TotalPages = TotalPages,
+                    CurrentPage = (int)Math.Ceiling((double)paginationDto.StartIndex / paginationDto.PageSize),
+                    searchQuery = paginationDto.SearchQuery,
+                };
+                _response.result = roleBaseResponse;
+                _response.IsSuccess = true;
+                _response.StatusCode = HttpStatusCode.OK;
+
+            }
+            catch (Exception ex)
+            {
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+                return _response;
+            }
+            return _response;
+        }
+
+        [HttpPost("AddStudentLeave")]
+        public async Task<ActionResult<APIResponse>> AddStudentLeave(StudentsLeaveDto studentsLeaveDto)
+        {
+            try
+            {
+                await _studentServices.AddStudentLeave(studentsLeaveDto);
+                RoleBaseResponse<bool> roleBaseResponse = new()
+                {
+                    data = true,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetWholeYearStudentResult")]
+        public async Task<ActionResult<APIResponse>> GetWholeYearStudentResult(StudentResults studentResults)
+        {
+            try
+            {
+                IList<StudentResults> studentResultss = await _studentServices.GetWholeYearResult(studentResults);
+                //int totalMarksObtained = 0;
+                //int totalMarks = 0;
+                //bool allSubjectsPassed = true;
+
+                //foreach(var result in studentResultss)
+                //{
+                //    totalMarksObtained += result.MarkObtained;
+                //    totalMarks += result.MaxMarks;
+
+                //    if(!result.Status)
+                //    {
+                //        allSubjectsPassed = false;
+                //    }
+                //}
+
+                //decimal percentage = totalMarks > 0 ? (decimal)totalMarksObtained / totalMarks * 100 : 0;
+                RoleBaseResponse<IList<StudentResults>> roleBaseResponse = new()
+                {
+                    data = studentResultss,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpGet("GetAllExamTypes")]
+        public async Task<ActionResult<APIResponse>> GetAllExamTypes()
+        {
+            try
+            {
+                IList<ExamType> examTypes = await _studentServices.GetAllExamTypes();
+                RoleBaseResponse<IList<ExamType>> roleBaseResponse = new()
+                {
+                    data = examTypes,
+                };
+                _response.result = roleBaseResponse;
+                _response.StatusCode = HttpStatusCode.OK;
+                _response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErroMessages = new List<string> { ex.Message };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+            }
+            return _response;
+        }
+
+        [HttpPut("UploadFiles")]
+        public async Task<ActionResult<APIResponse>> UploadFiles(IFormFile? file, IFormFile? motherFile, IFormFile? fatherFile)
+        {
+            try
+            {
+                var token = this.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (!_jwtServices.ValidateToken(token, out JwtSecurityToken jwtSecurityToken))
+                {
+
+                    _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
+                    _response.IsSuccess = false;
+                    return Unauthorized(_response);
+                }
+                else
+                {
+                    if (file != null && file.Length != 0)
+                    {
+                        var fileName = Path.GetFileName(file.FileName);
+                        var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "StudentProfiles");
+                        var filePath = Path.Combine(uploadsFolderPath, fileName);
+                        if (!Directory.Exists(uploadsFolderPath))
+                        {
+                            Directory.CreateDirectory(uploadsFolderPath);
+                        }
+
+                        if (!System.IO.File.Exists(filePath))
+                        {
+                            using var stream = new FileStream(filePath, FileMode.Create);
+                            await file.CopyToAsync(stream);
+                        }
+                    }
+
+
+                    var uploadsParentFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "ParentProfiles");
+                    if (fatherFile != null && fatherFile.Length != 0)
+                    {
+                        var fatherFileName = Path.GetFileName(fatherFile.FileName);
+                        var fatherFilePath = Path.Combine(uploadsParentFolderPath, fatherFileName);
+                        if (!Directory.Exists(uploadsParentFolderPath))
+                        {
+                            Directory.CreateDirectory(uploadsParentFolderPath);
+                        }
+
+                        if (!System.IO.File.Exists(fatherFilePath))
+                        {
+                            using var stream = new FileStream(fatherFilePath, FileMode.Create);
+                            await fatherFile.CopyToAsync(stream);
+                        }
+                    }
+
+
+                    if (motherFile != null && motherFile.Length != 0)
+                    {
+                        var motherFileName = Path.GetFileName(motherFile.FileName);
+                        var motherFilePath = Path.Combine(uploadsParentFolderPath, motherFileName);
+                        if (!Directory.Exists(uploadsParentFolderPath))
+                        {
+                            Directory.CreateDirectory(uploadsParentFolderPath);
+                        }
+
+                        if (!System.IO.File.Exists(motherFilePath))
+                        {
+                            using var stream = new FileStream(motherFilePath, FileMode.Create);
+                            await motherFile.CopyToAsync(stream);
+                        }
+                    }
+
+
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
+                    return Ok(_response);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+                return _response;
+            }
+        }
+
+
+        [HttpPut("UploadStudentDocuments")]
+        public async Task<ActionResult<APIResponse>> UploadStudentDocuments(List<IFormFile>? files, [FromForm] string? studentId)
+        {
+            try
+            {
+                var token = this.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                if (!_jwtServices.ValidateToken(token, out JwtSecurityToken jwtSecurityToken))
+                {
+
+                    _response.ErroMessages = new List<string>() { "JWT TOKEN IS INVALID " };
+                    _response.StatusCode = HttpStatusCode.Unauthorized;
+                    _response.IsSuccess = false;
+                    return Unauthorized(_response);
+                }
+                else
+                {
+                    if(files != null && files.Any())
+                    {
+                        var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Uploads", "StudentDocuments");
+                        if (!Directory.Exists(uploadsFolderPath))
+                        {
+                            Directory.CreateDirectory(uploadsFolderPath);
+                        }
+
+                        foreach(var file in files)
+                        {
+                            if(file.Length > 0)
+                            {
+                                var fileName = studentId + Path.GetFileName(file.FileName);
+                                var filePath = Path.Combine(uploadsFolderPath, fileName);
+                                if (!System.IO.File.Exists(filePath))
+                                {
+                                    using var stream = new FileStream(filePath, FileMode.Create);
+                                    await file.CopyToAsync(stream);
+                                }
+                            }
+                        }
+                    }
+
+                    _response.StatusCode = HttpStatusCode.OK;
+                    _response.IsSuccess = true;
+                    return Ok(_response);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                _response.ErroMessages = new List<string>() { "Internal Server error try again after sometimes" };
+                _response.StatusCode = HttpStatusCode.InternalServerError;
+                _response.IsSuccess = false;
+                return _response;
+            }
         }
     }
 }

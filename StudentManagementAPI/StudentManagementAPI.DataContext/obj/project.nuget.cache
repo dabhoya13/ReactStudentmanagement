@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "g/6xy+6YMnvGgPwr92f5VvSmhlbbmuaqB3eqdYQDMUt2D+AFR4+fspysAYL+Blu45IPLOcEGEguH7eFCZMiZMg==",
+  "dgSpecHash": "Pbq1GDSEqwE=",
   "success": true,
   "projectFilePath": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI.DataContext\\StudentManagementAPI.DataContext.csproj",
   "expectedPackageFiles": [
@@ -49,7 +49,10 @@
     "C:\\Users\\pctr54\\.nuget\\packages\\system.text.encodings.web\\7.0.0\\system.text.encodings.web.7.0.0.nupkg.sha512",
     "C:\\Users\\pctr54\\.nuget\\packages\\system.text.json\\7.0.0\\system.text.json.7.0.0.nupkg.sha512",
     "C:\\Users\\pctr54\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512",
-    "C:\\Users\\pctr54\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512"
+    "C:\\Users\\pctr54\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
+    "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\7.0.20\\microsoft.windowsdesktop.app.ref.7.0.20.nupkg.sha512",
+    "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.netcore.app.ref\\7.0.20\\microsoft.netcore.app.ref.7.0.20.nupkg.sha512",
+    "C:\\Users\\pctr54\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\7.0.20\\microsoft.aspnetcore.app.ref.7.0.20.nupkg.sha512"
   ],
   "logs": []
 }

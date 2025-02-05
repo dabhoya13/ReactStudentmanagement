@@ -1,0 +1,13 @@
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\bin\Release\net7.0\StudentManagementAPI.Models.deps.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\bin\Release\net7.0\StudentManagementAPI.Models.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\bin\Release\net7.0\StudentManagementAPI.Models.pdb
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.csproj.AssemblyReference.cache
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.GeneratedMSBuildEditorConfig.editorconfig
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.AssemblyInfoInputs.cache
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.AssemblyInfo.cs
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.csproj.CoreCompileInputs.cache
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.sourcelink.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\refint\StudentManagementAPI.Models.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\StudentManagementAPI.Models.pdb
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.Models\obj\Release\net7.0\ref\StudentManagementAPI.Models.dll

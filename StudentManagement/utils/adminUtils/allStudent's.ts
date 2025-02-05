@@ -1,12 +1,21 @@
+import { LargeNumberLike } from "crypto";
 import { CallAPI } from "../../pages/api/callApi";
+import { csCZ } from "@mui/x-date-pickers/locales";
 
 interface PaginationProps {
   SearchQuery: string | null;
   StartIndex: number;
   PageSize: number;
 }
-
-interface StudentDataProps {
+  export interface StudentDocumentProps {
+    studentDocumentId: number;
+    studentDocumentName: string;
+    studentDocumentUrl: string;
+    studentId: number;
+  }
+export interface StudentDataProps {
+  academicYear: string;
+  admissionDate: Date;
   studentId: number;
   firstName: string;
   lastName: string;
@@ -19,8 +28,44 @@ interface StudentDataProps {
   gender: number | null;
   imageName: string;
   imageUrl: string;
+  classId: number;
+  className: string;
+  classRank: string;
+  rollNo: number;
+  bloodGroup: string;
+  reigion: string;
+  caste: string;
+  category: string;
+  motherTongue: string;
+  mobileNumber: string;
+  fatherName: string;
+  fatherEmail: string;
+  fatherNumber: string;
+  fatherOccupation: string;
+  motherName: string;
+  motherEmail: string;
+  motherNumber: string;
+  motherOccupation: string;
+  currentAddress: string;
+  permanentAddress: string;
+  previousSchoolName: string;
+  previousSchoolAddress: string;
+  otherInfo: string;
+  password: string;
+  parents: ParentsProps[];
+  documents: StudentDocumentProps[];
 }
 
+export interface ParentsProps {
+  parentId: number;
+  parentName: string;
+  relation: number;
+  parentNumber: string;
+  parentEmail: string;
+  parentImage: string;
+  parentImageUrl: string;
+  occupation: string;
+}
 interface PaginationResponseProps {
   students: StudentDataProps[];
   totalItems: number;
@@ -88,12 +133,18 @@ export const GetStudentDetailsById = async (
       ControllerName: "Student",
       MethodName: "GetStudentDetailsById",
       DataObject: JSON.stringify(StudentId),
-      RoleIds: ["1"],
+      RoleIds: ["1", "3"],
     };
 
     var response = await CallAPI(formData);
-    const studentDataProps: StudentDataProps = response.result.data;
-    return studentDataProps;
+    const studentDataProps: StudentDataProps | null =
+      response?.result?.data ?? null;
+    if (studentDataProps) {
+      return studentDataProps;
+    } else {
+      console.error("Data not found in the response");
+      return null;
+    }
   } else {
     return null;
   }
@@ -187,17 +238,19 @@ interface StudentAttendanceDataProps {
   imageUrl: string;
   status: boolean;
 }
-export const GetStudentsAttendanceData =
-  async (): Promise<StudentAttendanceDataProps[]> => {
-    const formData = {
-      ControllerName: "Hod",
-      MethodName: "GetAllStudentsWithAttendance",
-      DataObject: JSON.stringify(null),
-      RoleIds: ["1"],
-    };
-
-    var response = await CallAPI(formData);
-    const studentDataProps: StudentAttendanceDataProps[] = response.result.data;
-    console.log(studentDataProps);
-    return studentDataProps;
+export const GetStudentsAttendanceData = async (): Promise<
+  StudentAttendanceDataProps[]
+> => {
+  const formData = {
+    ControllerName: "Hod",
+    MethodName: "GetAllStudentsWithAttendance",
+    DataObject: JSON.stringify(null),
+    RoleIds: ["1"],
   };
+
+  var response = await CallAPI(formData);
+  const studentDataProps: StudentAttendanceDataProps[] = response.result.data;
+  console.log(studentDataProps);
+  return studentDataProps;
+};
+

@@ -34,7 +34,11 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import Image from "next/image";
 import style from "../../styles/studentDashboard.module.css";
-import { EmailOutlined, MessageOutlined } from "@mui/icons-material";
+import {
+  AddCircleOutlineRounded,
+  EmailOutlined,
+  MessageOutlined,
+} from "@mui/icons-material";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -45,41 +49,35 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import {
+  ChangeTodoStatus,
+  deleteTodo,
+  FacultyProps,
+  GetAllNotices,
+  GetAllStudentTodoList,
   GetAttendanceData,
+  GetFacultiesForStudentDashboard,
   GetLast7DaysAttendance,
   GetLeaveStatus,
+  GetStudentExamByExamId,
   GetStudentExams,
+  GetStudentResultById,
   Last7DaysAttendaceProps,
+  NoticeProps,
   StudentAttendanceCountProps,
   StudentExamProps,
+  StudentResult,
   StudentsLeave,
+  StudentTodo,
 } from "@/utils/studentUtils/studentDashboard's";
 import { Value } from "react-calendar/dist/esm/shared/types.js";
-const settings = {
-  infinite: true,
-  speed: 500,
-  slidesToShow: 4,
-  slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 3000,
-  arrows: true,
-  centerMode: false,
-  responsive: [
-    {
-      breakpoint: 1024,
-      settings: {
-        slidesToShow: 3,
-        slidesToScroll: 1,
-      },
-    },
-    {
-      breakpoint: 600,
-      settings: {
-        slidesToShow: 1,
-        slidesToScroll: 1,
-      },
-    },
-  ],
+import {
+  AddEditExamCalanderModal,
+  AddStudentTodoList,
+} from "@/utils/allModals/studentModals";
+
+const generateRandomColor = (): string => {
+  const randomColor = Math.floor(Math.random() * 16777215).toString(16); // Generate a random hex color code
+  return `#${randomColor}`;
 };
 
 const labels = ["Math", "Phy", "Che", "Eng", "sci"];
@@ -91,14 +89,14 @@ const examData = {
       data: [65, 59, 80, 81, 89],
       backgroundColor: [
         "rgba(255, 99, 132, 0.2)",
-        "rgba(255, 159, 64, 0.2)",
+        "rgba(26, 190, 23, 0.1)",
         "rgba(54, 162, 235, 0.2)",
         "rgba(153, 102, 255, 0.2)",
         "rgba(255, 25, 64, 0.2)",
       ],
       borderColor: [
         "rgb(255, 99, 132)",
-        "rgb(255, 159, 64)",
+        "#1ABE17",
         "rgb(54, 162, 235)",
         "rgb(153, 102, 255)",
         "rgb(255, 25, 64)",
@@ -109,6 +107,29 @@ const examData = {
     },
   ],
 };
+
+const colorStyles = [
+  {
+    backgroundColor: "rgba(255, 99, 132, 0.2)",
+    color: "rgb(255, 99, 132)",
+  },
+  {
+    backgroundColor: "rgba(26, 190, 23, 0.1)",
+    color: "#1ABE17",
+  },
+  {
+    backgroundColor: "rgba(54, 162, 235, 0.2)",
+    color: "rgb(54, 162, 235)",
+  },
+  {
+    backgroundColor: "rgba(153, 102, 255, 0.2)",
+    color: "rgb(153, 102, 255)",
+  },
+  {
+    backgroundColor: "rgba(255, 25, 64, 0.2)",
+    color: "rgb(255, 25, 64)",
+  },
+];
 
 const attendanceData = {
   labels: ["Absent", "Present"],
@@ -182,6 +203,14 @@ const StudentDashboard: React.FC = () => {
   const [loading, setLoading] = useState<Boolean>(false);
   const [leaveStatusData, setLeaveStatusData] = useState<StudentsLeave[]>();
   const [studentExamData, setStudentExamData] = useState<StudentExamProps[]>();
+  const [studentExam, setStudentExam] = useState<StudentExamProps | null>(null);
+  const [faculties, setFaculties] = useState<FacultyProps[]>();
+  const [notices, setNotices] = useState<NoticeProps[]>();
+  const [studentResult, setStudentResult] = useState<StudentResult[]>([]);
+  const [examTypeId, setExamTypeId] = useState(2);
+  const [isOpenExamAddEditCalender, setIsOpenExamAddEditCalender] =
+    useState(false);
+  const [isOpenAddTodoModal, setIsOpenAddTodoModal] = useState(false);
 
   const [studentAttendanceCount, setStudentAttendanceCount] =
     useState<StudentAttendanceCountProps>();
@@ -192,15 +221,34 @@ const StudentDashboard: React.FC = () => {
   const [AttendancestartDate, setAttendanceStartDate] = useState<Date | null>(
     new Date()
   );
+
+  const [todoDate, setTodoDate] = useState<Date | null>(null);
   const [Last7DaysAttendance, setLast7DaysAttendance] =
     useState<Last7DaysAttendaceProps[]>();
   const [examDate, setExamDate] = useState<Date | null>();
   const sliderRef = useRef<Slider>(null);
   const [attendanceChartInstance, setAttendanceChartInstance] =
     useState<Chart | null>(null);
+  const [resultChartInstance, setResultChartInstance] = useState<Chart | null>(
+    null
+  );
 
+  const [performanceChartInstance, setPerformanceChartInstance] =
+    useState<Chart | null>(null);
+
+  const [studentTodoList, setStudentTodoList] = useState<StudentTodo[]>();
   const handlePrev = () => {
     sliderRef.current?.slickPrev();
+  };
+  const [selectedTodos, setSelectedTodos] = useState<number[]>([]);
+  const handleCheckboxChange = (todoId: number) => {
+    setSelectedTodos((prevSelectedTodos) => {
+      if (prevSelectedTodos.includes(todoId)) {
+        return prevSelectedTodos.filter((id) => id !== todoId); // Remove from selected
+      } else {
+        return [...prevSelectedTodos, todoId]; // Add to selected
+      }
+    });
   };
 
   const handleNext = () => {
@@ -251,6 +299,66 @@ const StudentDashboard: React.FC = () => {
     setAttendanceStartDate(newDate);
   };
 
+  const handleEditExamModalOpen = async (examId: number) => {
+    setLoading(true);
+    if (examId != 0) {
+      try {
+        const response = await GetStudentExamByExamId(examId);
+        if (response != null) {
+          setStudentExam(response);
+        }
+      } catch (error) {
+        console.error("Failed to load notice data", error);
+      } finally {
+      }
+    }
+    setIsOpenExamAddEditCalender(true);
+    setLoading(false);
+  };
+
+  const changeTodoStatus = async () => {
+    try {
+      await ChangeTodoStatus(selectedTodos);
+      location.reload();
+    } catch (error) {
+      console.error("Failed to load notice data", error);
+    }
+  };
+
+  const DeleteTodo = async () => {
+    try {
+      await deleteTodo(selectedTodos);
+      location.reload();
+    } catch (error) {
+      console.error("Failed to load notice data", error);
+    }
+  };
+  var settings = {
+    infinite: true,
+    speed: 500,
+    slidesToShow: Math.min(faculties?.length ?? 0, 4),
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: true,
+    centerMode: false,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: Math.min(faculties?.length ?? 0, 3),
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  };
   useEffect(() => {
     setIsClientSide(true);
   }, []);
@@ -296,36 +404,68 @@ const StudentDashboard: React.FC = () => {
 
   useEffect(() => {
     if (isClientSode) {
-      var examChartElement = document.getElementById(
-        "examResultChart"
-      ) as HTMLCanvasElement | null;
-      if (examChartElement) {
-        var mychart1 = new Chart(examChartElement, {
-          type: "bar",
-          data: examData,
-          options: {
-            responsive: true,
+      if (studentResult.length > 0) {
+        const examName = studentResult[0].examName; // Assuming all results belong to the same exam
+        const subjectNames = studentResult.map((result) => result.subjectName);
+        const marksObtained = studentResult.map(
+          (result) => result.markObtained
+        );
 
-            scales: {
-              x: {
-                stacked: true,
-                grid: {
-                  display: false, // Hide grid lines for y-axis
+        examData.datasets[0].data = marksObtained;
+        examData.labels = subjectNames;
+        examData.datasets[0].label = examName;
+
+        var examChartElement = document.getElementById(
+          "examResultChart"
+        ) as HTMLCanvasElement | null;
+        if (examChartElement) {
+          if (resultChartInstance) {
+            resultChartInstance.destroy();
+          }
+          var mychart1 = new Chart(examChartElement, {
+            type: "bar",
+            data: examData,
+            options: {
+              responsive: true,
+
+              scales: {
+                x: {
+                  stacked: true,
+                  grid: {
+                    display: false, // Hide grid lines for y-axis
+                  },
                 },
-              },
-              y: {
-                grid: {
-                  display: false, // Hide grid lines for y-axis
+                y: {
+                  grid: {
+                    display: false, // Hide grid lines for y-axis
+                  },
+                  stacked: true,
                 },
-                stacked: true,
               },
             },
-          },
-        });
+          });
+          setResultChartInstance(mychart1);
+        } else {
+          console.error("Chart element not found.");
+        }
       } else {
-        console.error("Chart element not found.");
-      }
+        var examChartElement = document.getElementById(
+          "examResultChart"
+        ) as HTMLCanvasElement | null;
 
+        if (examChartElement) {
+          // Destroy the existing chart if it exists
+          if (resultChartInstance) {
+            resultChartInstance.destroy();
+            setResultChartInstance(null); // Optionally reset the chart instance to null
+          }
+        }
+      }
+    }
+  }, [studentResult]);
+
+  useEffect(() => {
+    if (isClientSode) {
       var performanceChartElement = document.getElementById(
         "performanceChart"
       ) as HTMLCanvasElement | null;
@@ -346,6 +486,9 @@ const StudentDashboard: React.FC = () => {
           attendanceGradient.addColorStop(1, "rgba(245, 245, 245, 0.77)");
         }
 
+        if (performanceChartInstance) {
+          performanceChartInstance.destroy();
+        }
         var myChart3 = new Chart(performanceChartElement, {
           type: "line",
           data: {
@@ -398,6 +541,7 @@ const StudentDashboard: React.FC = () => {
             },
           },
         });
+        setPerformanceChartInstance(myChart3);
       } else {
         console.error("Chart element not found.");
       }
@@ -418,9 +562,7 @@ const StudentDashboard: React.FC = () => {
         leavesMonth,
         leavesYear
       );
-      if (leaveStatus.length > 0) {
-        setLeaveStatusData(leaveStatus);
-      }
+      setLeaveStatusData(leaveStatus);
     };
 
     getLeaveStatusFromStudentId();
@@ -437,7 +579,6 @@ const StudentDashboard: React.FC = () => {
         AttendancestartDate?.getFullYear() ?? new Date().getFullYear();
       const attendanceCount: StudentAttendanceCountProps | null =
         await GetAttendanceData(studentId, attendanceMonth, attendanceYear);
-      console.log(attendanceCount);
       if (attendanceCount != null) {
         setStudentAttendanceCount(attendanceCount);
       }
@@ -454,7 +595,6 @@ const StudentDashboard: React.FC = () => {
       startDate.setDate(endDate.getDate() - 6);
       var last7DaysAttendance: Last7DaysAttendaceProps[] =
         await GetLast7DaysAttendance(studentId, startDate, endDate);
-      console.log(last7DaysAttendance);
       setLast7DaysAttendance(last7DaysAttendance);
     };
     getLast7DaysAttendance();
@@ -467,12 +607,70 @@ const StudentDashboard: React.FC = () => {
         studentId,
         examDate ?? null
       );
+      console.log(studentExams);
       setStudentExamData(studentExams);
     };
 
     getStudentExamsFromDateandId();
   }, [examDate]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const [allNotices, allfaculties] = await Promise.all([
+        GetAllNotices(),
+        GetFacultiesForStudentDashboard(),
+      ]);
+      setFaculties(allfaculties);
+      setNotices(allNotices);
+      settings = {
+        infinite: true,
+        speed: 500,
+        slidesToShow:
+          allfaculties.length > 4 ? 4 : allfaculties?.length ?? 0 * 4,
+        slidesToScroll: 1,
+        autoplay: true,
+        autoplaySpeed: 3000,
+        arrows: true,
+        centerMode: false,
+        responsive: [
+          {
+            breakpoint: 1024,
+            settings: {
+              slidesToShow:
+                allfaculties.length > 4 ? 4 : allfaculties?.length ?? 0 * 3,
+              slidesToScroll: 1,
+            },
+          },
+          {
+            breakpoint: 600,
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+            },
+          },
+        ],
+      };
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const getStudentExamResult = async () => {
+      var studentId = parseInt(sessionStorage.getItem("UserId") ?? "0", 10);
+      const studentResult = await GetStudentResultById(studentId, examTypeId);
+      setStudentResult(studentResult);
+    };
+    getStudentExamResult();
+  }, [examTypeId]);
+
+  useEffect(() => {
+    const getTodoList = async () => {
+      const todoList = await GetAllStudentTodoList(todoDate);
+      setStudentTodoList(todoList);
+    };
+
+    getTodoList();
+  }, [todoDate]);
   function convertTo12HourFormat(time: string): string {
     const [hours, minutes] = time.split(":");
     const date = new Date();
@@ -488,86 +686,6 @@ const StudentDashboard: React.FC = () => {
     return date.toLocaleTimeString([], options);
   }
 
-  const card = (
-    <React.Fragment>
-      <CardContent className="dashboard-card-content">
-        <Box className="card-content-main-box">
-          <Box
-            className="card-content-icon-div"
-            sx={{
-              backgroundColor: "#3d5ee1",
-            }}
-          >
-            <AssuredWorkloadIcon sx={{ color: "white" }} />
-          </Box>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography className="total-text">Pay Fees</Typography>
-        </Box>
-      </CardContent>
-    </React.Fragment>
-  );
-
-  const card2 = (
-    <React.Fragment>
-      <CardContent className="dashboard-card-content">
-        <Box className="card-content-main-box">
-          <Box
-            className="card-content-icon-div"
-            sx={{
-              backgroundColor: "#3fc83d",
-            }}
-          >
-            <LibraryBooksIcon sx={{ color: "white" }} />
-          </Box>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography className="total-text">Exam Result</Typography>
-        </Box>
-      </CardContent>
-    </React.Fragment>
-  );
-
-  const card3 = (
-    <React.Fragment>
-      <CardContent className="dashboard-card-content">
-        <Box className="card-content-main-box">
-          <Box
-            className="card-content-icon-div"
-            sx={{
-              backgroundColor: "#eab300",
-            }}
-          >
-            <CalendarMonthIcon sx={{ color: "white" }} />
-          </Box>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography className="total-text">Calendar</Typography>
-        </Box>
-      </CardContent>
-    </React.Fragment>
-  );
-
-  const card4 = (
-    <React.Fragment>
-      <CardContent className="dashboard-card-content">
-        <Box className="card-content-main-box">
-          <Box
-            className="card-content-icon-div"
-            sx={{
-              backgroundColor: "#202c4b",
-            }}
-          >
-            <EditCalendarIcon sx={{ color: "white" }} />
-          </Box>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography className="total-text">Attendance</Typography>
-        </Box>
-      </CardContent>
-    </React.Fragment>
-  );
-
   return (
     <>
       {loading && (
@@ -575,15 +693,15 @@ const StudentDashboard: React.FC = () => {
           <img src={LoadingGif.src} alt="loading-gif" />
         </Box>
       )}
-      {/* BOX FOR ALL CARDS */}
-
-      <div className="d-flex row">
+      <div className="row">
         <div className="col-xxl-8">
           <div className="row flex-fill">
-            <div className="col-xl-6">
+            <div className="col-xl-6 d-flex">
               <div className="flex-fill">
-                <Box className={style.profile_main_div}>
-                  <Box>
+                <div
+                  className={`${style.profile_main_div} card position-relative p-0`}
+                >
+                  <div className="card-body ">
                     <Box sx={{ display: "flex", gap: 2 }}>
                       <Image
                         src={demoImage.src}
@@ -621,20 +739,19 @@ const StudentDashboard: React.FC = () => {
                           Pass
                         </Typography>
                       </Box>
-                      <Button className={style.edit_profile_btn}>
+                      <Button
+                        onClick={() => {
+                          router.push(`/student/editStudent`);
+                        }}
+                        className={style.edit_profile_btn}
+                      >
                         Edit Profile
                       </Button>
                     </Box>
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    marginTop: 3,
-                    backgroundColor: "white",
-                    paddingBottom: 2,
-                  }}
-                >
-                  <Box className={style.leave_status_header}>
+                  </div>
+                </div>
+                <div className="card flex-fill">
+                  <div className="card-header d-flex align-items-center justify-content-between">
                     <Typography className={style.leave_status_heading}>
                       Leave Status
                     </Typography>
@@ -646,6 +763,7 @@ const StudentDashboard: React.FC = () => {
                         width: "100px",
                         alignItems: "center",
                         justifyContent: "center",
+                        color: "grey",
                       }}
                     >
                       <DatePicker
@@ -659,11 +777,9 @@ const StudentDashboard: React.FC = () => {
                       />
                       <CalendarIcon />
                     </Box>
-                  </Box>
-                  <Typography
-                    className={style.header_bottomline_typography}
-                  ></Typography>
+                  </div>
                   <Box
+                    className="card-body p-0"
                     sx={{
                       overflowY: "auto",
                       minHeight: "270px",
@@ -671,51 +787,60 @@ const StudentDashboard: React.FC = () => {
                       marginTop: 1,
                     }}
                   >
-                    {leaveStatusData?.map((leaveStatus) => (
-                      <Box sx={{ marginTop: 1, padding: 1 }}>
-                        <Box className={style.leave_inner_box}>
-                          <Box sx={{ display: "flex", gap: 1 }}>
-                            <Box
-                              className={style.leave_inner_content_icon}
-                              sx={{
-                                backgroundColor: getLeaveBackgroundColor(
-                                  leaveStatus.leaveReason
-                                ),
-                              }}
-                            >
-                              <BlockIcon
+                    {leaveStatusData && leaveStatusData.length > 0 ? (
+                      leaveStatusData.map((leaveStatus) => (
+                        <Box
+                          sx={{ marginTop: 1, padding: 1 }}
+                          key={leaveStatus.leaveId}
+                        >
+                          <Box className={style.leave_inner_box}>
+                            <Box sx={{ display: "flex", gap: 1 }}>
+                              <Box
+                                className={style.leave_inner_content_icon}
                                 sx={{
-                                  color: getLeaveIconColor(
-                                    leaveStatus.leaveReason
+                                  backgroundColor: getLeaveBackgroundColor(
+                                    leaveStatus.leaveTypeName
                                   ),
-                                  fontSize: "15px",
                                 }}
-                              />
-                            </Box>
-                            <Box>
-                              <h6>{leaveStatus.leaveReason}</h6>
-                              <Typography
-                                sx={{ fontSize: "15px", color: "grey" }}
                               >
-                                Date:{" "}
-                                {formatDate(new Date(leaveStatus.leaveDate))}
-                              </Typography>
+                                <BlockIcon
+                                  sx={{
+                                    color: getLeaveIconColor(
+                                      leaveStatus.leaveTypeName
+                                    ),
+                                    fontSize: "15px",
+                                  }}
+                                />
+                              </Box>
+                              <Box>
+                                <h6>{leaveStatus.leaveTypeName}</h6>
+                                <Typography
+                                  sx={{ fontSize: "15px", color: "grey" }}
+                                >
+                                  Date:{" "}
+                                  {formatDate(new Date(leaveStatus.leaveDate))}
+                                </Typography>
+                              </Box>
                             </Box>
-                          </Box>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <LeaveStatus status={leaveStatus.leaveStatus} />
+                            <Box sx={{ display: "flex", alignItems: "center" }}>
+                              <LeaveStatus status={leaveStatus.leaveStatus} />
+                            </Box>
                           </Box>
                         </Box>
-                      </Box>
-                    ))}
+                      ))
+                    ) : (
+                      <Typography className="d-flex align-items-center justify-content-center">
+                        No data found
+                      </Typography>
+                    )}
                   </Box>
-                </Box>
+                </div>
               </div>
             </div>
-            <div className="col-xl-6 pie-chart-main-div">
-              <Box className="card flex-fill pie-chart-container ">
-                <Box className="student-attedance-chart-header pb-2">
-                  <h5>Attendance</h5>
+            <div className="col-xl-6 d-flex">
+              <div className="card flex-fill">
+                <div className="card-header d-flex align-items-center justify-content-between">
+                  <h5 className="mt-2 card-title">Attendance</h5>
                   <Box className="student-attedance-chart-header-inner-box">
                     <ArrowCircleLeftIcon onClick={handleDecreaseMonth} />
                     <DatePicker
@@ -729,263 +854,349 @@ const StudentDashboard: React.FC = () => {
                     />
                     <ArrowCircleRightIcon onClick={handleIncreaseMonth} />
                   </Box>
-                </Box>
-
-                <Box className={style.attendance_chart_present_absent_div}>
-                  <Box className="absent-present-div">
-                    <Typography>Present</Typography>
-                    <Typography>
-                      {studentAttendanceCount?.totalPresent}
-                    </Typography>
+                </div>
+                <div className="card-body d-flex flex-column align-items-center justify-content-between">
+                  <Box className={style.attendance_chart_present_absent_div}>
+                    <Box className="absent-present-div">
+                      <Typography>Present</Typography>
+                      <Typography>
+                        {studentAttendanceCount?.totalPresent}
+                      </Typography>
+                    </Box>
+                    <Box className="absent-present-div">
+                      <Typography>Absent</Typography>
+                      <Typography>
+                        {studentAttendanceCount?.totalAbsent}
+                      </Typography>
+                    </Box>
                   </Box>
-                  <Box className="absent-present-div">
-                    <Typography>Absent</Typography>
-                    <Typography>
-                      {studentAttendanceCount?.totalAbsent}
-                    </Typography>
-                  </Box>
-                </Box>
-                <span className="pie-chart-count">
-                  {studentAttendanceCount?.totalAbsentPresent}
-                </span>
-                {/* <PieChart
-                  colors={["red", "#3fc83d"]}
-                  className="pie-chart"
-                  height={255}
-                  width={200}
-                  series={[
-                    {
-                      data: pieData,
-                      innerRadius: radius,
-                      valueFormatter,
-                    },
-                  ]}
-                  margin={{ left: 20, right: 20, bottom: 0, top: -20 }}
-                  slotProps={{
-                    legend: {
-                      itemMarkHeight: 10,
-                      itemMarkWidth: 10,
-                      direction: "row",
-                      // itemGap: 100,
-                      itemGap: 20,
-                      position: { vertical: "bottom", horizontal: "right" },
-                      // padding: -80,
-                    },
-                  }}
-                  skipAnimation={false}
-                /> */}
-                {studentAttendanceCount?.totalAbsentPresent ?? 0 > 0 ? (
-                  <Box>
-                    <canvas id="attendanceChart"></canvas>
-                  </Box>
-                ) : (
-                  <Box sx={{ position: "relative" }}>
-                    <canvas id="attendanceChart"></canvas>
-                    <Typography
-                      sx={{
-                        position: "absolute",
-                        top: "80px",
-                        left: "100px",
-                      }}
-                    >
-                      No Data Found
-                    </Typography>
-                  </Box>
-                )}
-
-                <Box className={style.attendance_last7days_main_div}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <h5>Last 7 Days</h5>
-                    <Typography sx={{ color: "grey", fontSize: 13 }}>
-                      {formattedSevenDaysAgo} - {formattedCurrentDate}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ marginTop: 1, display: "flex", gap: 1 }}>
-                    {Last7DaysAttendance?.map((attendance) => (
-                      <Box
-                        className={style.attendance_last7days_weeks}
+                  <span className="student-pie-chart-count">
+                    {studentAttendanceCount?.totalAbsentPresent}
+                  </span>
+                  {studentAttendanceCount?.totalAbsentPresent ?? 0 > 0 ? (
+                    <Box>
+                      <canvas id="attendanceChart"></canvas>
+                    </Box>
+                  ) : (
+                    <Box sx={{}}>
+                      <canvas id="attendanceChart"></canvas>
+                      <Typography
                         sx={{
-                          backgroundColor:
-                            attendance.status == 1
-                              ? "#1abe17"
-                              : attendance.status == 0
-                              ? "#e82646"
-                              : "white",
-                          color: attendance.status === null ? "black" : "white",
+                          position: "absolute",
+                          top: "180px",
+                          left: "200px",
                         }}
                       >
-                        {attendance.weekDay}
-                      </Box>
-                    ))}
+                        No Data Found
+                      </Typography>
+                    </Box>
+                  )}
+
+                  <Box className={style.attendance_last7days_main_div}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <h5>Last 7 Days</h5>
+                      <Typography sx={{ color: "grey", fontSize: 13 }}>
+                        {formattedSevenDaysAgo} - {formattedCurrentDate}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ marginTop: 1, display: "flex", gap: 1 }}>
+                      {Last7DaysAttendance?.map((attendance) => (
+                        <Box
+                          key={attendance.date.toString()}
+                          className={style.attendance_last7days_weeks}
+                          sx={{
+                            backgroundColor:
+                              attendance.status == 1
+                                ? "#1abe17"
+                                : attendance.status == 0
+                                ? "#e82646"
+                                : "white",
+                            color:
+                              attendance.status === null ? "black" : "white",
+                          }}
+                        >
+                          {attendance.weekDay}
+                        </Box>
+                      ))}
+                    </Box>
                   </Box>
-                </Box>
-              </Box>
+                </div>
+              </div>
             </div>
             <div className="col-xl-12 d-flex">
-              <Box sx={{ flexGrow: 1, marginTop: 3 }}>
-                <Grid2 container spacing={2}>
-                  {/* Card 1 */}
-                  <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
-                    <Card
-                      className="studentDashboard-cards"
-                      variant="outlined"
-                      sx={{
-                        borderRadius: "15px",
-                        borderBottom: "2px solid #3d5ee1",
-                        // border: "none",
-                        boxShadow: "0 0 2px rgba(33,33,33,.2)",
-                      }}
-                    >
-                      {card}
-                    </Card>
-                  </Grid2>
-                  {/* Card 2 */}
-                  <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
-                    <Card
-                      className="studentDashboard-cards"
-                      variant="outlined"
-                      sx={{
-                        borderRadius: "15px",
-                        borderBottom: "2px solid #3fc83d",
+              <div className="row flex-fill">
+                <div className="col-sm-6 col-xl-3 d-flex">
+                  {/* <Card
+                    onClick={() =>
+                      (window.location.href = "/student/studentFees")
+                    }
+                    className="studentDashboard-cards"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: "10px",
+                      borderBottom: "2px solid #3d5ee1",
+                      // border: "none",
+                      boxShadow: "0 0 2px rgba(33,33,33,.2)",
+                    }}
+                  >
+                    {card}
+                  </Card> */}
 
-                        boxShadow: "0 0 2px rgba(33,33,33,.2)",
-                      }}
-                    >
-                      {card2}
-                    </Card>
-                  </Grid2>
-                  {/* Card 3 */}
-                  <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
-                    <Card
-                      className="studentDashboard-cards"
-                      variant="outlined"
-                      sx={{
-                        borderRadius: "15px",
-                        borderBottom: "2px solid #eab300",
+                  <a
+                    href="/student/studentFees"
+                    className="card border-2 flex-fill animate-card"
+                    style={{
+                      padding: "0",
+                      borderBottom: "2px solid #3d5ee1 !important",
+                      borderRadius: "10px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div className="card-body">
+                      <div className="d-flex align-items-center">
+                        <span className="avatar avatar-md rounded bg-primary me-2">
+                          <AssuredWorkloadIcon sx={{ color: "white" }} />
+                        </span>
+                        <h6>Pay Fees</h6>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div className="col-sm-6 col-xl-3 d-flex">
+                  {/* <Card
+                    onClick={() =>
+                      (window.location.href = "/student/examAndResult")
+                    }
+                    className="   "
+                    variant="outlined"
+                    sx={{
+                      borderRadius: "15px",
+                      borderBottom: "2px solid #3fc83d",
 
-                        boxShadow: "0 0 2px rgba(33,33,33,.2)",
-                      }}
-                    >
-                      {card3}
-                    </Card>
-                  </Grid2>
-                  {/* Card 4 */}
-                  <Grid2 size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
-                    <Card
-                      className="studentDashboard-cards"
-                      variant="outlined"
-                      sx={{
-                        borderRadius: "15px",
-                        borderBottom: "2px solid #202c4b",
+                      boxShadow: "0 0 2px rgba(33,33,33,.2)",
+                    }}
+                  >
+                    {card2}
+                  </Card> */}
+                  <a
+                    href="/student/examAndResult"
+                    className="card border-2 flex-fill animate-card"
+                    style={{
+                      padding: "0",
+                      borderBottom: "2px solid #3fc83d",
+                      borderRadius: "10px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div className="card-body">
+                      <div className="d-flex align-items-center">
+                        <span
+                          className="avatar avatar-md rounded me-2"
+                          style={{ backgroundColor: "#3fc83d" }}
+                        >
+                          <LibraryBooksIcon
+                            sx={{ color: "white", fontSize: "15px" }}
+                          />
+                        </span>
+                        <h6>Exam Results</h6>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div className="col-sm-6 col-xl-3 d-flex">
+                  {/* <Card
+                    onClick={() =>
+                      (window.location.href = "/student/timeTable")
+                    }
+                    className="studentDashboard-cards"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: "15px",
+                      borderBottom: "2px solid #eab300",
 
-                        boxShadow: "0 0 2px rgba(33,33,33,.2)",
-                      }}
-                    >
-                      {card4}
-                    </Card>
-                  </Grid2>
-                </Grid2>
-              </Box>
+                      boxShadow: "0 0 2px rgba(33,33,33,.2)",
+                    }}
+                  >
+                    {card3}
+                  </Card> */}
+                  <a
+                    href="/student/timeTable"
+                    className="card border-2 flex-fill animate-card"
+                    style={{
+                      padding: "0",
+                      borderBottom: "2px solid #eab300",
+                      borderRadius: "10px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div className="card-body">
+                      <div className="d-flex align-items-center">
+                        <span
+                          className="avatar avatar-md rounded me-2"
+                          style={{ backgroundColor: "#eab300" }}
+                        >
+                          <CalendarMonthIcon
+                            sx={{ color: "white", fontSize: "15px" }}
+                          />
+                        </span>
+                        <h6>Calender</h6>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+                <div className="col-sm-6 col-xl-3 d-flex">
+                  {/* <Card
+                    onClick={() =>
+                      (window.location.href = "/student/leaveAndAttendance")
+                    }
+                    className="studentDashboard-cards"
+                    variant="outlined"
+                    sx={{
+                      borderRadius: "15px",
+                      borderBottom: "2px solid #202c4b",
+
+                      boxShadow: "0 0 2px rgba(33,33,33,.2)",
+                    }}
+                  >
+                    {card4}
+                  </Card> */}
+                  <a
+                    href="/student/leaveAndAttendance"
+                    className="card border-2 flex-fill animate-card"
+                    style={{
+                      padding: "0",
+                      borderBottom: "2px solid #202c4b !important",
+                      borderRadius: "10px",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <div className="card-body">
+                      <div className="d-flex align-items-center">
+                        <span
+                          className="avatar avatar-md rounded me-2"
+                          style={{ backgroundColor: "#202c4b" }}
+                        >
+                          <CalendarMonthIcon
+                            sx={{ color: "white", fontSize: "15px" }}
+                          />
+                        </span>
+                        <h6>Attendance</h6>
+                      </div>
+                    </div>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div className="col-xxl-4 card flex-fill student-event-calender-div">
-          <Box className=" event-calender-box">
-            <h5 className="mt-2">Exam Calender</h5>
-            <button
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                marginRight: "10px",
-              }}
-            >
-              <MoreHorizIcon sx={{ fontSize: "20px" }} />
-            </button>
-          </Box>
-          <Box className="event-calender-inner-div">
-            {isClientSode && (
-              // <LocalizationProvider dateAdapter={AdapterDayjs}>
-              //   <DateCalendar
-              //     sx={{ width: "100%", maxWidth: "100%" }}
-              //     value={value}
-              //     onChange={(newValue) => setValue(newValue)}
-              //   />
-              // </LocalizationProvider>
-              <Calendar
-                className={style.calendar}
-                value={examDate}
-                onChange={(
-                  newValue: Value,
-                  event: React.MouseEvent<HTMLButtonElement>
-                ) => {
-                  if (newValue instanceof Date) {
-                    setExamDate(newValue);
-                  }
+        <div className="col-xxl-4 d-flex">
+          <div className="card flex-fill">
+            <Box className="card-header d-flex align-items-center justify-content-between">
+              <h5 className="mt-2 card-title">Exam Calender</h5>
+              <button
+                onClick={() => {
+                  setStudentExam(null);
+                  setIsOpenExamAddEditCalender(true);
                 }}
-              />
-            )}
-          </Box>
-          <h5 className="ms-2 mt-2">Exams</h5>
-          <Box sx={{ marginTop: 1 }} className={style.exam_details_main_div}>
-            {!studentExamData || studentExamData.length === 0 ? (
-              <Box
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
+                style={{
+                  backgroundColor: "transparent",
+                  border: "none",
+                  marginRight: "10px",
                 }}
               >
-                <Typography>
-                  No exam found
-                </Typography>
-              </Box>
-            ) : (
-              studentExamData.map((exam) => (
-                <Box className="exam-content-inner-div-1" key={exam.examId}>
-                  <Box className="exam-inner-content-header">
-                    <Typography sx={{ fontSize: 18, fontWeight: "500" }}>
-                      {exam.examType}
-                    </Typography>
-                    <Typography className="days-more-left">
-                      <ScheduleIcon sx={{ fontSize: "12px" }} />{" "}
-                      {exam.remainingDays} days more
-                    </Typography>
+                <MoreHorizIcon sx={{ fontSize: "20px" }} />
+              </button>
+            </Box>
+            <Box className="card-body p-0">
+              {isClientSode && (
+                // <LocalizationProvider dateAdapter={AdapterDayjs}>
+                //   <DateCalendar
+                //     sx={{ width: "100%", maxWidth: "100%" }}
+                //     value={value}
+                //     onChange={(newValue) => setValue(newValue)}
+                //   />
+                // </LocalizationProvider>
+                <Calendar
+                  className={style.calendar}
+                  value={examDate}
+                  onChange={(
+                    newValue: Value,
+                    event: React.MouseEvent<HTMLButtonElement>
+                  ) => {
+                    if (newValue instanceof Date) {
+                      setExamDate(newValue);
+                    }
+                  }}
+                />
+              )}
+              <h5 className="ms-2 mt-2">Exams</h5>
+              <Box
+                sx={{ marginTop: 1 }}
+                className={style.exam_details_main_div}
+              >
+                {!studentExamData || studentExamData.length === 0 ? (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Typography>No exam found</Typography>
                   </Box>
-                  <Box className="exam-content-inner-div-2">
-                    <Typography sx={{ fontSize: 20, fontWeight: "500" }}>
-                      {exam.subjectName}
-                    </Typography>
-                    <Box>
-                      <EventIcon sx={{ fontSize: "20px" }} />{" "}
-                      {new Date(exam.examDate).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })}
+                ) : (
+                  studentExamData.map((exam) => (
+                    <Box
+                      onClick={() => handleEditExamModalOpen(exam.examId)}
+                      className="exam-content-inner-div-1"
+                      key={exam.examId}
+                    >
+                      <Box className="exam-inner-content-header">
+                        <Typography sx={{ fontSize: 18, fontWeight: "500" }}>
+                          {exam.examName}
+                        </Typography>
+                        <Typography className="days-more-left">
+                          <ScheduleIcon sx={{ fontSize: "12px" }} />{" "}
+                          {exam.remainingDays} days more
+                        </Typography>
+                      </Box>
+                      <Box className="exam-content-inner-div-2">
+                        <Typography sx={{ fontSize: 20, fontWeight: "500" }}>
+                          {exam.subjectName}
+                        </Typography>
+                        <Box>
+                          <EventIcon sx={{ fontSize: "20px" }} />{" "}
+                          {new Date(exam.examDate).toLocaleDateString("en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </Box>
+                      </Box>
+                      <Box className="exam-content-inner-div-2">
+                        <Typography sx={{ fontSize: 15, fontWeight: "500" }}>
+                          <ScheduleIcon />{" "}
+                          {convertTo12HourFormat(exam.startTime)} -{" "}
+                          {convertTo12HourFormat(exam.endTime)}
+                        </Typography>
+                        <Typography>Room No. {exam.roomNo}</Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                  <Box className="exam-content-inner-div-2">
-                    <Typography sx={{ fontSize: 15, fontWeight: "500" }}>
-                      <ScheduleIcon /> {convertTo12HourFormat(exam.startTime)} -{" "}
-                      {convertTo12HourFormat(exam.endTime)}
-                    </Typography>
-                    <Typography>Room No. {exam.RoomNo}</Typography>
-                  </Box>
-                </Box>
-              ))
-            )}
-          </Box>
+                  ))
+                )}
+              </Box>
+            </Box>
+          </div>
         </div>
       </div>
-
       <div className="d-flex row mt-4">
         <div className="col-xxl-7 d-flex">
           <div className="card flex-fill bg-white">
@@ -1012,64 +1223,117 @@ const StudentDashboard: React.FC = () => {
         </div>
         <div className="col-xxl-5 d-flex">
           <div className="card flex-fill bg-white">
-            <Box className={style.leave_status_header}>
+            <Box className={`card-header ${style.leave_status_header}`}>
               <h5 className={style.leave_status_heading}>Todo</h5>
-              <Box sx={{ display: "flex", gap: 1, color: "grey" }}>
-                <CalendarIcon />
-                <select className={style.leave_status_dropdown}>
-                  <option>This Week</option>
-                  <option>Today</option>
-                  <option>This Month</option>
-                </select>
-              </Box>
-            </Box>
-            <Typography
-              className={style.header_bottomline_typography}
-            ></Typography>
-            <Box sx={{ padding: 2, maxHeight: "355px", overflowY: "auto" }}>
               <Box
+                className="todo_calendar_div"
                 sx={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  gap: 1,
+                  width: "120px",
                   alignItems: "center",
+                  justifyContent: "center",
+                  color: "grey",
                 }}
               >
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <input type="checkbox" />
-                  <Box>
-                    <h6>Send reminder for homework</h6>
-                    <Typography
-                      sx={{
-                        color: "gray",
-                        fontSize: "0.8em",
-                        margin: 0,
-                        padding: 0,
-                      }}
-                    >
-                      01:00 PM
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box
-                  sx={{
-                    paddingRight: 1,
-                    paddingLeft: 1,
-                    borderRadius: "5px",
-                    backgroundColor: "rgba(26, 190, 23, 0.1)",
-                    color: "#1ABE17",
-                    fontWeight: "600",
-                    fontSize: "15px",
-                  }}
-                >
-                  Completed
-                </Box>
+                <AddCircleOutlineRounded
+                  onClick={() => setIsOpenAddTodoModal(true)}
+                />
+                <DatePicker
+                  selected={todoDate}
+                  onChange={(date: Date | null) => setTodoDate(date)}
+                  dateFormat="dd/MM/yyyy" // Display only month and year
+                  showDateSelect
+                  dropdownMode="select"
+                />
+                <CalendarIcon />
               </Box>
             </Box>
+            <Box
+              className="card-body"
+              sx={{ padding: 2, maxHeight: "355px", overflowY: "auto" }}
+            >
+              {studentTodoList && studentTodoList.length > 0 ? (
+                studentTodoList.map((todo) => (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 2,
+                    }}
+                    key={todo.todoId}
+                  >
+                    <Box sx={{ display: "flex", gap: 1 }}>
+                      <input
+                        type="checkbox"
+                        onChange={() => handleCheckboxChange(todo.todoId)}
+                        checked={selectedTodos.includes(todo.todoId)}
+                      />
+                      <Box>
+                        <h6>{todo.todoName}</h6>
+                        <Typography
+                          sx={{
+                            color: "gray",
+                            fontSize: "0.8em",
+                            margin: 0,
+                            padding: 0,
+                          }}
+                        >
+                          Date: {format(todo.todoDate, "dd MMM, yyyy")} ||{" "}
+                          {convertTo12HourFormat(todo.time)}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box
+                      sx={{
+                        paddingRight: 1,
+                        paddingLeft: 1,
+                        borderRadius: "5px",
+                        backgroundColor: "rgba(26, 190, 23, 0.1)",
+                        color: "#1ABE17",
+                        fontWeight: "600",
+                        fontSize: "15px",
+                      }}
+                    >
+                      {todo.status ? "Completed" : "Pending"}
+                    </Box>
+                  </Box>
+                ))
+              ) : (
+                <Typography className="d-flex align-items-center justify-content-center">
+                  No data found
+                </Typography>
+              )}
+            </Box>
+
+            {selectedTodos.length > 0 && (
+              <Box
+                sx={{
+                  marginTop: 2,
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "end",
+                  gap: 0.5,
+                }}
+              >
+                <button
+                  className={style.todo_status_btn}
+                  onClick={changeTodoStatus}
+                >
+                  Change Status
+                </button>
+                <button className={style.todo_delete_btn} onClick={DeleteTodo}>
+                  Delete
+                </button>
+              </Box>
+            )}
           </div>
         </div>
       </div>
-      <div className={style.faculties_main_div}>
-        <div className={style.faculties_header_div}>
+      <div className={`card ${style.faculties_main_div}`}>
+        <div className={`card-header ${style.faculties_header_div}`}>
           <h5>Class Faculties</h5>
           <Box sx={{ display: "flex", gap: 1 }}>
             <Box className={style.faculties_crousel_btns} onClick={handlePrev}>
@@ -1080,20 +1344,21 @@ const StudentDashboard: React.FC = () => {
             </Box>
           </Box>
         </div>
-        <Typography className={style.header_bottomline_typography}></Typography>
-        <Box className={style.slider_main_div}>
+        <Box className={`card-body ${style.slider_main_div}`}>
           <Slider ref={sliderRef} className={style.slider} {...settings}>
-            {[...Array(6)].map((_, index) => (
-              <Box className={style.slider_box} key={index}>
+            {faculties?.map((faculty) => (
+              <Box className={style.slider_box} key={faculty.facultyId}>
                 <Box sx={{ display: "flex", gap: 1 }}>
                   <img
-                    src={demoImage.src}
+                    src={faculty.imageUrl}
                     alt="demoImage"
                     style={{ width: "2.813rem", height: "2.813rem" }}
                   />
                   <Box>
-                    <h6 style={{ marginBottom: "0.2rem" }}>Daniel Josua</h6>
-                    <span style={{ color: "grey" }}>Spanish</span>
+                    <h6 style={{ marginBottom: "0.2rem" }}>
+                      {faculty.facultyFirstName} {faculty.facultyLastName}
+                    </h6>
+                    <span style={{ color: "grey" }}>{faculty.courseName}</span>
                   </Box>
                 </Box>
                 <Box
@@ -1131,58 +1396,52 @@ const StudentDashboard: React.FC = () => {
               backgroundColor: "white",
             }}
           >
-            <Box className={style.leave_status_header}>
+            <Box className={`card-header ${style.leave_status_header}`}>
               <h5 className={style.leave_status_heading}>Notice Board</h5>
-              <Box sx={{ display: "flex", gap: 1, fontWeight: "600" }}>
+              <Box
+                onClick={() => router.push("/student/allNotices")}
+                sx={{ display: "flex", gap: 1, fontWeight: "600" }}
+              >
                 View All
               </Box>
             </Box>
-            <Typography
-              className={style.header_bottomline_typography}
-            ></Typography>
-            <Box sx={{ overflowY: "auto", maxHeight: "300x" }}>
-              <Box>
-                <Box className={style.notice_board_main_box}>
-                  <Box className={style.notice_board_inner_box}>
-                    <Box className={style.notice_board_icon_box}>
-                      <BlockIcon sx={{ color: "red", fontSize: "15px" }} />
+            <Box className="p-0" sx={{ overflowY: "auto", maxHeight: "400px" }}>
+              {notices?.map((notice) => (
+                <Box
+                  onClick={() =>
+                    router.push(`/student/notice/${notice.noticeId}`)
+                  }
+                  key={notice.noticeId}
+                >
+                  <Box className={style.notice_board_main_box}>
+                    <Box className={style.notice_board_inner_box}>
+                      <Box
+                        sx={{ marginRight: "15px" }}
+                        className={style.notice_board_icon_box}
+                      >
+                        <img
+                          src={notice.imageUrl}
+                          alt="notice-board-img"
+                          width={20}
+                          height={20}
+                        />
+                      </Box>
+                      <Box>
+                        <h6>{notice.title}</h6>
+                        <Typography sx={{ fontSize: "15px", color: "grey" }}>
+                          <CalendarIcon
+                            sx={{ fontSize: "14px", marginRight: 0.5 }}
+                          />{" "}
+                          Date: {format(notice.date, "dd MMM, yyyy")}
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Box>
-                      <h6>New Syllabus Instructions</h6>
-                      <Typography sx={{ fontSize: "15px", color: "grey" }}>
-                        <CalendarIcon
-                          sx={{ fontSize: "14px", marginRight: 0.5 }}
-                        />{" "}
-                        Added On: 15 Jun 2025
-                      </Typography>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <ChevronRightIcon sx={{ color: "grey" }} />
                     </Box>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <ChevronRightIcon sx={{ color: "grey" }} />
                   </Box>
                 </Box>
-              </Box>
-              <Box>
-                <Box className={style.notice_board_main_box}>
-                  <Box className={style.notice_board_inner_box}>
-                    <Box className={style.notice_board_icon_box}>
-                      <BlockIcon sx={{ color: "red", fontSize: "15px" }} />
-                    </Box>
-                    <Box>
-                      <h6>New Syllabus Instructions</h6>
-                      <Typography sx={{ fontSize: "15px", color: "grey" }}>
-                        <CalendarIcon
-                          sx={{ fontSize: "14px", marginRight: 0.5 }}
-                        />{" "}
-                        Added On: 15 Jun 2025
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <ChevronRightIcon sx={{ color: "grey" }} />
-                  </Box>
-                </Box>
-              </Box>
+              ))}
             </Box>
           </Box>
         </div>
@@ -1193,60 +1452,43 @@ const StudentDashboard: React.FC = () => {
               backgroundColor: "white",
             }}
           >
-            <Box className={style.leave_status_header}>
+            <Box className={`card-header ${style.leave_status_header}`}>
               <h5 className={style.leave_status_heading}>Exam Result</h5>
               <Box sx={{ display: "flex", gap: 1, color: "grey" }}>
                 <CalendarIcon />
-                <select className={style.leave_status_dropdown}>
-                  <option>1st Quarter</option>
-                  <option>2st Quarter</option>
-                  <option>Half Yearly</option>
-                  <option>Model</option>
-                  <option>Finals</option>
+                <select
+                  className={style.leave_status_dropdown}
+                  value={examTypeId} // Bind value to examId state
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                    setExamTypeId(Number(e.target.value))
+                  }
+                >
+                  <option value={2}>1st Quarter</option>
+                  <option value={3}>2st Quarter</option>
+                  <option value={4}>Model</option>
+                  <option value={5}>Half Yearly</option>
+                  <option value={6}>Finals</option>
                 </select>
               </Box>
             </Box>
-            <Typography
-              className={style.header_bottomline_typography}
-            ></Typography>
-            <Box sx={{ padding: 2, height: "100%" }}>
+            <Box className="card-body" sx={{ padding: 2, height: "100%" }}>
               <Box className={style.Exam_result_marks_main_box}>
-                <Box
-                  className={style.Exam_result_marks_inner_box}
-                  sx={{
-                    backgroundColor: "#ebeffc",
-                    color: "#5a76e5",
-                  }}
-                >
-                  Mat : 100
-                </Box>
-                <Box
-                  className={style.Exam_result_marks_inner_box}
-                  sx={{
-                    backgroundColor: "rgba(26, 190, 23, 0.1)",
-                    color: "#1ABE17",
-                  }}
-                >
-                  Phy : 100
-                </Box>
-                <Box
-                  className={style.Exam_result_marks_inner_box}
-                  sx={{
-                    backgroundColor: "rgba(234, 179, 0, 0.1)",
-                    color: "#EAB300",
-                  }}
-                >
-                  Che : 100
-                </Box>
-                <Box
-                  className={style.Exam_result_marks_inner_box}
-                  sx={{
-                    backgroundColor: "rgba(232, 38, 70, 0.1)",
-                    color: "#E82646",
-                  }}
-                >
-                  Eng : 100
-                </Box>
+                {studentResult.map((result, index) => {
+                  const { subjectName, markObtained } = result;
+                  const colorStyle = colorStyles[index % colorStyles.length]; // This ensures the color cycles if there are more subjects than colors
+                  return (
+                    <Box
+                      key={result.resultId}
+                      className={style.Exam_result_marks_inner_box}
+                      sx={{
+                        backgroundColor: colorStyle.backgroundColor,
+                        color: colorStyle.color,
+                      }}
+                    >
+                      {subjectName}: {markObtained}
+                    </Box>
+                  );
+                })}
               </Box>
               <Box
                 sx={{ width: "100%", height: "100%", padding: 2, marginTop: 1 }}
@@ -1259,28 +1501,20 @@ const StudentDashboard: React.FC = () => {
             </Box>
           </Box>
         </div>
-        <div className="fees-reminder-main-div col-xxl-4 col-xl-6 d-flex">
+        <div className="fees-reminder-main-div col-xxl-4 d-flex">
           <Box
             className="card flex-fill"
             sx={{
               backgroundColor: "white",
             }}
           >
-            <Box className={style.leave_status_header}>
+            <Box className={`card-header ${style.leave_status_header}`}>
               <h5 className={style.leave_status_heading}>Fees Reminder</h5>
               <Box sx={{ display: "flex", gap: 1, fontWeight: "600" }}>
                 View All
               </Box>
             </Box>
-            <Typography
-              sx={{
-                marginTop: 1,
-                color: "white",
-                width: "100%",
-                borderBottom: "1px solid lightgrey",
-              }}
-            ></Typography>
-            <Box>
+            <Box className="card-body p-0">
               {[...Array(5)].map((_, index) => (
                 <Box sx={{ padding: 0 }} key={index}>
                   <Box className={style.fees_reminder_main_box}>
@@ -1315,6 +1549,18 @@ const StudentDashboard: React.FC = () => {
           </Box>
         </div>
       </div>
+      <AddEditExamCalanderModal
+        isOpen={isOpenExamAddEditCalender}
+        onClose={() => {
+          setIsOpenExamAddEditCalender(false);
+          setStudentExam(null);
+        }}
+        initialData={studentExam}
+      />
+      <AddStudentTodoList
+        isOpen={isOpenAddTodoModal}
+        onClose={() => setIsOpenAddTodoModal(false)}
+      />
     </>
   );
 };

@@ -12,13 +12,17 @@ import EventOutlinedIcon from "@mui/icons-material/EventOutlined";
 import PriceChangeOutlinedIcon from "@mui/icons-material/PriceChangeOutlined";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";
 import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import { format } from "date-fns";
+import { useStudentContext } from "@/utils/auth/Context/StudentProvider";
+import LoadingGif from "../../../public/Images/Animation.gif";
+
 type Props = {
   children: React.ReactNode;
 };
 const StudentDetailsLayout = ({ children }: Props) => {
   const router = useRouter();
   const { pathname } = router;
-
+  const { studentData, isLoading, error } = useStudentContext();
   const tabs = [
     {
       name: "Student Details",
@@ -63,6 +67,30 @@ const StudentDetailsLayout = ({ children }: Props) => {
     },
   ];
 
+  // useEffect(() => {
+  //   const fetchStudentDetails = async () => {
+  //     var studentId = parseInt(sessionStorage.getItem("UserId") ?? "0", 10);
+  //     const student: StudentDataProps | null = await GetStudentDetailsById(
+  //       studentId
+  //     );
+  //     if (student != null) {
+  //       setStudentData(student);
+  //     } else {
+  //       console.log("student not found ");
+  //       router.replace("/");
+  //     }
+  //   };
+  //   fetchStudentDetails();
+  // }, []);
+
+  if (isLoading)
+    return (
+      <Box className="loading-spinner">
+        <img src={LoadingGif.src} alt="loading-gif" />
+      </Box>
+    );
+  if (error) return <div>{error}</div>;
+
   return (
     <>
       <Head>
@@ -75,7 +103,7 @@ const StudentDetailsLayout = ({ children }: Props) => {
             className="col-xxl-3 col-xl-4"
             sx={{ position: "relative", overflow: "visible" }}
           >
-            <Box sx={{paddingBottom: 1 }}>
+            <Box sx={{ paddingBottom: 1 }}>
               <div className="card border-white ">
                 <Box
                   sx={{
@@ -85,8 +113,8 @@ const StudentDetailsLayout = ({ children }: Props) => {
                 >
                   <div className="d-flex align-items-center flex-wrap row-gap-3">
                     <Box className="me-3">
-                      <Image
-                        src={demoImage.src}
+                      <img
+                        src={studentData?.imageUrl ?? demoImage.src}
                         alt="profile-pic"
                         width={80}
                         height={80}
@@ -96,8 +124,12 @@ const StudentDetailsLayout = ({ children }: Props) => {
                       <span className="badge badge-soft-success d-inline-flex align-items-center mb-1">
                         • Active
                       </span>
-                      <h5>Kishan Dabhoya</h5>
-                      <p className="text-primary">456789</p>
+                      <h5>
+                        {studentData?.firstName} {studentData?.lastName}
+                      </h5>
+                      <p className="text-primary">
+                        {studentData?.studentId ?? "-"}
+                      </p>
                     </Box>
                   </div>
                 </Box>
@@ -105,27 +137,41 @@ const StudentDetailsLayout = ({ children }: Props) => {
                   <h5 className="mb-3">Basic Information</h5>
                   <dl className="row mb-0">
                     <dt className="col-6 text-dark mb-3">Roll No</dt>
-                    <dd className="col-6 mb-3">350123</dd>
+                    <dd className="col-6 mb-3">{studentData?.rollNo ?? "-"}</dd>
                     <dt className="col-6 text-dark mb-3">Gender</dt>
-                    <dd className="col-6 mb-3">Male</dd>
+                    <dd className="col-6 mb-3">
+                      {studentData?.gender == 1 ? "Male" : "Female"}
+                    </dd>
                     <dt className="col-6 className text-dark mb-3">
                       Date Of Birth
                     </dt>
-                    <dd className="col-6 mb-3">15 Jan 2008</dd>
+                    <dd className="col-6 mb-3">
+                      {studentData?.birthDate != null
+                        ? format(studentData?.birthDate, "dd MMM yyyy")
+                        : ""}
+                    </dd>
                     <dt className="col-6 className text-dark mb-3">
                       Blood Group
                     </dt>
-                    <dd className="col-6 mb-3">O +ve</dd>
+                    <dd className="col-6 mb-3">
+                      {studentData?.bloodGroup ?? "-"}
+                    </dd>
                     <dt className="col-6 className text-dark mb-3">Reigion</dt>
-                    <dd className="col-6 mb-3">Hindu</dd>
+                    <dd className="col-6 mb-3">
+                      {studentData?.reigion ?? "-"}
+                    </dd>
                     <dt className="col-6 className text-dark mb-3">Cast</dt>
-                    <dd className="col-6 mb-3">Patel</dd>
+                    <dd className="col-6 mb-3">{studentData?.caste ?? "-"}</dd>
                     <dt className="col-6 className text-dark mb-3">Category</dt>
-                    <dd className="col-6 mb-3">General</dd>
+                    <dd className="col-6 mb-3">
+                      {studentData?.category ?? "-"}
+                    </dd>
                     <dt className="col-6 className text-dark mb-3">
                       Mother Tongue
                     </dt>
-                    <dd className="col-6 mb-3">English</dd>
+                    <dd className="col-6 mb-3">
+                      {studentData?.motherTongue ?? "-"}
+                    </dd>
                   </dl>
                   <a
                     href="#"
@@ -148,7 +194,9 @@ const StudentDetailsLayout = ({ children }: Props) => {
                       <span className="text-dark className mb-1">
                         Phone Number
                       </span>
-                      <p className="mb-0">+1 46548 84498</p>
+                      <p className="mb-0">
+                        +91 {studentData?.mobileNumber ?? "-"}
+                      </p>
                     </div>
                   </div>
                   <div className="d-flex align-items-center">
@@ -159,7 +207,7 @@ const StudentDetailsLayout = ({ children }: Props) => {
                       <span className="text-dark className mb-1">
                         Email Address
                       </span>
-                      <p className="mb-0">jan@example.com</p>
+                      <p className="mb-0">{studentData?.email ?? "-"}</p>
                     </div>
                   </div>
                 </div>

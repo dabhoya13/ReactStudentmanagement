@@ -1,0 +1,28 @@
+wwwroot\Images\school_logo.png
+wwwroot\Uploads\FacultyImages\kishan.jpg
+wwwroot\Uploads\FacultyImages\Terasa.jpg
+wwwroot\Uploads\HodProfiles\Animation.gif
+wwwroot\Uploads\HodProfiles\image123.jpg
+wwwroot\Uploads\HodProfiles\img.jpeg
+wwwroot\Uploads\HodProfiles\img2.jpeg
+wwwroot\Uploads\HodProfiles\profile-image.jfif
+wwwroot\Uploads\NoticeImages\Animation.gif
+wwwroot\Uploads\NoticeImages\annual-Day.jpg
+wwwroot\Uploads\NoticeImages\Annual-Day-pic.jpg
+wwwroot\Uploads\NoticeImages\download (4).jfif
+wwwroot\Uploads\NoticeImages\mid-term-schedule.jfif
+wwwroot\Uploads\NoticeImages\painting_competition.jpg
+wwwroot\Uploads\NoticeImages\profile-image.jfif
+wwwroot\Uploads\ParentProfiles\kishan.jpg
+wwwroot\Uploads\ParentProfiles\studentimage.jpg
+wwwroot\Uploads\ParentProfiles\Terasa.jpg
+wwwroot\Uploads\PdfTemplate\PdfFooter.html
+wwwroot\Uploads\PdfTemplate\PdfHeader.html
+wwwroot\Uploads\PdfTemplate\PdfTemplate.html
+wwwroot\Uploads\StudentDocuments\1kishan-dabhoya-resume (1).pdf
+wwwroot\Uploads\StudentDocuments\1PDF_file_icon.svg.png
+wwwroot\Uploads\StudentDocuments\1Terasa.jpg
+wwwroot\Uploads\StudentProfiles\Animation.gif
+wwwroot\Uploads\StudentProfiles\default.png
+wwwroot\Uploads\StudentProfiles\profile-image.jfif
+wwwroot\Uploads\StudentProfiles\studentimage.jpg

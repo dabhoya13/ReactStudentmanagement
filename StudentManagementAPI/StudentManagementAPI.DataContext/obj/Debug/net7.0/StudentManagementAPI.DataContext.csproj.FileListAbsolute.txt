@@ -10,3 +10,4 @@ D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataCo
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\refint\StudentManagementAPI.DataContext.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.pdb
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\ref\StudentManagementAPI.DataContext.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI.DataContext\obj\Debug\net7.0\StudentManagementAPI.DataContext.sourcelink.json

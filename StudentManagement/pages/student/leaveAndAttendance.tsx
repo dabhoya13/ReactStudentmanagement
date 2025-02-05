@@ -8,16 +8,44 @@ import FirstPageRoundedIcon from "@mui/icons-material/FirstPageRounded";
 import LastPageRoundedIcon from "@mui/icons-material/LastPageRounded";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
 import FileOpenOutlinedIcon from "@mui/icons-material/FileOpenOutlined";
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
+import { StudentsLeave } from "@/utils/studentUtils/studentDashboard's";
+import LoadingGif from "../../public/Images/Animation.gif";
+import {
+  GetAllStudentsLeave,
+  GetStudentUsedLeaveCounts,
+  PaginationProps,
+  PaginationResponseProps,
+} from "@/utils/studentUtils/leaveAndAttendance's";
+import { format } from "date-fns";
+import { AddLeaveModal } from "@/utils/allModals/studentModals";
 const LeaveAttendanceDetails: React.FC = () => {
   const [page, setPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState<string | null>(null);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
-
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [studentLeaveData, setStudentLeaveData] =
+    useState<PaginationResponseProps>();
+  const [isOpenAddLeaveModal, setIsOpenAddLeaveModal] =
+    useState<boolean>(false);
+  const [totalLeaves, setTotalLeaves] = useState({
+    totalMedicalLeave: 0,
+    totalCasualLeave: 0,
+    totalMaternityLeave: 0,
+    totalPaternityLeave: 0,
+  });
+  const [leaveBalances, setLeaveBalances] = useState({
+    usedMedicalLeave: 0,
+    usedCasualLeave: 0,
+    usedMaternityLeave: 0,
+    usedPaternityLeave: 0,
+  });
+  const [isClientSide, setIsClientSide] = useState<boolean>(false);
+  const [studentId, setStudentId] = useState<number>(0);
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
@@ -37,8 +65,77 @@ const LeaveAttendanceDetails: React.FC = () => {
     setPage(0);
   };
 
+  useEffect(() => {
+    const fetchCounts = async () => {
+      const studentId = parseInt(sessionStorage.getItem("UserId") ?? "0", 10);
+      const leaveCounts: StudentsLeave | null = await GetStudentUsedLeaveCounts(
+        studentId
+      );
+      if (leaveCounts != null) {
+        console.log(leaveCounts);
+        setLeaveBalances({
+          usedMedicalLeave: leaveCounts.medicalLeaveCount,
+          usedCasualLeave: leaveCounts.casualLeaveCount,
+          usedMaternityLeave: leaveCounts.maternityLeaveCount,
+          usedPaternityLeave: leaveCounts.paternityLeaveCount,
+        });
+
+        setTotalLeaves({
+          totalMedicalLeave: leaveCounts.totalMedicalLeave,
+          totalCasualLeave: leaveCounts.totalCasualLeave,
+          totalMaternityLeave: leaveCounts.totalMaternityLeave,
+          totalPaternityLeave: leaveCounts.totalPaternityLeave,
+        });
+      }
+    };
+    fetchCounts();
+  }, []);
+
+  useEffect(() => {
+    const getStudentsData = async () => {
+      const studentId = parseInt(sessionStorage.getItem("UserId") ?? "0", 10);
+      setLoading(true);
+      const pagination: PaginationProps = {
+        PageSize: rowsPerPage,
+        SearchQuery: searchQuery,
+        StartIndex: page * rowsPerPage,
+        StudentId: studentId,
+      };
+
+      try {
+        const result = await GetAllStudentsLeave(pagination);
+        if (result != null) {
+          setStudentLeaveData(result);
+        }
+      } catch (error) {
+        console.error("Error fetching students data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getStudentsData();
+  }, [rowsPerPage, page, searchQuery]);
+
+  useEffect(() => {
+    setIsClientSide(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClientSide) {
+      const storedStudentId = sessionStorage.getItem("UserId");
+      // Parse the studentId and set it in state
+      setStudentId(parseInt(storedStudentId ?? "0", 10));
+    }
+  }, [isClientSide]);
+
   return (
     <StudentDetailsLayout>
+      {loading && (
+        <Box className="loading-spinner">
+          <img src={LoadingGif.src} alt="loading-gif" />
+        </Box>
+      )}
       <div className="card mb-3">
         <div className="card-body ">
           <ul
@@ -79,10 +176,18 @@ const LeaveAttendanceDetails: React.FC = () => {
             <div className="col-lg-6 col-xxl-3 d-flex">
               <div className="card flex-fill">
                 <div className="card-body">
-                  <h5 className="mb-2">Medical Leave (10) </h5>
+                  <h5 className="mb-2">
+                    Medical Leave ({totalLeaves.totalMedicalLeave}){" "}
+                  </h5>
                   <div className="d-flex align-items-center flex-wrap">
-                    <p className="border-end pe-2 me-2 mb-0">Used : 5</p>
-                    <p className="mb-0">Available : 5</p>
+                    <p className="border-end pe-2 me-2 mb-0">
+                      Used : {leaveBalances.usedMedicalLeave}
+                    </p>
+                    <p className="mb-0">
+                      Available :{" "}
+                      {totalLeaves.totalMedicalLeave -
+                        leaveBalances.usedMedicalLeave}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -90,10 +195,18 @@ const LeaveAttendanceDetails: React.FC = () => {
             <div className="col-lg-6 col-xxl-3 d-flex">
               <div className="card flex-fill">
                 <div className="card-body">
-                  <h5 className="mb-2">Casual Leave (12) </h5>
+                  <h5 className="mb-2">
+                    Casual Leave ({totalLeaves.totalCasualLeave}){" "}
+                  </h5>
                   <div className="d-flex align-items-center flex-wrap">
-                    <p className="border-end pe-2 me-2 mb-0">Used : 5</p>
-                    <p className="mb-0">Available : 7</p>
+                    <p className="border-end pe-2 me-2 mb-0">
+                      Used : {leaveBalances.usedCasualLeave}
+                    </p>
+                    <p className="mb-0">
+                      Available :{" "}
+                      {totalLeaves.totalCasualLeave -
+                        leaveBalances.usedCasualLeave}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -101,10 +214,18 @@ const LeaveAttendanceDetails: React.FC = () => {
             <div className="col-lg-6 col-xxl-3 d-flex">
               <div className="card flex-fill">
                 <div className="card-body">
-                  <h5 className="mb-2">Maternity Leave (10) </h5>
+                  <h5 className="mb-2">
+                    Maternity Leave ({totalLeaves.totalMaternityLeave}){" "}
+                  </h5>
                   <div className="d-flex align-items-center flex-wrap">
-                    <p className="border-end pe-2 me-2 mb-0">Used : 0</p>
-                    <p className="mb-0">Available : 10</p>
+                    <p className="border-end pe-2 me-2 mb-0">
+                      Used : {leaveBalances.usedMaternityLeave}
+                    </p>
+                    <p className="mb-0">
+                      Available :{" "}
+                      {totalLeaves.totalMaternityLeave -
+                        leaveBalances.usedMaternityLeave}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -112,10 +233,18 @@ const LeaveAttendanceDetails: React.FC = () => {
             <div className="col-lg-6 col-xxl-3 d-flex">
               <div className="card flex-fill">
                 <div className="card-body">
-                  <h5 className="mb-2">Paternity Leave (0) </h5>
+                  <h5 className="mb-2">
+                    Paternity Leave ({totalLeaves.totalPaternityLeave}){" "}
+                  </h5>
                   <div className="d-flex align-items-center flex-wrap">
-                    <p className="border-end pe-2 me-2 mb-0">Used : 0 </p>
-                    <p className="mb-0">Available : 0</p>
+                    <p className="border-end pe-2 me-2 mb-0">
+                      Used : {leaveBalances.usedPaternityLeave}{" "}
+                    </p>
+                    <p className="mb-0">
+                      Available :{" "}
+                      {totalLeaves.totalPaternityLeave -
+                        leaveBalances.usedPaternityLeave}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -128,6 +257,7 @@ const LeaveAttendanceDetails: React.FC = () => {
             <div className="card-body p-0 py-3">
               <Box className="d-flex align-items-center justify-content-between mb-3 ms-2 me-2">
                 <TextField
+                  onKeyUp={handleSearch}
                   sx={{ backgroundColor: "white" }}
                   size="small"
                   variant="outlined"
@@ -142,7 +272,7 @@ const LeaveAttendanceDetails: React.FC = () => {
                   }}
                 />
                 <a
-                  href="#"
+                  onClick={() => setIsOpenAddLeaveModal(true)}
                   data-bs-target="#apply_leave"
                   data-bs-toggle="modal"
                   className="btn btn-primary d-inline-flex align-items-center gap-2 mt-1"
@@ -166,29 +296,44 @@ const LeaveAttendanceDetails: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>Casual Leave</td>
-                      <td>07 May 2024</td>
-                      <td>1</td>
-                      <td>06 May 2024</td>
-                      <td>
-                        <span className="badge badge-soft-success d-inline-flex align-items-center">
-                          • Approved
-                        </span>
-                      </td>
-                    </tr>
+                    {studentLeaveData?.studentsLeave.map((row) => (
+                      <tr>
+                        <td>{row.leaveTypeName}</td>
+                        <td>{format(row.leaveDate, "dd MMM yyyy")}</td>
+                        <td>{row.numberOfDays}</td>
+                        <td>{format(row.createdDate, "dd MMM yyyy")}</td>
+                        <td>
+                          {row.leaveStatus === 1 ? (
+                            <span className="badge badge-soft-pending d-inline-flex align-items-center">
+                              • Pending
+                            </span>
+                          ) : row.leaveStatus === 2 ? (
+                            <span className="badge badge-soft-success d-inline-flex align-items-center">
+                              • Approved
+                            </span>
+                          ) : (
+                            <span className="badge badge-soft-success d-inline-flex align-items-center">
+                              • Rejected
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                   <tfoot>
                     <tr>
                       <CustomTablePagination
                         rowsPerPageOptions={[
-                          2,
+                          5,
                           10,
                           25,
-                          { label: "All", value: 10 },
+                          {
+                            label: "All",
+                            value: studentLeaveData?.totalItems ?? 0,
+                          },
                         ]}
                         // colSpan={3}
-                        count={10}
+                        count={studentLeaveData?.totalItems ?? 0}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         slotProps={{
@@ -387,6 +532,11 @@ const LeaveAttendanceDetails: React.FC = () => {
           </div>
         </div>
       </div>
+      <AddLeaveModal
+        isOpen={isOpenAddLeaveModal}
+        onClose={() => setIsOpenAddLeaveModal(false)}
+        studentId={studentId}
+      />
     </StudentDetailsLayout>
   );
 };

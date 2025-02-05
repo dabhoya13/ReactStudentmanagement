@@ -74,7 +74,6 @@ D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\De
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\staticwebassets.build.json
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\staticwebassets.development.json
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\scopedcss\bundle\StudentManagementAPI.styles.css
-D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.csproj.CopyComplete
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\refint\StudentManagementAPI.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.pdb
@@ -110,3 +109,9 @@ D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\bin\De
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\bin\Debug\net7.0\Hl7.Fhir.Base.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\bin\Debug\net7.0\Hl7.Fhir.Conformance.dll
 D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\bin\Debug\net7.0\Hl7.Fhir.R4.dll
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\bin\Debug\net7.0\StudentManagementAPI.staticwebassets.endpoints.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentManagementAPI.sourcelink.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\staticwebassets.build.endpoints.json
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\staticwebassets\msbuild.StudentManagementAPI.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\StudentM.EBBAD0FE.Up2Date
+D:\StudentManagementSystemReact\StudentManagementAPI\StudentManagementAPI\obj\Debug\net7.0\staticwebassets.upToDateCheck.txt

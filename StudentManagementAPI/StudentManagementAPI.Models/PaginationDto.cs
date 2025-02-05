@@ -17,6 +17,8 @@ namespace StudentManagementAPI.Models
         public string? OrderBy { get; set; } = null;
 
         public string? OrderDirection { get; set; } = null;
+
+        public int StudentId { get; set; }
     }
 
     public class ExportPdfViewModel

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getUserFromToken } from "../../utils/auth/auth";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
+import LoadingGif from "../../public/Images/Animation.gif";
 import {
   AddTodayAttendance,
   GetAttendanceDetails,
@@ -45,6 +46,7 @@ const Attendance: React.FC = () => {
       router.replace("/login");
     }
   }, [router]);
+  const [loading, setLoading] = useState<Boolean>(false);
 
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -152,6 +154,7 @@ const Attendance: React.FC = () => {
   };
 
   const submitAttendance = async () => {
+    setLoading(true);
     var studentId = parseInt(sessionStorage.getItem("UserId") ?? "0", 10);
     if (studentId != 0) {
       var todayDate = new Date();
@@ -177,6 +180,7 @@ const Attendance: React.FC = () => {
           setFillAttendanceText("Attendance Filled Successfully");
         }
       }
+      setLoading(false);
     } else {
       router.replace("/");
     }
@@ -199,6 +203,11 @@ const Attendance: React.FC = () => {
 
   return (
     <div>
+      {loading && (
+        <Box className="loading-spinner">
+          <img src={LoadingGif.src} alt="loading-gif" />
+        </Box>
+      )}
       <h2>Attendance</h2>
       <hr style={{ width: "100%", border: "3px solid black" }} />
 
@@ -246,9 +255,12 @@ const Attendance: React.FC = () => {
           </Box>
         </Box>
         <Box sx={{ marginTop: 5, color: "green" }}>{fillAttendanceText}</Box>
-        <Box className={style.attendance_table_header}
-        >
-          {new Date(selectedYear,selectedMonth-1).toLocaleDateString('default',{month:"long"})}-{selectedYear}
+        <Box className={style.attendance_table_header}>
+          {new Date(selectedYear, selectedMonth - 1).toLocaleDateString(
+            "default",
+            { month: "long" }
+          )}
+          -{selectedYear}
         </Box>
       </Box>
 

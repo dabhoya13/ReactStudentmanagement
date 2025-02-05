@@ -119,7 +119,7 @@ namespace StudentManagementAPI.Controllers
                 }
 
             }
-            catch (Exception ex)
+                catch (Exception ex)
             {
                 _response.ErroMessages = new List<string>() { ex.Message.ToString() };
                 _response.StatusCode = HttpStatusCode.InternalServerError;

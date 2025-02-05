@@ -5,8 +5,28 @@
       "PackagePath": "staticwebassets\\Images\\school_logo.png"
     },
     {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\FacultyImages\\Terasa.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\FacultyImages\\Terasa.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\FacultyImages\\kishan.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\FacultyImages\\kishan.jpg"
+    },
+    {
       "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\Animation.gif",
       "PackagePath": "staticwebassets\\Uploads\\HodProfiles\\Animation.gif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\image123.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\HodProfiles\\image123.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\img.jpeg",
+      "PackagePath": "staticwebassets\\Uploads\\HodProfiles\\img.jpeg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\img2.jpeg",
+      "PackagePath": "staticwebassets\\Uploads\\HodProfiles\\img2.jpeg"
     },
     {
       "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\HodProfiles\\profile-image.jfif",
@@ -41,6 +61,18 @@
       "PackagePath": "staticwebassets\\Uploads\\NoticeImages\\profile-image.jfif"
     },
     {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\ParentProfiles\\Terasa.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\ParentProfiles\\Terasa.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\ParentProfiles\\kishan.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\ParentProfiles\\kishan.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\ParentProfiles\\studentimage.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\ParentProfiles\\studentimage.jpg"
+    },
+    {
       "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\PdfTemplate\\PdfFooter.html",
       "PackagePath": "staticwebassets\\Uploads\\PdfTemplate\\PdfFooter.html"
     },
@@ -53,6 +85,18 @@
       "PackagePath": "staticwebassets\\Uploads\\PdfTemplate\\PdfTemplate.html"
     },
     {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentDocuments\\1PDF_file_icon.svg.png",
+      "PackagePath": "staticwebassets\\Uploads\\StudentDocuments\\1PDF_file_icon.svg.png"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentDocuments\\1Terasa.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\StudentDocuments\\1Terasa.jpg"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentDocuments\\1kishan-dabhoya-resume (1).pdf",
+      "PackagePath": "staticwebassets\\Uploads\\StudentDocuments\\1kishan-dabhoya-resume (1).pdf"
+    },
+    {
       "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentProfiles\\Animation.gif",
       "PackagePath": "staticwebassets\\Uploads\\StudentProfiles\\Animation.gif"
     },
@@ -63,6 +107,14 @@
     {
       "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentProfiles\\profile-image.jfif",
       "PackagePath": "staticwebassets\\Uploads\\StudentProfiles\\profile-image.jfif"
+    },
+    {
+      "Id": "D:\\StudentManagementSystemReact\\StudentManagementAPI\\StudentManagementAPI\\wwwroot\\Uploads\\StudentProfiles\\studentimage.jpg",
+      "PackagePath": "staticwebassets\\Uploads\\StudentProfiles\\studentimage.jpg"
+    },
+    {
+      "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.StudentManagementAPI.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },
     {
       "Id": "obj\\Debug\\net7.0\\staticwebassets\\msbuild.StudentManagementAPI.Microsoft.AspNetCore.StaticWebAssets.props",

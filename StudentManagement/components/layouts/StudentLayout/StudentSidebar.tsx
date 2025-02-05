@@ -12,11 +12,18 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { useState } from "react";
 import logoImage from "../../../public/Images/logo2.svg";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import AddTaskIcon from '@mui/icons-material/AddTask';
+import AddTaskIcon from "@mui/icons-material/AddTask";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import { useRouter } from "next/router";
 import Image from "next/image";
-
+import AssuredWorkloadOutlinedIcon from "@mui/icons-material/AssuredWorkloadOutlined";
+import DocumentScannerOutlinedIcon from "@mui/icons-material/DocumentScannerOutlined";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import LocalLibraryOutlinedIcon from "@mui/icons-material/LocalLibraryOutlined";
+import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
+import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
+import { BookOnlineOutlined } from "@mui/icons-material";
 const drawerWidth = 240;
 interface Props {
   /**
@@ -27,7 +34,7 @@ interface Props {
 }
 const StudentSidebar: React.FC = (props: Props) => {
   const { window } = props;
-  const router  = useRouter();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
 
@@ -60,7 +67,7 @@ const StudentSidebar: React.FC = (props: Props) => {
     <div className="sidebar-main-div">
       {/* <Toolbar /> */}
       <div className="logo-div">
-        <Image width={100} height={35} src={logoImage}  alt="logo" />
+        <Image width={100} height={35} src={logoImage} alt="logo" />
       </div>
 
       <Box sx={{ display: "flex", flexDirection: "column", height: "90vh" }}>
@@ -93,6 +100,97 @@ const StudentSidebar: React.FC = (props: Props) => {
             <ListItemButton className="list-items-btn">
               <AddTaskIcon />
               <ListItemText primary="Attendance" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              router.pathname === "/student/studentDetails" ||
+              router.pathname === "/student/timeTable"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/studentDetails")}
+          >
+            <ListItemButton className="list-items-btn">
+              <SchoolOutlinedIcon />
+              <ListItemText primary="StudentDetails" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              router.pathname === "/student/examAndResult"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/examAndResult")}
+          >
+            <ListItemButton className="list-items-btn">
+              <CalendarMonthOutlinedIcon />
+              <ListItemText primary="Exam & Result" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              router.pathname === "/student/library"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/library")}
+          >
+            <ListItemButton className="list-items-btn">
+              <LocalLibraryOutlinedIcon />
+              <ListItemText primary="Library" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              router.pathname === "/student/leaveAndAttendance"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/leaveAndAttendance")}
+          >
+            <ListItemButton className="list-items-btn">
+              <EventAvailableOutlinedIcon />
+              <ListItemText primary="Leaves" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              router.pathname === "/student/studentFees"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/studentFees")}
+          >
+            <ListItemButton className="list-items-btn">
+              <AssuredWorkloadOutlinedIcon />
+              <ListItemText primary="Fees" />
+            </ListItemButton>
+          </ListItem>
+
+          <ListItem
+            className={
+              router.pathname === "/student/allNotices"
+                ? "list-items selected"
+                : "list-items"
+            }
+            disablePadding
+            onClick={() => handleItemClick("/student/allNotices")}
+          >
+            <ListItemButton className="list-items-btn">
+              <StickyNote2OutlinedIcon />
+              <ListItemText primary="AllNotices" />
             </ListItemButton>
           </ListItem>
         </List>
